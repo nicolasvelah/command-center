@@ -2,25 +2,18 @@ import React from 'react'
 import { isLoggedIn } from '../services/auth'
 import { navigate } from 'gatsby'
 
-import Layout from '../components/layout'
-
 const IndexPage = () => {
   if (!isLoggedIn()) {
-    navigate(`/app/login`)
+    if (typeof window !== 'undefined') {
+      navigate(`/app/login`)
+    }
+  } else {
+    if (typeof window !== 'undefined') {
+      navigate(`/app/board`)
+    }
   }
-  return (
-    <Layout>
-      <div>
-        {isLoggedIn() ? (
-          <>
-            <h1>Bienvenidos al Centro de Comando PAS HQ.</h1>
-          </>
-        ) : (
-          ''
-        )}
-      </div>
-    </Layout>
-  )
+
+  return <div />
 }
 
 export default IndexPage

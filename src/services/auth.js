@@ -1,4 +1,5 @@
 const axios = require('axios')
+const { navigate } = require('gatsby')
 
 export const isBrowser = () => typeof window !== 'undefined'
 
@@ -9,11 +10,12 @@ export const getUser = () =>
 
 const setUser = user => {
   window.localStorage.setItem('gatsbyUser', JSON.stringify(user))
+  navigate(`/`)
 }
 
 export const handleLogin = async ({ username, password }) => {
   try {
-    const response = await axios.post(`${process.env.API_URL}/api/v1/login`, {
+    const response = await axios.post(`${process.env.API_URL}/login`, {
       email: username,
       password: password,
     })
@@ -29,7 +31,7 @@ export const handleLogin = async ({ username, password }) => {
 }
 const getUserData = async token => {
   axios
-    .get(`${process.env.API_URL}/api/v1/me`, {
+    .get(`${process.env.API_URL}/me`, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'x-access-token': token,

@@ -4,38 +4,51 @@ import { StaticQuery, graphql } from 'gatsby'
 
 import Header from './header'
 import NavBar from './navBar'
-import './layout.css'
+import '../assets/css/Layout.css'
+import { isLoggedIn } from '../services/auth'
+import {
+  initializeFirebase,
+  askForPermissioToReceiveNotifications,
+} from '../services/push-notification'
 
-const Layout = ({ children }) => (
-  <StaticQuery
-    query={graphql`
-      query SiteTitleQuery {
-        site {
-          siteMetadata {
-            title
+const initFirebase = async () => {
+  await initializeFirebase()
+  askForPermissioToReceiveNotifications()
+}
+
+const Layout = ({ children }) => {
+  if (isLoggedIn()) {
+    initFirebase()
+  }
+  return (
+    <StaticQuery
+      query={graphql`
+        query SiteTitleQuery {
+          site {
+            siteMetadata {
+              title
+            }
           }
         }
-      }
-    `}
-    render={data => (
-      <>
-        <Header siteTitle={data.site.siteMetadata.title} />
-        <div
-          style={{
-            margin: '0 auto',
-            maxWidth: 960,
-            padding: '0px 1.0875rem 1.45rem',
-            paddingTop: 0,
-          }}
-        >
-          <NavBar />
-          {children}
-        </div>
-      </>
-    )}
-  />
-)
-
+      `}
+      render={data => (
+        <>
+          <Header siteTitle={data.site.siteMetadata.title} />
+          <div
+            style={{
+              margin: '0 auto',
+              padding: '0px 1.0875rem 1.45rem',
+              paddingTop: 0,
+            }}
+          >
+            <NavBar />
+            {children}
+          </div>
+        </>
+      )}
+    />
+  )
+}
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
 }

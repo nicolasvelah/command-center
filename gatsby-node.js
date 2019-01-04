@@ -11,7 +11,20 @@ exports.onCreatePage = async ({ page, actions }) => {
     createPage(page)
   }
 }
-
+exports.onCreateWebpackConfig = ({ actions, stage }) => {
+  if (stage === 'build-html') {
+    actions.setWebpackConfig({
+      module: {
+        rules: [
+          {
+            test: /firebase/,
+            use: ['null-loader'],
+          },
+        ],
+      },
+    })
+  }
+}
 require('dotenv').config({
   path: `.env.${process.env.NODE_ENV}`,
 })

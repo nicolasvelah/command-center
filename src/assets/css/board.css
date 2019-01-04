@@ -1,0 +1,96 @@
+.board {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.b-column {
+  width: 23%;
+  margin: 20px 1%;
+  padding: 10px;
+  background-color: #eaeaea;
+  min-height: 100px;
+  border-radius: 5px;
+}
+.column-header {
+  text-transform: uppercase;
+  font-size: 15px;
+}
+.b-row {
+  min-height: 50px;
+  border: 1px dotted #ccc;
+  margin: 5px 0 0;
+  padding: 5px;
+}
+.b-row .column-header {
+  padding: 0px 3px;
+  font-size: 11px;
+}
+.task {
+  margin: 5px 0 0;
+  background: #fff;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+.live .task {
+  background: #ecffe1;
+}
+.standby .task {
+  background: #fcd0d0;
+}
+.complete .task {
+  background: #dedede;
+  color: #aaaaaa;
+}
+.asigned .task {
+  background: #f9f6dc;
+}
+.task-header {
+  display: flex;
+  flex-direction: row;
+  height: 25px;
+}
+.task h3 {
+  font-weight: normal;
+  font-size: 14px;
+  width: 75%;
+  margin: 0px;
+  padding-left: 5px;
+}
+.task img {
+  pointer-events: none;
+}
+.category-icon {
+  text-align: left;
+}
+.category-icon img {
+  max-width: 30px;
+  width: 100%;
+}
+.task-data {
+  font-size: 11px;
+  line-height: normal;
+  margin-bottom: 5px;
+}
+.operator {
+  position: relative;
+}
+.dropdownOperatorData {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: -50%;
+  background: #fff;
+  border: 1px solid #dedede;
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 11px;
+  line-height: normal;
+  min-width: 200px;
+}
+.operator:hover .dropdownOperatorData {
+  display: block;
+}
+.operator a {
+  float: left;
+}
