@@ -3,11 +3,9 @@ import axios from 'axios'
 import { getUser } from '../services/auth'
 import Select, { Async } from 'react-select'
 import styled from 'styled-components'
+import MapServiceLocator from './MapServiceLocator'
 
 const StyledAutocomplete = styled(Async)`
-  width: 87%;
-  float: left;
-
   .Select-control {
     border: solid 1px ${props => props.theme.gray};
     border-radius: 0 !important;
@@ -59,14 +57,20 @@ export default class CreateTask extends Component {
       isLoading: false,
       operators: [],
       categories: [],
+      services: [],
+      providers: [],
+      servicesShow: false,
+      providerShow: false,
+      mapShow: false,
     }
   }
 
   componentDidMount() {
     this.getOperators()
+    this.getCategories()
   }
 
-  getOptions = (inputValue, callback) => {
+  getClient = (inputValue, callback) => {
     //this.setState({ isLoading: true })
     if (!this.state.isLoading && inputValue) {
       let options = []
@@ -103,7 +107,6 @@ export default class CreateTask extends Component {
     }
     return
   }
-
   getOperators = async () => {
     const data = await axios
       .post(
@@ -117,8 +120,6 @@ export default class CreateTask extends Component {
         }
       )
       .then(async result => {
-        console.log('Operatorts')
-        console.log(result)
         const options = await result.data.users.map(user => {
           return { id: user.id, label: user.name, value: user.id }
         })
@@ -131,7 +132,87 @@ export default class CreateTask extends Component {
 
     return data
   }
+  getCategories = async () => {
+    const data = await axios
+      .get(
+        `${process.env.API_URL}/categories`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      .then(async result => {
+        const options = await result.data.categories.map(category => {
+          return { id: category.id, label: category.name, value: category.id }
+        })
 
+        this.setState({ categories: options })
+      })
+      .catch(er => {
+        console.log(er)
+      })
+
+    return data
+  }
+  getServices = async id => {
+    const data = await axios
+      .get(
+        `${process.env.API_URL}/services/` + id,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      .then(async result => {
+        const options = await result.data.services.map(service => {
+          return { id: service.id, label: service.name, value: service.id }
+        })
+
+        this.setState({ services: options })
+      })
+      .catch(er => {
+        console.log(er)
+      })
+
+    return data
+  }
+  getProvider = async id => {
+    const data = await axios
+      .get(
+        `${process.env.API_URL}/providers/` + id,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      .then(async result => {
+        console.log('Proiveedores')
+        console.log(result)
+        const options = await result.data.providers.map(provider => {
+          return {
+            id: provider.id,
+            label: provider.Provider.busnessName,
+            value: provider.id,
+          }
+        })
+
+        this.setState({ providers: options })
+      })
+      .catch(er => {
+        console.log(er)
+      })
+
+    return data
+  }
   handleTypeInputSearch = inputValue => {
     if (this.state.firstTyping) {
       this.setState({ firstTyping: false })
@@ -140,24 +221,36 @@ export default class CreateTask extends Component {
       this.setState({ keyWord: inputValue })
     }
   }
-
   handleAutoCompleteChange = async option => {
     if (option) {
-      await this.setState({ keyWord: option.label })
+      await this.setState({
+        keyWord: option.label,
+        mapShow: true,
+        clientId: option.value,
+      })
     } else {
       await this.setState({ keyWord: '' })
     }
 
     return option.label
   }
+  handleCategioryChange = async option => {
+    this.getServices(option.value)
+    this.setState({ servicesShow: true, providerShow: false })
+  }
+  handleServiceChange = async option => {
+    this.getProvider(option.value)
+    this.setState({ providerShow: true })
+  }
 
   render() {
     return (
       <form>
-        Formulario de tareas
+        <h1>Nueva Taréa</h1>
         <Select
           className="basic-single"
-          classNamePrefix="Busca Operador"
+          classNamePrefix="operator"
+          placeholder="Operador"
           isClearable={true}
           isSearchable={true}
           name="operator"
@@ -177,19 +270,53 @@ export default class CreateTask extends Component {
           inputProps={{ autoComplete: 'on' }}
           isLoading={this.state.isLoading}
           cache={false}
-          loadOptions={this.getOptions}
+          loadOptions={this.getClient}
           loadingPlaceholder="Buscando..."
           searchPromptText="Escriba una frase o palabra para realizar una búsqueda"
           ignoreAccents={false}
         />
         <Select
           className="basic-single"
-          classNamePrefix="Busca Categoría"
+          classNamePrefix="category"
+          placeholder="Categoría"
           isClearable={true}
           isSearchable={true}
           name="category"
+          onChange={this.handleCategioryChange}
           options={this.state.categories}
         />
+        {this.state.servicesShow ? (
+          <Select
+            className="basic-single"
+            classNamePrefix="services"
+            placeholder="Servicios"
+            isClearable={true}
+            isSearchable={true}
+            name="services"
+            onChange={this.handleServiceChange}
+            options={this.state.services}
+          />
+        ) : (
+          ''
+        )}
+        {this.state.providerShow ? (
+          <Select
+            className="basic-single"
+            classNamePrefix="provider"
+            placeholder="Proiveedor"
+            isClearable={true}
+            isSearchable={true}
+            name="provider"
+            options={this.state.providers}
+          />
+        ) : (
+          ''
+        )}
+        {this.state.mapShow ? (
+          <MapServiceLocator userId={this.state.clientId} />
+        ) : (
+          ''
+        )}
       </form>
     )
   }
