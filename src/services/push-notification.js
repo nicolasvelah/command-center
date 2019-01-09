@@ -22,20 +22,19 @@ export const askForPermissioToReceiveNotifications = async () => {
     await messaging.requestPermission()
     const token = await messaging.getToken()
     console.log('token do usuário:', token)
-    const data = { token: token }
 
-    await axios.post(`${process.env.API_URL}/updateToken`, data, {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
-      },
-    })
-
-    messaging.onMessage(function(payload) {
-      console.log('Message received. ', payload)
-    })
-
-    return token
+    await axios.post(
+      `${process.env.API_URL}/updateToken`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': getUser().token,
+          token: token,
+        },
+      }
+    )
+    return messaging
   } catch (error) {
     console.error(error)
   }

@@ -32,19 +32,23 @@
   border-radius: 5px;
   padding: 5px 10px;
 }
+.asigned .task {
+  background: #fff;
+}
 .live .task {
   background: #ecffe1;
 }
 .standby .task {
+  background: #f9f6dc;
+}
+.notresponse .task {
   background: #fcd0d0;
 }
 .complete .task {
   background: #dedede;
   color: #aaaaaa;
 }
-.asigned .task {
-  background: #f9f6dc;
-}
+
 .task-header {
   display: flex;
   flex-direction: row;
@@ -75,6 +79,18 @@
 .operator {
   position: relative;
 }
+.operator span {
+  text-transform: uppercase;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  background: #dedede;
+  display: block;
+  text-align: center;
+  font-size: 15px;
+  padding-top: 2px;
+  color: #999;
+}
 .dropdownOperatorData {
   display: none;
   position: absolute;
@@ -93,4 +109,15 @@
 }
 .operator a {
   float: left;
+}
+
+.column-footer {
+  margin-top: 20px;
+  text-align: right;
+}
+.column-footer button {
+  border: none;
+  padding: 5px 20px;
+  background: #026aa7;
+  color: #fff;
 }

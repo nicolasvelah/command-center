@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    title: 'Command Center',
+    title: 'Pas - Command Center',
     description: 'Pas HQ Command Center',
     author: '@pashqdevteam',
   },
