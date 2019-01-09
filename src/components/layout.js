@@ -5,7 +5,7 @@ import axios from 'axios'
 
 import Header from './header'
 import NavBar from './navBar'
-import '../assets/css/Layout.css'
+import '../assets/css/layout.css'
 import { isLoggedIn } from '../services/auth'
 import { getUser } from '../services/auth'
 import { initializeFirebase } from '../services/push-notification'
