@@ -1,4 +1,5 @@
 module.exports = {
+  pathPrefix: `/`,
   siteMetadata: {
     title: 'Pas - Command Center',
     description: 'Pas HQ Command Center',

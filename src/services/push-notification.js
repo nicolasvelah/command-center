@@ -8,11 +8,11 @@ export const initializeFirebase = () => {
     firebase.initializeApp({
       messagingSenderId: process.env.FB_SENDER_ID,
     })
-    /*navigator.serviceWorker
+    navigator.serviceWorker
       .register('./firebase-messaging-sw.js')
       .then(registration => {
         firebase.messaging().useServiceWorker(registration)
-      })*/
+      })
   }
 }
 
