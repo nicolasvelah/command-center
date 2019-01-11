@@ -108,29 +108,34 @@ export default class CreateTask extends Component {
     return
   }
   getOperators = async () => {
-    const data = await axios
-      .post(
-        `${process.env.API_URL}/getOperators`,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
-          },
-        }
-      )
-      .then(async result => {
-        const options = await result.data.users.map(user => {
-          return { id: user.id, label: user.name, value: user.id }
+    try {
+      const data = await axios
+        .post(
+          `${process.env.API_URL}/getOperators`,
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': getUser().token,
+            },
+          }
+        )
+        .then(async result => {
+          const options = await result.data.users.map(user => {
+            return { id: user.id, label: user.name, value: user.id }
+          })
+
+          this.setState({ operators: options })
+        })
+        .catch(er => {
+          console.log(er)
         })
 
-        this.setState({ operators: options })
-      })
-      .catch(er => {
-        console.log(er)
-      })
-
-    return data
+      return data
+    } catch (err) {
+      console.log(err.message)
+      return []
+    }
   }
   getCategories = async () => {
     const data = await axios

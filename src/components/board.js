@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getUser } from '../services/auth'
+import { getUser, logout } from '../services/auth'
 import { Link } from 'gatsby'
 
 import axios from 'axios'
@@ -57,20 +57,25 @@ export default class Board extends Component {
 
   //TASKS
   getMyTasks = async () => {
-    const tasks = await axios.post(
-      `${process.env.API_URL}/orders/getOrders`,
-      {},
-      {
-        headers: {
-          'x-access-token': getUser().token,
-        },
-      }
-    )
-    this.setState({
-      tasks: tasks.data.tasks,
-    })
+    try {
+      const tasks = await axios.post(
+        `${process.env.API_URL}/orders/getOrders`,
+        {},
+        {
+          headers: {
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      this.setState({
+        tasks: tasks.data.tasks,
+      })
+    } catch (err) {
+      console.log(err)
+      logout()
+    }
+    return true
   }
-
   //BOARD ACTIONS
   onDragOver = ev => {
     ev.preventDefault()

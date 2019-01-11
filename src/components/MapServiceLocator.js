@@ -124,7 +124,8 @@ class MapServiceLocator extends Component {
       },
     })
   }
-  centerClients = () => {
+  centerClients = e => {
+    e.preventDefault()
     let bounds = new this.google.maps.LatLngBounds()
 
     if (this.state.clients.length === 0) {
@@ -153,12 +154,13 @@ class MapServiceLocator extends Component {
   }
 
   onMarkerDragEnd = map => {
-    let url = map.mapUrl.split('?')
+    /*let url = map.mapUrl.split('?')
     url = url[1].split('&')
     url = url[0].split('=')
     url = url[1].split(',')
-    console.log(map)
+    console.log(map)*/
   }
+  
   render() {
     const { clients, center, zoom } = this.state
     return (
