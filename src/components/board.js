@@ -23,6 +23,7 @@ export default class Board extends Component {
       tasks: [],
       showModal: false,
       curTask: [],
+      dragStard: false,
     }
   }
 
@@ -94,6 +95,9 @@ export default class Board extends Component {
   }
   onDragStart = (ev, id) => {
     ev.dataTransfer.setData('text/plain', id)
+    this.setState({
+      dragStard: true,
+    })
   }
   onDrop = async (ev, cat) => {
     let id = ev.dataTransfer.getData('text')
@@ -108,6 +112,7 @@ export default class Board extends Component {
 
     this.setState({
       tasks,
+      dragStard: false,
     })
 
     await axios.post(
@@ -215,7 +220,7 @@ export default class Board extends Component {
 
     //DASHBOARD
     return (
-      <div>
+      <div className={this.state.dragStard ? 'dragging' : ''}>
         <div className="Welcome">Bienvenido {getUser().name}</div>
         <div className="board">
           {getUser().type !== 'operator' ? (

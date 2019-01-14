@@ -22,6 +22,9 @@
   margin: 5px 0 0;
   padding: 5px;
 }
+.dragging .b-row {
+  border: 2px dotted #026aa7;
+}
 .b-row .column-header {
   padding: 0px 3px;
   font-size: 11px;
