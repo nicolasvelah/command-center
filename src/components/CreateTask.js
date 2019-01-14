@@ -62,7 +62,35 @@ export default class CreateTask extends Component {
       servicesShow: false,
       providerShow: false,
       mapShow: false,
+      clientId: null,
+      isSending: false,
+      errorSending: false,
+      client: {
+        value: '',
+        error: '',
+      },
+      service: {
+        value: '',
+        error: '',
+      },
+      provider: {
+        value: '',
+        error: '',
+      },
+      comment: {
+        value: 'Prueba desde CC',
+        error: '',
+      },
+      lat: {
+        value: '',
+        error: '',
+      },
+      lnt: {
+        value: '',
+        error: '',
+      },
     }
+    this.setLocation = this.setLocation.bind(this)
   }
 
   componentDidMount() {
@@ -239,21 +267,80 @@ export default class CreateTask extends Component {
 
     return option.label
   }
-  handleCategioryChange = async option => {
+  handleCategoryChange = async option => {
     this.getServices(option.value)
-    this.setState({ servicesShow: true, providerShow: false })
+    this.setState({
+      servicesShow: true,
+      providerShow: false,
+    })
   }
   handleServiceChange = async option => {
     this.getProvider(option.value)
-    this.setState({ providerShow: true })
+    this.setState({
+      providerShow: true,
+      service: { value: option.value },
+    })
+  }
+  handleProviderChange = async option => {
+    this.setState({
+      provider: { value: option.value },
+    })
+  }
+  sendTask = async e => {
+    e.preventDefault()
+    this.setState({ isSending: true })
+    try {
+      await axios.post(
+        `${process.env.API_URL}/orders/addOrder`,
+        {
+          clientId: this.state.clientId,
+          serviceId: this.state.service.value,
+          providerId: this.state.provider.value,
+          comment: this.state.comment.value,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'x-access-token': getUser().token,
+            lat: this.state.lat.value,
+            len: this.state.lnt.value,
+          },
+        }
+      )
+      this.setState({ isSending: false, errorSending: false })
+    } catch (err) {
+      console.log(err)
+      this.setState({ isSending: false, errorSending: true })
+    }
+    return true
+  }
+  setLocation = (lat, lnt) => {
+    this.setState({
+      lat: {
+        value: lat,
+      },
+      lnt: {
+        value: lnt,
+      },
+    })
   }
 
   render() {
     return (
-      <form>
+      <form className="form">
+        <div
+          className={
+            this.state.errorSending ? 'errorSending' : 'noErrorSending'
+          }
+        >
+          No hemos podido insertar la tarea vuelva a intentar.
+        </div>
+        <div className={this.state.isSending ? 'sending' : 'nosending'}>
+          Creando la tarea....
+        </div>
         <h1>Nueva Taréa</h1>
         <Select
-          className="basic-single"
+          className="input"
           classNamePrefix="operator"
           placeholder="Operador"
           isClearable={true}
@@ -279,20 +366,21 @@ export default class CreateTask extends Component {
           loadingPlaceholder="Buscando..."
           searchPromptText="Escriba una frase o palabra para realizar una búsqueda"
           ignoreAccents={false}
+          className="input"
         />
         <Select
-          className="basic-single"
+          className="input"
           classNamePrefix="category"
           placeholder="Categoría"
           isClearable={true}
           isSearchable={true}
           name="category"
-          onChange={this.handleCategioryChange}
+          onChange={this.handleCategoryChange}
           options={this.state.categories}
         />
         {this.state.servicesShow ? (
           <Select
-            className="basic-single"
+            className="input"
             classNamePrefix="services"
             placeholder="Servicios"
             isClearable={true}
@@ -306,22 +394,31 @@ export default class CreateTask extends Component {
         )}
         {this.state.providerShow ? (
           <Select
-            className="basic-single"
+            className="input"
             classNamePrefix="provider"
             placeholder="Proiveedor"
             isClearable={true}
             isSearchable={true}
             name="provider"
+            onChange={this.handleProviderChange}
             options={this.state.providers}
           />
         ) : (
           ''
         )}
         {this.state.mapShow ? (
-          <MapServiceLocator userId={this.state.clientId} />
+          <MapServiceLocator
+            userId={this.state.clientId}
+            setLocation={this.setLocation}
+          />
         ) : (
           ''
         )}
+        <div className="text-right">
+          <button onClick={this.sendTask} className="btn">
+            Crear Tarea
+          </button>
+        </div>
       </form>
     )
   }

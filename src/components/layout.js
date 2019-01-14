@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Helmet } from 'react-helmet'
 import { StaticQuery, graphql } from 'gatsby'
 import axios from 'axios'
 
@@ -60,16 +61,25 @@ export default class Layout extends React.Component {
         `}
         render={data => (
           <>
+            <Helmet>
+              <script
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCW_VtwnO2cCNOYEGkd3tigdoCxeRxAnU4&libraries=places"
+                async
+                defer
+              />
+              <link
+                rel="stylesheet"
+                href="https://i.icomoon.io/public/temp/f76dfd8f51/UntitledProject/style.css"
+              />
+              <link
+                href="https://fonts.googleapis.com/css?family=Teko:500|Yantramanav:300"
+                rel="stylesheet"
+              />
+            </Helmet>
             <Header siteTitle={data.site.siteMetadata.title} />
-            <div
-              style={{
-                margin: '0 auto',
-                padding: '0px 1.0875rem 1.45rem',
-                paddingTop: 0,
-              }}
-            >
+            <div className="container">
               <NavBar />
-              {this.props.children}
+              <div className="content">{this.props.children}</div>
             </div>
           </>
         )}

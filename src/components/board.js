@@ -11,6 +11,7 @@ import { askForPermissioToReceiveNotifications } from '../services/push-notifica
 import { ToastContainer, toast } from 'react-toastify'
 
 import Modal from './modal'
+import Task from './Task'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../assets/css/board.css'
@@ -21,7 +22,7 @@ export default class Board extends Component {
     this.state = {
       tasks: [],
       showModal: false,
-      ModalContent: '',
+      curTask: [],
     }
   }
 
@@ -48,8 +49,19 @@ export default class Board extends Component {
   }
 
   //MODAL
-  setModal = () => {
-    this.setState({ showModal: !this.state.showModal })
+  setModal = async id => {
+    this.setState({})
+    let task = []
+    await this.state.tasks.filter(item => {
+      if (item.id === id) {
+        task.push(item)
+      }
+      return item
+    })
+    this.setState({
+      curTask: task,
+      showModal: !this.state.showModal,
+    })
   }
 
   //ALERTS
@@ -157,13 +169,13 @@ export default class Board extends Component {
           onDragStart={e => this.onDragStart(e, 'id_' + t.id)}
           draggable
           className={'draggable task ' + t.cssClasses}
-          onClick={this.setModal}
+          onClick={e => this.setModal(t.id)}
         >
           <div className="task-header">
             <div className="category-icon">
               <img src={icon} alt={t.service.category} />
             </div>
-            <h3>{t.service.category}</h3>
+            <h3>{t.service.name}</h3>
             {getUser().type !== 'operator' ? (
               <div className="operator">
                 {t.operator !== null ? (
@@ -193,11 +205,10 @@ export default class Board extends Component {
             )}
           </div>
           <p className="task-data">
-            <b>Servicio:</b> {t.service.name} <br />
             <b>Cliente:</b> {t.client.name + ' ' + t.client.lastName} <br />
             <b>Proveedor:</b> {t.provider.busnessName} <br />
+            <b>Creada el:</b> {t.provider.createdAt} <br />
           </p>
-          <div className="task-footer">p</div>
         </div>
       )
     })
@@ -205,6 +216,7 @@ export default class Board extends Component {
     //DASHBOARD
     return (
       <div>
+        <div className="Welcome">Bienvenido {getUser().name}</div>
         <div className="board">
           {getUser().type !== 'operator' ? (
             <div
@@ -278,9 +290,13 @@ export default class Board extends Component {
           </div>
         </div>
         <ToastContainer />
-        <Modal setModal={this.setModal} showModal={this.state.showModal}>
-          {this.state.ModalContent}
-        </Modal>
+        {this.state.showModal ? (
+          <Modal setModal={this.setModal} showModal={this.state.showModal}>
+            <Task task={this.state.curTask} />
+          </Modal>
+        ) : (
+          ''
+        )}
       </div>
     )
   }

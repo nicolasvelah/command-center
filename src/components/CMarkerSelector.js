@@ -9,31 +9,21 @@ const Wrapper = styled.div`
   justify-content: center;
   cursor: default;
   img {
-    position: absolute;
-    left:20%;
-    top;-50%;
+    position: relative;
+    left: -11%;
+    top: -17px;
   }
 `
 
 export default class CMarkerSelector extends React.Component {
-  state = {
-    active: false,
-  }
-
-  //improve performance
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextState !== this.state
-  }
-
   render() {
-    const { active } = this.state
-
     return (
-      <Wrapper
-        className={`${active ? 'active' : ''}`}
-        onClick={() => this.setState({ active: !active })}
-      >
-        <img src={locatorIcon} alt="" style={{ width: '40px' }} />
+      <Wrapper>
+        <img
+          src={locatorIcon}
+          alt=""
+          style={{ width: '40px', pointerEvents: 'none' }}
+        />
       </Wrapper>
     )
   }

@@ -3,27 +3,29 @@ import GoogleMapReact from 'google-map-react'
 import { fitBounds } from 'google-map-react/utils'
 import CMarker from './CMarker'
 import CMarkerSelector from './CMarkerSelector'
+import Autocomplete from 'react-google-autocomplete'
 import io from 'socket.io-client'
 import styled from 'styled-components'
 import axios from 'axios'
 import { getUser } from '../services/auth'
+import '../assets/css/map.css'
 
 const Button = styled.button`
   padding: 10px 20px;
   border-radius: 3px;
   font-size: 15px;
-  background-color: #d3d3d3;
+  background-color: #4e86d8;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #000;
+  color: #fff;
   cursor: pointer;
-  &:hover {
-    background-color: #c3c3c3;
-  }
-  &:focus {
-    outline: none;
-  }
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  zindex: 1;
 `
 
 const token = getUser().token
@@ -34,12 +36,19 @@ class MapServiceLocator extends Component {
     this.state = {
       userId: 2,
       clients: [],
+      draggable: true,
       center: {
+        lat: -0.1865934,
+        lng: -78.4480523,
+      },
+      pointer: {
         lat: -0.1865934,
         lng: -78.4480523,
       },
       zoom: 14,
     }
+    this.onCircleInteraction = this.onCircleInteraction.bind(this)
+    this.activeDraggable = this.activeDraggable.bind(this)
   }
   async componentDidMount() {
     //Geolocalizacion
@@ -88,7 +97,12 @@ class MapServiceLocator extends Component {
           lat: lat,
           lng: lng,
         },
+        pointer: {
+          lat: lat,
+          lng: lng,
+        },
       })
+      this.props.setLocation(lat, lng)
     } catch (error) {
       console.error(error)
     }
@@ -97,8 +111,6 @@ class MapServiceLocator extends Component {
     console.log('connected with socketID', id)
   }
   onClientLocation = data => {
-    //console.log('client', data)
-
     const client = {
       id: data.id,
       info: data.info,
@@ -122,24 +134,35 @@ class MapServiceLocator extends Component {
         lat: client.lat,
         lng: client.lng,
       },
+      pointer: {
+        lat: client.lat,
+        lng: client.lng,
+      },
     })
   }
   centerClients = e => {
     e.preventDefault()
     let bounds = new this.google.maps.LatLngBounds()
-
     if (this.state.clients.length === 0) {
       alert('No hay marcadores para centrar')
       return
     } else if (this.state.clients.length === 1) {
       const client = this.state.clients[0]
-      this.setState({ center: { lat: client.lat, lng: client.lng } })
+      this.setState({
+        center: {
+          lat: client.lat,
+          lng: client.lng,
+        },
+        pointer: {
+          lat: client.lat,
+          lng: client.lng,
+        },
+      })
       return
     }
     this.state.clients.forEach(p => {
       bounds.extend(new this.google.maps.LatLng(p.lat, p.lng))
     })
-
     // GET NW, SE BY NE, SW
     const ne = bounds.getNorthEast()
     const sw = bounds.getSouthWest()
@@ -149,22 +172,61 @@ class MapServiceLocator extends Component {
       { se: { lat: se.lat, lng: se.lng }, nw: { lat: nw.lat, lng: nw.lng } },
       { width: 225, height: 777 }
     )
-
     this.setState({ center, zoom })
   }
 
   onMarkerDragEnd = map => {
-    /*let url = map.mapUrl.split('?')
+    //Si si... optimizar.... :(
+    let url = map.mapUrl.split('?')
     url = url[1].split('&')
     url = url[0].split('=')
     url = url[1].split(',')
-    console.log(map)*/
+    this.setState({
+      center: {
+        lat: Number(url[0]),
+        lng: Number(url[1]),
+      },
+    })
   }
-  
+
+  handlerLocalization = place => {
+    this.setState({
+      center: {
+        lat: place.geometry.viewport.ma.l,
+        lng: place.geometry.viewport.fa.l,
+      },
+      pointer: {
+        lat: place.geometry.viewport.ma.l,
+        lng: place.geometry.viewport.fa.l,
+      },
+    })
+  }
+  onCircleInteraction(childKey, childProps, mouse) {
+    // function is just a stub to test callbacks
+    this.setState({
+      draggable: false,
+      pointer: {
+        lat: mouse.lat,
+        lng: mouse.lng,
+      },
+    })
+    this.props.setLocation(mouse.lat, mouse.lng)
+  }
+  activeDraggable(childKey, childProps, mouse) {
+    this.setState({ draggable: true })
+  }
+
   render() {
     const { clients, center, zoom } = this.state
     return (
-      <div style={{ position: 'relative', height: '200px', width: '100%' }}>
+      <div className="map-container">
+        <Autocomplete
+          onPlaceSelected={this.handlerLocalization}
+          types={[]}
+          componentRestrictions={{ country: 'ec' }}
+          className="mapSearch"
+          placeholder="Introduce una ubicación (Opcional)"
+        />
         <GoogleMapReact
           bootstrapURLKeys={{
             key: 'AIzaSyCW_VtwnO2cCNOYEGkd3tigdoCxeRxAnU4',
@@ -172,6 +234,11 @@ class MapServiceLocator extends Component {
           center={center}
           zoom={zoom}
           onDrag={this.onMarkerDragEnd}
+          yesIWantToUseGoogleMapApiInternals={true}
+          draggable={this.state.draggable}
+          onChildMouseDown={this.onCircleInteraction}
+          onChildMouseUp={this.activeDraggable}
+          onChildMouseMove={this.onCircleInteraction}
         >
           {clients.map((client, index) => (
             <CMarker
@@ -182,13 +249,15 @@ class MapServiceLocator extends Component {
               info={client.info}
             />
           ))}
-          <CMarkerSelector key={20} id={20} />
+          <CMarkerSelector
+            key={20}
+            id={20}
+            lat={this.state.pointer.lat}
+            lng={this.state.pointer.lng}
+          />
         </GoogleMapReact>
 
-        <Button
-          onClick={this.centerClients}
-          style={{ position: 'absolute', bottom: 0, left: 20, zIndex: 999 }}
-        >
+        <Button onClick={this.centerClients}>
           <b>CENTRAR CLIENTES</b>
         </Button>
       </div>

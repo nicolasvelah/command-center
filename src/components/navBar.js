@@ -1,53 +1,58 @@
 import React, { Component } from 'react'
 import { navigate } from 'gatsby'
-import { getUser, isLoggedIn, logout } from '../services/auth'
+import { isLoggedIn, logout } from '../services/auth'
 import Modal from './modal'
 import CreateTask from './CreateTask'
+import '../assets/css/menu.css'
+import radar from '../images/radar.svg'
 
 export default class navBar extends Component {
   constructor(props) {
     super(props)
     this.state = {
       showModal: false,
+      menuActive: false,
     }
   }
   setModal = () => {
     this.setState({ showModal: !this.state.showModal })
   }
+  activeMenu = () => {
+    this.setState({ menuActive: !this.state.menuActive })
+  }
   render() {
     //MODAL
 
-    const content = { message: '', login: true }
-    if (isLoggedIn()) {
-      content.message = `Hello, ${getUser().name}`
-    } else {
-      content.message = 'You are not logged in'
-    }
-
     return (
-      <div
-        style={{
-          display: 'flex',
-          flex: '1',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #d1c1e0',
-        }}
-      >
-        <span>{content.message}</span>
-
+      <div className={this.state.menuActive ? 'menu' : 'menu inactive'}>
         {isLoggedIn() ? (
           <div>
             <nav>
-              <a
-                href="/"
+              <div className="logo">
+                Command Center
+                <img src={radar} alt="IsoLogo" />
+              </div>
+              <div onClick={this.activeMenu} className="menuItem">
+                <span
+                  className={
+                    this.state.menuActive
+                      ? 'icon-circle-right icon IconRotate'
+                      : 'icon-circle-right icon'
+                  }
+                />
+              </div>
+              <div onClick={this.setModal} className="menuItem">
+                Crear Tarea <span className="icon-plus icon" />
+              </div>
+              <div
                 onClick={event => {
                   event.preventDefault()
                   logout(() => navigate(`/app/login`))
                 }}
+                className="menuItem"
               >
-                Logout
-              </a>
-              <div onClick={this.setModal}>Crear Tarea</div>
+                Salir <span className="icon-exit icon" />
+              </div>
             </nav>
             <Modal setModal={this.setModal} showModal={this.state.showModal}>
               <CreateTask />
