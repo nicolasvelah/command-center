@@ -3,6 +3,11 @@
   height: 400px;
   margin-bottom: 40px;
   position: relative;
+  font-family: 'Yantramanav', sans-serif;
+}
+.map-container-traking {
+  height: 200px;
+  position: relative;
 }
 .mapSearch {
   z-index: 1;
@@ -10,5 +15,34 @@
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   border: 1px solid #ddd;
+  border-bottom: none;
   padding: 3px 10px;
+  font-family: 'Yantramanav', sans-serif;
+}
+.trakingMap {
+  transition: all 1s;
+  overflow: hidden;
+  min-height: 0px;
+  height: 0px;
+}
+.trakingMap.mapActive {
+  min-height: 250px;
+}
+.hideShowMap {
+  cursor: pointer;
+  font-family: 'Yantramanav', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 0px;
+  font-size: 22px;
+}
+.hideShowMap img {
+  max-width: 20px;
+  padding: 0px;
+  margin: 0 0 0 10px;
+  transition: all 1s;
+}
+.trakingMapIcon {
+  transform: rotate(180deg);
 }

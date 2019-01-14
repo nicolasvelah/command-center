@@ -48,7 +48,25 @@ const StyledAutocomplete = styled(Async)`
     }
   }
 `
+const Error = styled.div`
+  color: red;
+  font-size: 12px;
+  position: absolute;
+  top: 34px;
+  left: 0;
+`
+const InputContainer = styled.div`
+  position: relative;
+`
 export default class CreateTask extends Component {
+  validations = {
+    operator: { required: true },
+    client: { required: true },
+    category: { required: true },
+    service: { required: true },
+    provider: { required: true },
+    comment: { required: true },
+  }
   constructor(props) {
     super(props)
     this.state = {
@@ -65,7 +83,15 @@ export default class CreateTask extends Component {
       clientId: null,
       isSending: false,
       errorSending: false,
+      operator: {
+        value: '',
+        error: '',
+      },
       client: {
+        value: '',
+        error: '',
+      },
+      category: {
         value: '',
         error: '',
       },
@@ -97,7 +123,6 @@ export default class CreateTask extends Component {
     this.getOperators()
     this.getCategories()
   }
-
   getClient = (inputValue, callback) => {
     //this.setState({ isLoading: true })
     if (!this.state.isLoading && inputValue) {
@@ -246,7 +271,7 @@ export default class CreateTask extends Component {
 
     return data
   }
-  handleTypeInputSearch = inputValue => {
+  handleClientTypeInputSearch = inputValue => {
     if (this.state.firstTyping) {
       this.setState({ firstTyping: false })
     }
@@ -254,12 +279,13 @@ export default class CreateTask extends Component {
       this.setState({ keyWord: inputValue })
     }
   }
-  handleAutoCompleteChange = async option => {
+  handleClientAutoCompleteChange = async option => {
     if (option) {
       await this.setState({
         keyWord: option.label,
         mapShow: true,
         clientId: option.value,
+        client: { value: option.value },
       })
     } else {
       await this.setState({ keyWord: '' })
@@ -267,11 +293,17 @@ export default class CreateTask extends Component {
 
     return option.label
   }
+  handleOperatorChange = async option => {
+    this.setState({
+      operator: { value: option.value },
+    })
+  }
   handleCategoryChange = async option => {
     this.getServices(option.value)
     this.setState({
       servicesShow: true,
       providerShow: false,
+      category: { value: option.value },
     })
   }
   handleServiceChange = async option => {
@@ -286,9 +318,44 @@ export default class CreateTask extends Component {
       provider: { value: option.value },
     })
   }
+  setLocation = (lat, lnt) => {
+    this.setState({
+      lat: {
+        value: lat,
+      },
+      lnt: {
+        value: lnt,
+      },
+    })
+  }
   sendTask = async e => {
     e.preventDefault()
-    this.setState({ isSending: true })
+    this.clearFormErrors()
+    const newState = this.state
+    let hasError = false
+    const context = this
+    Object.keys(this.validations).forEach(field => {
+      for (let rule in this.validations[field]) {
+        if (rule === 'required') {
+          if (this.validations[field].required === true) {
+            if (context.state[field].value === '') {
+              console.log(field)
+              hasError = true
+              newState[field].error = 'Campo Obligatorio'
+              break
+            }
+          }
+        }
+      }
+    })
+    this.setState(newState)
+
+    if (hasError) {
+      this.setState({ isSending: false })
+      console.log('Tiene errores')
+      return
+    }
+    console.log('POST')
     try {
       await axios.post(
         `${process.env.API_URL}/orders/addOrder`,
@@ -297,6 +364,7 @@ export default class CreateTask extends Component {
           serviceId: this.state.service.value,
           providerId: this.state.provider.value,
           comment: this.state.comment.value,
+          operator: this.state.operator.value,
         },
         {
           headers: {
@@ -314,15 +382,12 @@ export default class CreateTask extends Component {
     }
     return true
   }
-  setLocation = (lat, lnt) => {
-    this.setState({
-      lat: {
-        value: lat,
-      },
-      lnt: {
-        value: lnt,
-      },
+  clearFormErrors = async () => {
+    const newState = this.state
+    await Object.keys(this.validations).forEach(field => {
+      newState[field].error = ''
     })
+    await this.setState(newState)
   }
 
   render() {
@@ -339,81 +404,90 @@ export default class CreateTask extends Component {
           Creando la tarea....
         </div>
         <h1>Nueva Taréa</h1>
-        <Select
-          className="input"
-          classNamePrefix="operator"
-          placeholder="Operador"
-          isClearable={true}
-          isSearchable={true}
-          name="operator"
-          options={this.state.operators}
-        />
-        <StyledAutocomplete
-          name="client"
-          autosize={true}
-          noResultsText="No se han encontrado clientes"
-          placeholder="Buscar Cliente"
-          clearValueText="Limpiar Campo"
-          onChange={this.handleAutoCompleteChange}
-          onInputChange={this.handleTypeInputSearch}
-          onSelectResetsInput={false}
-          onBlurResetsInput={false}
-          onCloseResetsInput={false}
-          inputProps={{ autoComplete: 'on' }}
-          isLoading={this.state.isLoading}
-          cache={false}
-          loadOptions={this.getClient}
-          loadingPlaceholder="Buscando..."
-          searchPromptText="Escriba una frase o palabra para realizar una búsqueda"
-          ignoreAccents={false}
-          className="input"
-        />
-        <Select
-          className="input"
-          classNamePrefix="category"
-          placeholder="Categoría"
-          isClearable={true}
-          isSearchable={true}
-          name="category"
-          onChange={this.handleCategoryChange}
-          options={this.state.categories}
-        />
-        {this.state.servicesShow ? (
+        <InputContainer>
           <Select
             className="input"
-            classNamePrefix="services"
-            placeholder="Servicios"
+            classNamePrefix="operator"
+            placeholder="Operador"
             isClearable={true}
             isSearchable={true}
-            name="services"
-            onChange={this.handleServiceChange}
-            options={this.state.services}
+            name="operator"
+            options={this.state.operators}
+            onChange={this.handleOperatorChange}
           />
+          <Error>{this.state.operator.error}</Error>
+        </InputContainer>
+        <InputContainer>
+          <StyledAutocomplete
+            name="client"
+            autosize={true}
+            noResultsText="No se han encontrado clientes"
+            placeholder="Buscar Cliente"
+            clearValueText="Limpiar Campo"
+            onChange={this.handleClientAutoCompleteChange}
+            onInputChange={this.handleClientTypeInputSearch}
+            onSelectResetsInput={false}
+            onBlurResetsInput={false}
+            onCloseResetsInput={false}
+            inputProps={{ autoComplete: 'on' }}
+            isLoading={this.state.isLoading}
+            cache={false}
+            loadOptions={this.getClient}
+            loadingPlaceholder="Buscando..."
+            searchPromptText="Escriba una frase o palabra para realizar una búsqueda"
+            ignoreAccents={false}
+            className="input"
+          />
+          <Error>{this.state.client.error}</Error>
+        </InputContainer>
+        <InputContainer>
+          <Select
+            className="input"
+            classNamePrefix="category"
+            placeholder="Categoría"
+            isClearable={true}
+            isSearchable={true}
+            name="category"
+            onChange={this.handleCategoryChange}
+            options={this.state.categories}
+          />
+          <Error>{this.state.category.error}</Error>
+        </InputContainer>
+        {this.state.servicesShow ? (
+          <InputContainer>
+            <Select
+              className="input"
+              classNamePrefix="services"
+              placeholder="Servicios"
+              isClearable={true}
+              isSearchable={true}
+              name="services"
+              onChange={this.handleServiceChange}
+              options={this.state.services}
+            />
+            <Error>{this.state.service.error}</Error>
+          </InputContainer>
         ) : (
           ''
         )}
         {this.state.providerShow ? (
-          <Select
-            className="input"
-            classNamePrefix="provider"
-            placeholder="Proiveedor"
-            isClearable={true}
-            isSearchable={true}
-            name="provider"
-            onChange={this.handleProviderChange}
-            options={this.state.providers}
-          />
+          <InputContainer>
+            <Select
+              className="input"
+              classNamePrefix="provider"
+              placeholder="Proiveedor"
+              isClearable={true}
+              isSearchable={true}
+              name="provider"
+              onChange={this.handleProviderChange}
+              options={this.state.providers}
+            />
+            <Error>{this.state.provider.error}</Error>
+          </InputContainer>
         ) : (
           ''
         )}
-        {this.state.mapShow ? (
-          <MapServiceLocator
-            userId={this.state.clientId}
-            setLocation={this.setLocation}
-          />
-        ) : (
-          ''
-        )}
+        {this.state.mapShow ? <MapServiceLocator userId={1} /> : ''}
         <div className="text-right">
           <button onClick={this.sendTask} className="btn">
             Crear Tarea

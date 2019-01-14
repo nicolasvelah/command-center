@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import GoogleMapReact from 'google-map-react'
 import { fitBounds } from 'google-map-react/utils'
 import CMarker from './CMarker'
-import CMarkerSelector from './CMarkerSelector'
 import Autocomplete from 'react-google-autocomplete'
 import io from 'socket.io-client'
 import styled from 'styled-components'
@@ -30,7 +29,7 @@ const Button = styled.button`
 
 const token = getUser().token
 
-class MapServiceLocator extends Component {
+class MapServiceTacking extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -102,7 +101,6 @@ class MapServiceLocator extends Component {
           lng: lng,
         },
       })
-      this.props.setLocation(lat, lng)
     } catch (error) {
       console.error(error)
     }
@@ -210,7 +208,6 @@ class MapServiceLocator extends Component {
         lng: mouse.lng,
       },
     })
-    this.props.setLocation(mouse.lat, mouse.lng)
   }
   activeDraggable(childKey, childProps, mouse) {
     this.setState({ draggable: true })
@@ -219,7 +216,7 @@ class MapServiceLocator extends Component {
   render() {
     const { clients, center, zoom } = this.state
     return (
-      <div className="map-container">
+      <div className="map-container-traking">
         <Autocomplete
           onPlaceSelected={this.handlerLocalization}
           types={[]}
@@ -246,20 +243,14 @@ class MapServiceLocator extends Component {
               info={client.info}
             />
           ))}
-          <CMarkerSelector
-            key={20}
-            id={20}
-            lat={this.state.pointer.lat}
-            lng={this.state.pointer.lng}
-          />
         </GoogleMapReact>
 
         <Button onClick={this.centerClients}>
-          <b>CENTRAR CLIENTE</b>
+          <b>CENTRAR USUARIOS</b>
         </Button>
       </div>
     )
   }
 }
 
-export default MapServiceLocator
+export default MapServiceTacking

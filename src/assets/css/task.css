@@ -1,0 +1,100 @@
+.row {
+  display: inline-flex;
+  font-family: 'Yantramanav', sans-serif;
+  width: 100%;
+}
+.column {
+  padding: 20px;
+  width: 33%;
+  border: 1px solid #eee;
+  margin: 10px 20px 0px 0px;
+  border-radius: 10px;
+  width: 50%;
+}
+.flex {
+  display: inline-flex;
+  width: 100%;
+}
+.popUpTitle {
+  margin: 20px 0px 10px;
+  border-top: 1px solid #dedede;
+  padding-top: 10px;
+  font-size: 28px;
+}
+.title-tool {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 0px;
+  font-size: 22px;
+}
+.callButton {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #dedede;
+  border-radius: 50%;
+  display: block;
+  text-align: center;
+  padding: 9px 0px 0px;
+  margin: 0px 0px 0px 20px;
+}
+.callButton img {
+  width: 20px;
+  padding: 0px;
+}
+.data {
+  font-size: 14px;
+  line-height: 15px;
+}
+.chatContainer {
+  margin-left: 25px;
+  width: 100%;
+  position: relative;
+}
+.chat {
+  border: 1px solid #dedede;
+  width: 100%;
+  border-radius: 10px;
+  overflow-x: auto;
+  background: #ecffe1;
+  height: 500px;
+}
+.mensagessContainer {
+  min-height: 500px;
+  width: 100%;
+}
+.mensagess {
+  padding: 20px;
+  background: #ecffe1;
+  min-height: 500px;
+}
+.mensagessForm {
+  position: absolute;
+  bottom: 10px;
+  left: 5%;
+  margin: auto;
+  width: 90%;
+  background: #fff;
+  padding: 10px;
+  box-shadow: 1px 1px 2px #dedede;
+  border-radius: 40px;
+  display: inline-flex;
+}
+.mensagessForm input {
+  border: none;
+  width: 100%;
+  margin-bottom: 0px;
+}
+.mensagessForm input:focus {
+  border: none;
+  outline-width: 0;
+}
+.sendMenssage {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+.sendMenssage img {
+  pointer-events: none;
+}

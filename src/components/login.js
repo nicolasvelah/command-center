@@ -40,18 +40,21 @@ class Login extends React.Component {
           }}
         >
           <label>
-            Username
+            Username <br />
             <input type="text" name="username" onChange={this.handleUpdate} />
           </label>
+          <br />
           <label>
             Password
+            <br />
             <input
               type="password"
               name="password"
               onChange={this.handleUpdate}
             />
           </label>
-          <input type="submit" value="Log In" />
+          <br />
+          <input type="submit" value="Log In" className="btn" />
         </form>
         <ToastContainer />
       </>

@@ -25,6 +25,9 @@
 .dragging .b-row {
   border: 2px dotted #026aa7;
 }
+.dragging .b-column {
+  border: 2px dotted #026aa7;
+}
 .b-row .column-header {
   padding: 0px 3px;
   font-size: 11px;
@@ -34,6 +37,7 @@
   background: #fff;
   border-radius: 5px;
   padding: 5px 10px;
+  cursor: pointer;
 }
 .asigned .task {
   background: #fff;
