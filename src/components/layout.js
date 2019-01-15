@@ -68,10 +68,6 @@ export default class Layout extends React.Component {
                 defer
               />
               <link
-                rel="stylesheet"
-                href="https://i.icomoon.io/public/temp/f76dfd8f51/UntitledProject/style.css"
-              />
-              <link
                 href="https://fonts.googleapis.com/css?family=Teko:500|Yantramanav:300"
                 rel="stylesheet"
               />

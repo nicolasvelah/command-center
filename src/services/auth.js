@@ -32,12 +32,16 @@ export const handleLogin = async ({ username, password }) => {
 }
 const getUserData = async token => {
   axios
-    .get(`${process.env.API_URL}/me`, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'x-access-token': token,
-      },
-    })
+    .post(
+      `${process.env.API_URL}/me`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'x-access-token': token,
+        },
+      }
+    )
     .then(async response => {
       response.data.token = token
       setUser(response.data)

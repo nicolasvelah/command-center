@@ -1,6 +1,6 @@
 .menu {
   width: 180px;
-  position: absolute;
+  position: fixed;
   top: 0px;
   left: 0px;
   background: #0047b3;
@@ -10,6 +10,7 @@
   padding: 0px;
   transition: all 1s;
   text-align: right;
+  z-index: 1;
 }
 .inactive {
   left: -130px;
@@ -48,9 +49,10 @@
   padding: 0px 10px 20px 0px;
 }
 .menu .icon {
-  font-size: 30px;
+  width: 30px;
   margin-left: 20px;
   transition: all 1s;
+  margin-bottom: 0px;
 }
 .IconRotate {
   transform: rotate(180deg);

@@ -79,11 +79,10 @@
   padding: 10px;
   box-shadow: 1px 1px 2px #dedede;
   border-radius: 40px;
-  display: inline-flex;
 }
 .mensagessForm input {
   border: none;
-  width: 100%;
+  width: 90%;
   margin-bottom: 0px;
 }
 .mensagessForm input:focus {
@@ -97,4 +96,61 @@
 }
 .sendMenssage img {
   pointer-events: none;
+}
+.taskState {
+  float: right;
+  font-family: 'Yantramanav', sans-serif;
+  margin-top: -20px;
+}
+.notes {
+  font-family: 'Yantramanav', sans-serif;
+}
+.notes h3 {
+  border-bottom: 1px solid #dedede;
+  margin-bottom: 0px;
+}
+textarea {
+  width: 100%;
+  border: 1px solid #dedede;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+textarea:focus,
+button:focus {
+  outline-width: 0;
+}
+
+.noteContainer {
+  border-bottom: 1px solid #dedede;
+  margin-top: 20px;
+}
+.noteOperator {
+  font-weight: bold;
+  margin-right: 10px;
+}
+.date {
+  font-size: 12px;
+}
+.note {
+  margin: 20px 0;
+}
+.noteSpan {
+  background: #eee;
+  box-shadow: 1px 1px 2px #f9f9f9;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 5px;
+}
+.tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 14px;
+}
+.edit {
+  margin-right: 5px;
+  cursor: pointer;
+}
+.delete {
+  cursor: pointer;
 }

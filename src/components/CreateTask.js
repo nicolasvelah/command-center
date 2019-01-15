@@ -65,7 +65,6 @@ export default class CreateTask extends Component {
     category: { required: true },
     service: { required: true },
     provider: { required: true },
-    comment: { required: true },
   }
   constructor(props) {
     super(props)
@@ -104,7 +103,7 @@ export default class CreateTask extends Component {
         error: '',
       },
       comment: {
-        value: 'Prueba desde CC',
+        value: '',
         error: '',
       },
       lat: {
@@ -115,6 +114,10 @@ export default class CreateTask extends Component {
         value: '',
         error: '',
       },
+      priority: {
+        value: 3,
+        error: '',
+      },
     }
     this.setLocation = this.setLocation.bind(this)
   }
@@ -123,6 +126,7 @@ export default class CreateTask extends Component {
     this.getOperators()
     this.getCategories()
   }
+
   getClient = (inputValue, callback) => {
     //this.setState({ isLoading: true })
     if (!this.state.isLoading && inputValue) {
@@ -253,13 +257,11 @@ export default class CreateTask extends Component {
         }
       )
       .then(async result => {
-        console.log('Proiveedores')
-        console.log(result)
         const options = await result.data.providers.map(provider => {
           return {
-            id: provider.id,
+            id: provider.providerId,
             label: provider.Provider.busnessName,
-            value: provider.id,
+            value: provider.providerId,
           }
         })
 
@@ -318,6 +320,11 @@ export default class CreateTask extends Component {
       provider: { value: option.value },
     })
   }
+  handlePriorityChange = async option => {
+    this.setState({
+      priority: { value: option.value },
+    })
+  }
   setLocation = (lat, lnt) => {
     this.setState({
       lat: {
@@ -339,7 +346,6 @@ export default class CreateTask extends Component {
         if (rule === 'required') {
           if (this.validations[field].required === true) {
             if (context.state[field].value === '') {
-              console.log(field)
               hasError = true
               newState[field].error = 'Campo Obligatorio'
               break
@@ -355,7 +361,6 @@ export default class CreateTask extends Component {
       console.log('Tiene errores')
       return
     }
-    console.log('POST')
     try {
       await axios.post(
         `${process.env.API_URL}/orders/addOrder`,
@@ -364,18 +369,27 @@ export default class CreateTask extends Component {
           serviceId: this.state.service.value,
           providerId: this.state.provider.value,
           comment: this.state.comment.value,
-          operator: this.state.operator.value,
+          operatorId: this.state.operator.value,
+          priority: this.state.priority.value,
         },
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
             'x-access-token': getUser().token,
             lat: this.state.lat.value,
             len: this.state.lnt.value,
           },
         }
       )
-      this.setState({ isSending: false, errorSending: false })
+      this.setState({
+        isSending: false,
+        errorSending: false,
+        clientId: '',
+        service: { value: '' },
+        provider: { value: '' },
+        comment: { value: '' },
+        operator: { value: '' },
+      })
     } catch (err) {
       console.log(err)
       this.setState({ isSending: false, errorSending: true })
@@ -388,6 +402,11 @@ export default class CreateTask extends Component {
       newState[field].error = ''
     })
     await this.setState(newState)
+  }
+  setComment = e => {
+    this.setState({
+      comment: { value: e.target.value },
+    })
   }
 
   render() {
@@ -475,7 +494,7 @@ export default class CreateTask extends Component {
             <Select
               className="input"
               classNamePrefix="provider"
-              placeholder="Proiveedor"
+              placeholder="Proveedor"
               isClearable={true}
               isSearchable={true}
               name="provider"
@@ -487,7 +506,30 @@ export default class CreateTask extends Component {
         ) : (
           ''
         )}
-        {this.state.mapShow ? <MapServiceLocator userId={1} /> : ''}
+        <InputContainer>
+          <Select
+            className="input"
+            classNamePrefix="priority"
+            placeholder="Prioridad"
+            isClearable={true}
+            isSearchable={true}
+            name="priority"
+            onChange={this.handlePriorityChange}
+            options={[
+              { value: 1, label: 'Alta' },
+              { value: 2, label: 'Media' },
+              { value: 3, label: 'Baja' },
+            ]}
+            defaultValue={{ value: 3, label: 'Baja' }}
+          />
+          <Error>{this.state.category.error}</Error>
+        </InputContainer>
+        <textarea onChange={this.setComment} placeholder="Comentario" />
+        {this.state.mapShow ? (
+          <MapServiceLocator userId={1} setLocation={this.setLocation} />
+        ) : (
+          ''
+        )}
         <div className="text-right">
           <button onClick={this.sendTask} className="btn">
             Crear Tarea

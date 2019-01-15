@@ -73,6 +73,13 @@ h2 {
   font-family: 'Yantramanav', sans-serif;
   font-weight: normal;
 }
+h3 {
+  font-size: 1.3em;
+  margin: 0.67em 0;
+  text-align: left;
+  font-family: 'Yantramanav', sans-serif;
+  font-weight: normal;
+}
 mark {
   background-color: #ff0;
   color: #000;
@@ -230,23 +237,6 @@ img {
   margin-bottom: 1.45rem;
 }
 
-h3 {
-  margin-left: 0;
-  margin-right: 0;
-  margin-top: 0;
-  padding-bottom: 0;
-  padding-left: 0;
-  padding-right: 0;
-  padding-top: 0;
-  margin-bottom: 1.45rem;
-  color: inherit;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  font-weight: bold;
-  text-rendering: optimizeLegibility;
-  font-size: 1.38316rem;
-  line-height: 1.1;
-}
 h4 {
   margin-left: 0;
   margin-right: 0;

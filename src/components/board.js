@@ -4,8 +4,6 @@ import { Link } from 'gatsby'
 
 import axios from 'axios'
 
-import vialIcon from '../images/car.svg'
-import defaultIcon from '../images/default.svg'
 import arrowDownIcon from '../images/arrow-down.svg'
 import { askForPermissioToReceiveNotifications } from '../services/push-notification'
 import { ToastContainer, toast } from 'react-toastify'
@@ -37,7 +35,7 @@ export default class Board extends Component {
     messaging.onMessage(function(payload) {
       console.log('Frond Message received. ', payload)
       context.getMyTasks()
-      context.MsmNewTask()
+      context.MsmNewTask(payload.notification.title)
     })
     window.addEventListener(
       'focus',
@@ -48,6 +46,8 @@ export default class Board extends Component {
       false
     )
   }
+  //ALERTS
+  MsmNewTask = title => toast(title)
 
   //MODAL
   setModal = async id => {
@@ -65,9 +65,6 @@ export default class Board extends Component {
     })
   }
 
-  //ALERTS
-  MsmNewTask = () => toast('Tienes una nueva solicitud asignada.')
-
   //TASKS
   getMyTasks = async () => {
     try {
@@ -80,6 +77,7 @@ export default class Board extends Component {
           },
         }
       )
+      console.log(tasks)
       this.setState({
         tasks: tasks.data.tasks,
       })
@@ -132,23 +130,30 @@ export default class Board extends Component {
   Delivery = async () => {
     await this.state.tasks.map(async item => {
       if (item.status.name === 'complete') {
-        await axios.post(
-          `${process.env.API_URL}/orders/updateStatus`,
-          {
-            statusName: 'delivered',
-            orderId: item.id,
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': getUser().token,
+        try {
+          await axios.post(
+            `${process.env.API_URL}/orders/updateStatus`,
+            {
+              statusName: 'delivered',
+              orderId: item.id,
             },
-          }
-        )
-        this.getMyTasks()
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': getUser().token,
+              },
+            }
+          )
+
+          this.getMyTasks()
+        } catch (err) {
+          console.log(err)
+        }
       }
-      return item
+      return await item
     })
+
+    return
   }
 
   render() {
@@ -164,10 +169,16 @@ export default class Board extends Component {
 
     //TASK ITEMS
     this.state.tasks.forEach(t => {
-      let icon = defaultIcon
-      if (t.service.category === 'vial') {
-        icon = vialIcon
-      }
+      let icon = t.service.categories.name
+      icon =
+        icon
+          .toString()
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w]+/g, '')
+          .replace(/^-+/, '')
+          .replace(/-+$/, '') + '.svg'
+
       tasks[t.status.name].push(
         <div
           key={t.id}
@@ -178,7 +189,10 @@ export default class Board extends Component {
         >
           <div className="task-header">
             <div className="category-icon">
-              <img src={icon} alt={t.service.category} />
+              <img
+                src={require('../images/' + icon)}
+                alt={t.service.category}
+              />
             </div>
             <h3>{t.service.name}</h3>
             {getUser().type !== 'operator' ? (
@@ -287,7 +301,13 @@ export default class Board extends Component {
 
             {getUser().type !== 'operator' ? (
               <div className="column-footer">
-                <button onClick={this.Delivery}>Entregar Resueltos</button>
+                <button
+                  onClick={() => {
+                    this.Delivery()
+                  }}
+                >
+                  Entregar
+                </button>
               </div>
             ) : (
               ''

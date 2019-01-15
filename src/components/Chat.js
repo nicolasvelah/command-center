@@ -15,7 +15,13 @@ export default class Chat extends React.Component {
             type="text"
             className="input"
             placeholder="Escribe un mensaje"
-            onChange={this.props.setMenssage}
+            onChange={e =>
+              this.props.setMenssage(
+                e,
+                this.props.isClientTo,
+                this.props.userId
+              )
+            }
           />
           <div className="sendMenssage" onClick={this.props.sendMenssage}>
             <img src={send} alt="" />
