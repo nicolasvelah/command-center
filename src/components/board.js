@@ -22,6 +22,7 @@ export default class Board extends Component {
       showModal: false,
       curTask: [],
       dragStard: false,
+      messagesTask: [],
     }
   }
 
@@ -34,13 +35,17 @@ export default class Board extends Component {
     const context = this
     messaging.onMessage(function(payload) {
       console.log('Frond Message received. ', payload)
-      context.getMyTasks()
-      context.MsmNewTask(payload.notification.title)
+      const notification = JSON.parse(payload.notification.body)
+      if (notification.type === 'chat') {
+        context.chatNotifications(notification.orderId)
+      } else {
+        context.getMyTasks()
+        context.MsmNewTask(payload.notification.title)
+      }
     })
     window.addEventListener(
       'focus',
       function(event) {
-        console.log('Regresaste ')
         context.getMyTasks()
       },
       false
@@ -49,9 +54,29 @@ export default class Board extends Component {
   //ALERTS
   MsmNewTask = title => toast(title)
 
+  //CHAT
+  chatNotifications = id => {
+    console.log('Order ID', id)
+    console.log('Ver si la orden esta activa')
+
+    if (typeof this.state.curTask[0] !== 'undefined') {
+      if (this.state.curTask[0].id === Number(id)) {
+        console.log('Si esta activa')
+        console.log(
+          'Traer las mesajes relacionados a la orden y actualiza el estado de los mesajes reacionados al chat correspondiente'
+        )
+      } else {
+        console.log('No esta activa')
+        console.log('Actualiza la notificacion de las tareas')
+      }
+    } else {
+      console.log('No esta activa')
+      console.log('Actualiza la notificacion de las tareas')
+    }
+  }
+
   //MODAL
   setModal = async id => {
-    this.setState({})
     let task = []
     await this.state.tasks.filter(item => {
       if (item.id === id) {
@@ -59,8 +84,101 @@ export default class Board extends Component {
       }
       return item
     })
+
+    console.log(
+      'Trear mensajes de esta tarea para proveedor y cliente y actualiza estado messagesProvider y messagesClient'
+    )
+
+    const response2 = await axios.post(
+      `${process.env.API_URL}/getMessages`,
+      {
+        orderId: task[0].id,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': getUser().token,
+        },
+      }
+    )
+    console.log('response2.data')
+    console.log(response2.data)
+    const response = {
+      data: {
+        client: [
+          {
+            id: 1,
+            message: 'Hola',
+            type: 'client',
+            name: 'Nico',
+            date: '00/00/0000 00:00',
+          },
+          {
+            id: 2,
+            message: 'Hola',
+            type: 'client',
+            name: 'Nico',
+            date: '00/00/0000 00:00',
+          },
+          {
+            id: 3,
+            message:
+              'HolaHola asdda sdjl alkjsha klj sahfkha kfdh kdf akhjf sdflsh dfkhs fdks dkhs dkhs dlk slkgdh skghj ',
+            type: 'operator',
+            name: 'Carlos',
+            date: '00/00/0000 00:00',
+          },
+          {
+            id: 4,
+            message: 'Hola',
+            type: 'supervisor',
+            name: 'Elena',
+            date: '00/00/0000 00:00',
+          },
+        ],
+        provider: [
+          {
+            id: 1,
+            message: 'Hola sd',
+            type: 'client',
+            name: 'Hugo',
+            date: '00/00/0000 00:00',
+          },
+          {
+            id: 2,
+            message:
+              'Hola asdda sdjl alkjsha klj sahfkha kfdh kdf akhjf sdflsh dfkhs fdks dkhs dkhs dlk slkgdh skghj ',
+            type: 'client',
+            name: 'Hugo',
+            date: '00/00/0000 00:00',
+          },
+          {
+            id: 3,
+            message: 'Hola sad',
+            type: 'operator',
+            name: 'Carlos',
+            date: '00/00/0000 00:00',
+          },
+          {
+            id: 4,
+            message: 'Hola amif',
+            type: 'supervisor',
+            name: 'Elena',
+            date: '00/00/0000 00:00',
+          },
+        ],
+      },
+    }
+
     this.setState({
       curTask: task,
+      showModal: !this.state.showModal,
+      messagesTask: response2.data,
+    })
+  }
+  closeModal = () => {
+    this.setState({
+      curTask: [],
       showModal: !this.state.showModal,
     })
   }
@@ -316,8 +434,11 @@ export default class Board extends Component {
         </div>
         <ToastContainer />
         {this.state.showModal ? (
-          <Modal setModal={this.setModal} showModal={this.state.showModal}>
-            <Task task={this.state.curTask} />
+          <Modal closeModal={this.closeModal} showModal={this.state.showModal}>
+            <Task
+              task={this.state.curTask}
+              messagesTask={this.state.messagesTask}
+            />
           </Modal>
         ) : (
           ''

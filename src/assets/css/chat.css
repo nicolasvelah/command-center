@@ -1,0 +1,97 @@
+.chatContainer {
+  margin-left: 25px;
+  width: 100%;
+  position: relative;
+}
+.chat {
+  border: 1px solid #dedede;
+  width: 100%;
+  border-radius: 10px;
+  overflow-x: auto;
+  background: #f7f0eb;
+  height: 500px;
+  padding-bottom: 90px;
+}
+.mensagessContainer {
+  min-height: 500px;
+  width: 100%;
+}
+.mensagess {
+  padding: 20px;
+  background: #f7f0eb;
+  min-height: 500px;
+}
+.mensagessForm {
+  position: absolute;
+  bottom: 10px;
+  left: 5%;
+  margin: auto;
+  width: 90%;
+  background: #fff;
+  padding: 10px;
+  box-shadow: 1px 1px 2px #dedede;
+  border-radius: 40px;
+}
+.mensagessForm input {
+  border: none;
+  width: 90%;
+  margin-bottom: 0px;
+}
+.mensagessForm input:focus {
+  border: none;
+  outline-width: 0;
+}
+.sendMenssage {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+.sendMenssage img {
+  pointer-events: none;
+}
+
+.message {
+  width: 100%;
+  display: inline-block;
+}
+.message.itsMeAlign {
+  text-align: right;
+}
+.msm {
+  width: auto;
+  border-radius: 5px;
+  display: inline-block;
+  text-align: left;
+  padding: 10px;
+  margin-bottom: 10px;
+  max-width: 90%;
+  box-shadow: 1px 1px 2px #dedede;
+}
+.itsMe {
+  background: #dcf8c6;
+}
+.notMe {
+  background: #fff;
+}
+.msmDate {
+  font-size: 10px;
+  text-align: right;
+}
+.message .userData .client {
+  color: #6bcbef;
+  font-weight: bold;
+}
+.message .userData .supervisor,
+.message .userData .operator {
+  color: #35cd96;
+  font-weight: bold;
+}
+.message .itsMe .userData .supervisor,
+.message .itsMe .userData .operator {
+  color: #35cd96;
+  font-weight: bold;
+  display: none;
+}
+.message .userType {
+  font-size: 10px;
+}

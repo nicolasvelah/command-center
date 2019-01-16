@@ -1,11 +1,11 @@
 import React from 'react'
 import '../assets/css/modal.css'
 
-const Modal = ({ setModal, showModal, children }) => {
+const Modal = ({ closeModal, showModal, children }) => {
   return (
     <div className={showModal ? 'modal display-block' : 'modal display-none'}>
       <section className="modal-main">
-        <button onClick={setModal} className="modalClose">
+        <button onClick={closeModal} className="modalClose">
           X
         </button>
         {children}

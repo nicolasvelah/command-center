@@ -47,56 +47,7 @@
   font-size: 14px;
   line-height: 15px;
 }
-.chatContainer {
-  margin-left: 25px;
-  width: 100%;
-  position: relative;
-}
-.chat {
-  border: 1px solid #dedede;
-  width: 100%;
-  border-radius: 10px;
-  overflow-x: auto;
-  background: #ecffe1;
-  height: 500px;
-}
-.mensagessContainer {
-  min-height: 500px;
-  width: 100%;
-}
-.mensagess {
-  padding: 20px;
-  background: #ecffe1;
-  min-height: 500px;
-}
-.mensagessForm {
-  position: absolute;
-  bottom: 10px;
-  left: 5%;
-  margin: auto;
-  width: 90%;
-  background: #fff;
-  padding: 10px;
-  box-shadow: 1px 1px 2px #dedede;
-  border-radius: 40px;
-}
-.mensagessForm input {
-  border: none;
-  width: 90%;
-  margin-bottom: 0px;
-}
-.mensagessForm input:focus {
-  border: none;
-  outline-width: 0;
-}
-.sendMenssage {
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-}
-.sendMenssage img {
-  pointer-events: none;
-}
+
 .taskState {
   float: right;
   font-family: 'Yantramanav', sans-serif;

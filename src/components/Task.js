@@ -128,6 +128,7 @@ export default class Task extends Component {
                     sendMenssage={this.sendMenssage}
                     isClientTo={true}
                     userId={this.props.task[0].client.id}
+                    messagesTask={this.props.messagesTask.client}
                   />
                 </div>
               </div>
@@ -171,6 +172,7 @@ export default class Task extends Component {
                     sendMenssage={this.sendMenssage}
                     isClientTo={false}
                     userId={this.props.task[0].provider.id}
+                    messagesTask={this.props.messagesTask.provider}
                   />
                 </div>
               </div>

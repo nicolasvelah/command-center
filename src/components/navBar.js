@@ -61,7 +61,7 @@ export default class navBar extends Component {
             )}
           </nav>
           {isLoggedIn() && this.state.showModal ? (
-            <Modal setModal={this.setModal} showModal={this.state.showModal}>
+            <Modal closeModal={this.setModal} showModal={this.state.showModal}>
               <CreateTask />
             </Modal>
           ) : (
