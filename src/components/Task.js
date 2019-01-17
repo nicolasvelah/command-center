@@ -12,7 +12,14 @@ import '../assets/css/task.css'
 export default class Task extends Component {
   constructor(props) {
     super(props)
-    this.state = { showHideMap: true }
+    this.state = {
+      showHideMap: true,
+      Menssage: '',
+      to: null,
+      orderId: null,
+      isClientTo: true,
+    }
+    //this.sendMenssage = this.sendMenssage.bind(this)
   }
 
   componentDidMount() {}
@@ -20,36 +27,39 @@ export default class Task extends Component {
   showHideMap = () => {
     this.setState({
       showHideMap: !this.state.showHideMap,
-      Menssage: '',
-      to: null,
-      orderId: null,
-      isClientTo: true,
     })
   }
-  sendMenssage = e => {
-    console.log(this.state.to)
-    console.log(this.state.Menssage)
-    console.log(this.state.orderId)
-    console.log(this.state.isClientTo)
-    axios
-      .post(
-        `${process.env.API_URL}/sendMessage`,
-        {
-          to: this.state.to,
-          content: this.state.Menssage,
-          orderId: this.state.orderId,
-          isClientTo: this.state.isClientTo,
+  sendMenssage = async e => {
+    const result = await axios.post(
+      `${process.env.API_URL}/sendMessage`,
+      {
+        to: this.state.to,
+        content: this.state.Menssage,
+        orderId: this.state.orderId,
+        isClientTo: this.state.isClientTo,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': getUser().token,
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
-          },
-        }
-      )
-      .then(async result => {
-        console.log(result)
-      })
+      }
+    )
+
+    const msm = {
+      date: '17/01/2019 12:01:00',
+      id: 100,
+      message: this.state.Menssage,
+      name: getUser().name + getUser().lastName,
+      type: getUser().type,
+    }
+    let userType = 'provider'
+    if (this.state.isClientTo) {
+      userType = 'client'
+    }
+    this.props.addMensages(msm, userType)
+    e.target.value = ''
+    return result
   }
   setMenssage = (e, isClientTo, userId) => {
     this.setState({
@@ -101,10 +111,12 @@ export default class Task extends Component {
                       </span>
                     </h2>
                     <div>
-                      <b>Nombre:</b> {this.props.task[0].client.name}
-                    </div>
-                    <div>
-                      <b>Apellido:</b> {this.props.task[0].client.lastName}
+                      <b>Nombre:</b>{' '}
+                      <span className="actorNameC">
+                        {this.props.task[0].client.name +
+                          ' ' +
+                          this.props.task[0].client.lastName}
+                      </span>
                     </div>
                     <div>
                       <b>Cédula:</b> {this.props.task[0].client.idCard}
@@ -129,6 +141,7 @@ export default class Task extends Component {
                     isClientTo={true}
                     userId={this.props.task[0].client.id}
                     messagesTask={this.props.messagesTask.client}
+                    id="chatClient"
                   />
                 </div>
               </div>
@@ -144,9 +157,11 @@ export default class Task extends Component {
                     <div className="data">
                       <div>
                         <b>Nombre:</b>{' '}
-                        {this.props.task[0].provider.user.name +
-                          ' ' +
-                          this.props.task[0].provider.user.lastName}
+                        <span className="actorNameP">
+                          {this.props.task[0].provider.user.name +
+                            ' ' +
+                            this.props.task[0].provider.user.lastName}
+                        </span>
                       </div>
                       <div>
                         <b>Nombre del negocio:</b>{' '}
@@ -173,6 +188,7 @@ export default class Task extends Component {
                     isClientTo={false}
                     userId={this.props.task[0].provider.id}
                     messagesTask={this.props.messagesTask.provider}
+                    id="chatProvider"
                   />
                 </div>
               </div>

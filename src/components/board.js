@@ -24,6 +24,8 @@ export default class Board extends Component {
       dragStard: false,
       messagesTask: [],
     }
+    this.getMessages = this.getMessages.bind(this)
+    this.addMensages = this.addMensages.bind(this)
   }
 
   async componentDidMount() {
@@ -56,25 +58,54 @@ export default class Board extends Component {
 
   //CHAT
   chatNotifications = id => {
-    console.log('Order ID', id)
-    console.log('Ver si la orden esta activa')
-
     if (typeof this.state.curTask[0] !== 'undefined') {
       if (this.state.curTask[0].id === Number(id)) {
         console.log('Si esta activa')
-        console.log(
-          'Traer las mesajes relacionados a la orden y actualiza el estado de los mesajes reacionados al chat correspondiente'
-        )
+        this.getMessages(id)
       } else {
         console.log('No esta activa')
-        console.log('Actualiza la notificacion de las tareas')
+        this.notificationMessages(id, 'provider')
       }
     } else {
       console.log('No esta activa')
-      console.log('Actualiza la notificacion de las tareas')
+      this.notificationMessages(id, 'provider')
     }
   }
+  //NOTIFICATIONS
+  notificationMessages = (id, type) => {
+    console.log('entra', { id: id, type: type })
+    return ''
+  }
 
+  //CHAT
+  getMessages = async id => {
+    const messages = await axios.post(
+      `${process.env.API_URL}/getMessages`,
+      {
+        orderId: id,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': getUser().token,
+        },
+      }
+    )
+    this.setState({
+      messagesTask: messages.data,
+    })
+    return messages
+  }
+  addMensages = (msm, type) => {
+    let { messagesTask } = this.state
+    console.log('messagesTask')
+    console.log(msm)
+    console.log(messagesTask[type])
+    messagesTask[type].push(msm)
+    this.setState({
+      messagesTask,
+    })
+  }
   //MODAL
   setModal = async id => {
     let task = []
@@ -85,101 +116,17 @@ export default class Board extends Component {
       return item
     })
 
-    console.log(
-      'Trear mensajes de esta tarea para proveedor y cliente y actualiza estado messagesProvider y messagesClient'
-    )
-
-    const response2 = await axios.post(
-      `${process.env.API_URL}/getMessages`,
-      {
-        orderId: task[0].id,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
-        },
-      }
-    )
-    console.log('response2.data')
-    console.log(response2.data)
-    const response = {
-      data: {
-        client: [
-          {
-            id: 1,
-            message: 'Hola',
-            type: 'client',
-            name: 'Nico',
-            date: '00/00/0000 00:00',
-          },
-          {
-            id: 2,
-            message: 'Hola',
-            type: 'client',
-            name: 'Nico',
-            date: '00/00/0000 00:00',
-          },
-          {
-            id: 3,
-            message:
-              'HolaHola asdda sdjl alkjsha klj sahfkha kfdh kdf akhjf sdflsh dfkhs fdks dkhs dkhs dlk slkgdh skghj ',
-            type: 'operator',
-            name: 'Carlos',
-            date: '00/00/0000 00:00',
-          },
-          {
-            id: 4,
-            message: 'Hola',
-            type: 'supervisor',
-            name: 'Elena',
-            date: '00/00/0000 00:00',
-          },
-        ],
-        provider: [
-          {
-            id: 1,
-            message: 'Hola sd',
-            type: 'client',
-            name: 'Hugo',
-            date: '00/00/0000 00:00',
-          },
-          {
-            id: 2,
-            message:
-              'Hola asdda sdjl alkjsha klj sahfkha kfdh kdf akhjf sdflsh dfkhs fdks dkhs dkhs dlk slkgdh skghj ',
-            type: 'client',
-            name: 'Hugo',
-            date: '00/00/0000 00:00',
-          },
-          {
-            id: 3,
-            message: 'Hola sad',
-            type: 'operator',
-            name: 'Carlos',
-            date: '00/00/0000 00:00',
-          },
-          {
-            id: 4,
-            message: 'Hola amif',
-            type: 'supervisor',
-            name: 'Elena',
-            date: '00/00/0000 00:00',
-          },
-        ],
-      },
-    }
+    await this.getMessages(task[0].id)
 
     this.setState({
       curTask: task,
-      showModal: !this.state.showModal,
-      messagesTask: response2.data,
+      showModal: true,
     })
   }
   closeModal = () => {
     this.setState({
       curTask: [],
-      showModal: !this.state.showModal,
+      showModal: false,
     })
   }
 
@@ -438,6 +385,8 @@ export default class Board extends Component {
             <Task
               task={this.state.curTask}
               messagesTask={this.state.messagesTask}
+              getMessages={this.getMessages}
+              addMensages={this.addMensages}
             />
           </Modal>
         ) : (

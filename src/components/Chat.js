@@ -2,8 +2,21 @@ import React from 'react'
 import { getUser } from '../services/auth'
 import send from '../images/send.svg'
 import '../assets/css/chat.css'
+import scrollIntoView from 'scroll-into-view'
 
 export default class Chat extends React.Component {
+  scrollToBottom = id => {
+    scrollIntoView(document.getElementById(id))
+    return
+  }
+
+  componentDidMount() {
+    this.scrollToBottom(this.props.id)
+  }
+
+  componentDidUpdate() {
+    this.scrollToBottom(this.props.id)
+  }
   render() {
     console.log('mesajers para esta tarea', this.props.messagesTask)
     return (
@@ -30,7 +43,7 @@ export default class Chat extends React.Component {
                         }
                       >
                         <div className="userData">
-                          <div className={item.type}>
+                          <div className={'chat-' + item.type}>
                             {item.name}{' '}
                             <span className="userType">{item.type}</span>
                           </div>
@@ -41,6 +54,13 @@ export default class Chat extends React.Component {
                     </div>
                   ))
                 : ''}
+              <div
+                ref={el => {
+                  console.log(el)
+                  this.messagesEnd = el
+                }}
+                id={this.props.id}
+              />
             </div>
           </div>
         </div>
@@ -57,9 +77,12 @@ export default class Chat extends React.Component {
               )
             }
           />
-          <div className="sendMenssage" onClick={this.props.sendMenssage}>
-            <img src={send} alt="" />
-          </div>
+          <img
+            src={send}
+            alt=""
+            className="sendMenssage"
+            onClick={this.props.sendMenssage}
+          />
         </div>
       </div>
     )
