@@ -5,14 +5,16 @@ import { getUser } from '../services/auth'
 
 export const initializeFirebase = () => {
   if (typeof window !== 'undefined') {
-    firebase.initializeApp({
-      messagingSenderId: process.env.FB_SENDER_ID,
-    })
-    /*navigator.serviceWorker
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        messagingSenderId: process.env.FB_SENDER_ID,
+      })
+      /*navigator.serviceWorker
       .register('./firebase-messaging-sw.js')
       .then(registration => {
         firebase.messaging().useServiceWorker(registration)
       })*/
+    }
   }
 }
 
@@ -37,5 +39,6 @@ export const askForPermissioToReceiveNotifications = async () => {
     return messaging
   } catch (error) {
     console.error(error)
+    return error
   }
 }

@@ -31,6 +31,7 @@
   padding: 5px 10px 3px;
   box-shadow: 1px 1px 2px #dedede;
   border-radius: 40px;
+  z-index: 1;
 }
 .mensagessForm input {
   border: none;
@@ -42,6 +43,7 @@
 .mensagessForm input:focus {
   border: none;
   outline-width: 0;
+  color: initial;
 }
 .sendMenssage {
   width: 25px;

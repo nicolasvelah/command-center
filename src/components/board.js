@@ -23,9 +23,26 @@ export default class Board extends Component {
       curTask: [],
       dragStard: false,
       messagesTask: [],
+      notesTask: [
+        {
+          id: 1,
+          contend: 'laksdajsd laks jd',
+          name: 'Nicolas Vela',
+          type: 'operator',
+          date: '00/00/0000 00:00',
+        },
+        {
+          id: 2,
+          contend: 'laksdajsd laks jd',
+          name: 'Ricardo',
+          type: 'supervisor',
+          date: '00/00/0000 00:00',
+        },
+      ],
     }
     this.getMessages = this.getMessages.bind(this)
     this.addMensages = this.addMensages.bind(this)
+    this.addNote = this.addNote.bind(this)
   }
 
   async componentDidMount() {
@@ -48,7 +65,11 @@ export default class Board extends Component {
     window.addEventListener(
       'focus',
       function(event) {
-        context.getMyTasks()
+        context.getMyTasks(context.state.curTask)
+        if (typeof context.state.curTask[0] !== 'undefined') {
+          console.log('entro para traer mensajes')
+          context.chatNotifications(context.state.curTask[0].id)
+        }
       },
       false
     )
@@ -98,13 +119,19 @@ export default class Board extends Component {
   }
   addMensages = (msm, type) => {
     let { messagesTask } = this.state
-    console.log('messagesTask')
-    console.log(msm)
-    console.log(messagesTask[type])
     messagesTask[type].push(msm)
     this.setState({
       messagesTask,
     })
+  }
+  //NOTES
+  addNote = async msm => {
+    let { notesTask } = this.state
+    notesTask.push(msm)
+    this.setState({
+      notesTask,
+    })
+    return notesTask
   }
   //MODAL
   setModal = async id => {
@@ -387,6 +414,8 @@ export default class Board extends Component {
               messagesTask={this.state.messagesTask}
               getMessages={this.getMessages}
               addMensages={this.addMensages}
+              addNote={this.addNote}
+              notesTask={this.state.notesTask}
             />
           </Modal>
         ) : (

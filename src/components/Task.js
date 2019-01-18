@@ -18,8 +18,10 @@ export default class Task extends Component {
       to: null,
       orderId: null,
       isClientTo: true,
+      note: '',
     }
-    //this.sendMenssage = this.sendMenssage.bind(this)
+    this.setNote = this.setNote.bind(this)
+    this.sendNote = this.sendNote.bind(this)
   }
 
   componentDidMount() {}
@@ -29,44 +31,91 @@ export default class Task extends Component {
       showHideMap: !this.state.showHideMap,
     })
   }
+  sendMenssageByEnter = e => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      this.sendMenssage(e)
+    }
+  }
   sendMenssage = async e => {
-    const result = await axios.post(
-      `${process.env.API_URL}/sendMessage`,
-      {
-        to: this.state.to,
-        content: this.state.Menssage,
-        orderId: this.state.orderId,
-        isClientTo: this.state.isClientTo,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+    if (this.state.Menssage != '') {
+      const result = await axios.post(
+        `${process.env.API_URL}/sendMessage`,
+        {
+          to: this.state.to,
+          content: this.state.Menssage,
+          orderId: this.state.orderId,
+          isClientTo: this.state.isClientTo,
         },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      const msm = {
+        date: '17/01/2019 12:01:00',
+        id: 100,
+        message: this.state.Menssage,
+        name: getUser().name + getUser().lastName,
+        type: getUser().type,
       }
-    )
-
-    const msm = {
-      date: '17/01/2019 12:01:00',
-      id: 100,
-      message: this.state.Menssage,
-      name: getUser().name + getUser().lastName,
-      type: getUser().type,
+      let userType = 'provider'
+      if (this.state.isClientTo) {
+        userType = 'client'
+      }
+      this.props.addMensages(msm, userType)
+      document.getElementById('chat-' + userType).reset()
+      this.setState({
+        Menssage: '',
+      })
+      return result
+    } else {
+      return
     }
-    let userType = 'provider'
-    if (this.state.isClientTo) {
-      userType = 'client'
-    }
-    this.props.addMensages(msm, userType)
-    e.target.value = ''
-    return result
   }
   setMenssage = (e, isClientTo, userId) => {
+    if (typeof e.target !== 'undefined') {
+      this.setState({
+        Menssage: e.target.value,
+        to: userId,
+        orderId: this.props.task[0].id,
+        isClientTo: isClientTo,
+      })
+    }
+  }
+  sendNote = async e => {
+    try {
+      await axios.post(
+        `${process.env.API_URL}/orders/addNote`,
+        {
+          content: this.state.note,
+          orderId: this.state.orderId,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      const note = {
+        id: 100,
+        contend: this.state.note,
+        name: 'Nicolas Vela',
+        type: 'operator',
+        date: '00/00/0000 00:00',
+      }
+      this.props.addNote(note)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  setNote = e => {
     this.setState({
-      Menssage: e.target.value,
-      to: userId,
+      note: e.target.value,
       orderId: this.props.task[0].id,
-      isClientTo: isClientTo,
     })
   }
 
@@ -138,10 +187,12 @@ export default class Task extends Component {
                   <Chat
                     setMenssage={this.setMenssage}
                     sendMenssage={this.sendMenssage}
+                    sendMenssageByEnter={this.sendMenssageByEnter}
                     isClientTo={true}
                     userId={this.props.task[0].client.id}
                     messagesTask={this.props.messagesTask.client}
                     id="chatClient"
+                    idInput="client"
                   />
                 </div>
               </div>
@@ -185,10 +236,12 @@ export default class Task extends Component {
                   <Chat
                     setMenssage={this.setMenssage}
                     sendMenssage={this.sendMenssage}
+                    sendMenssageByEnter={this.sendMenssageByEnter}
                     isClientTo={false}
                     userId={this.props.task[0].provider.id}
                     messagesTask={this.props.messagesTask.provider}
                     id="chatProvider"
+                    idInput="provider"
                   />
                 </div>
               </div>
@@ -196,7 +249,11 @@ export default class Task extends Component {
             <br />
             <br />
             <div>
-              <Notes />
+              <Notes
+                setNote={this.setNote}
+                sendNote={this.sendNote}
+                notesTask={this.props.notesTask}
+              />
             </div>
           </div>
         ) : (

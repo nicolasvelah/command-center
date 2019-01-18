@@ -65,24 +65,27 @@ export default class Chat extends React.Component {
           </div>
         </div>
         <div className="mensagessForm">
-          <input
-            type="text"
-            className="input"
-            placeholder="Escribe un mensaje"
-            onChange={e =>
-              this.props.setMenssage(
-                e,
-                this.props.isClientTo,
-                this.props.userId
-              )
-            }
-          />
-          <img
-            src={send}
-            alt=""
-            className="sendMenssage"
-            onClick={this.props.sendMenssage}
-          />
+          <form id={'chat-' + this.props.idInput}>
+            <input
+              type="text"
+              className="input"
+              placeholder="Escribe un mensaje"
+              onChange={e =>
+                this.props.setMenssage(
+                  e,
+                  this.props.isClientTo,
+                  this.props.userId
+                )
+              }
+              onKeyPress={this.props.sendMenssageByEnter}
+            />
+            <img
+              src={send}
+              alt=""
+              className="sendMenssage"
+              onClick={this.props.sendMenssage}
+            />
+          </form>
         </div>
       </div>
     )
