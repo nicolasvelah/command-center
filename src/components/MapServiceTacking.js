@@ -80,19 +80,12 @@ class MapServiceTacking extends Component {
           jwt: token,
         },
       })
-      //console.log('Clientes', res.data)
-      let users = null
-      let lat = null
-      let lng = null
-      const context = this
-      res.data.map(user => {
-        if (user.id === context.props.userId) {
-          users = user
-          lat = user.lat
-          lng = user.lng
-        }
-        return user
-      })
+
+      const filterC = await this.filterClient(res.data, this.props.userId)
+      let users = filterC.user
+      let lat = filterC.lat
+      let lng = filterC.lng
+
       console.log('Clientes [users]', users)
       await this.setState({
         clients: [users],
@@ -105,6 +98,28 @@ class MapServiceTacking extends Component {
       console.error(error)
     }
   }
+  filterClient = async (users, userId) => {
+    let response = {
+      lat: null,
+      lng: null,
+      user: null,
+    }
+    await users.map(user => {
+      if (user.id === userId) {
+        response = {
+          lat: user.lat,
+          lng: user.lng,
+          user: user,
+        }
+      }
+      return user
+    })
+    console.log('Response filter', response)
+    return response
+  }
+  onSockedId = id => {
+    //console.log('connected with socketID', id)
+  }
   async getProviders() {
     if (this.props.providerId !== 0) {
       try {
@@ -116,73 +131,83 @@ class MapServiceTacking extends Component {
           },
         })
 
-        let users = null
-        const context = this
-        res.data.map(user => {
-          if (user.id === context.props.providerId) {
-            console.log('----------user.id', user.id)
-            console.log('context.props.providerId', context.props.providerId)
-            console.log('Provider ', user)
-            users = user
-          }
-          return user
-        })
-        console.log('providers: [users]', users)
+        let users = await this.filterProviders(res.data, this.props.providerId)
+
         await this.setState({ providers: [users] })
       } catch (error) {
         console.error(error)
       }
     }
   }
+  filterProviders = async (users, providerId) => {
+    let response = null
+    await users.map(user => {
+      if (user.id === providerId) {
+        response = user
+      }
+      return user
+    })
+    return response
+  }
   onSockedId = id => {
     //console.log('connected with socketID', id)
   }
-  onClientLocation = data => {
-    const client = {
-      id: data.id,
-      info: data.info,
-      lat: data.lat,
-      lng: data.lng,
+  onClientLocation = async data => {
+    if (data.id === this.state.clients[0].id) {
+      const client = {
+        id: data.id,
+        info: data.info,
+        lat: data.lat,
+        lng: data.lng,
+      }
+      var tmpClients = this.state.clients
+      const index = tmpClients.findIndex(o => o.userId === data.userId)
+      if (index !== -1) {
+        //if the user is already on the list
+        //just only udate the user by index
+        tmpClients[index] = client
+      } else {
+        //add the client to the list
+        tmpClients.push(client)
+      }
+      //update tne state
+
+      tmpClients = await this.filterClient(tmpClients, data.id)
+
+      this.setState({
+        clients: [tmpClients.user],
+      })
     }
-    var tmpClients = this.state.clients
-    const index = tmpClients.findIndex(o => o.userId === data.userId)
-    if (index !== -1) {
-      //if the user is already on the list
-      //just only udate the user by index
-      tmpClients[index] = client
-    } else {
-      //add the client to the list
-      tmpClients.push(client)
-    }
-    //update tne state
-    this.setState({
-      clients: tmpClients,
-    })
   }
-  onProviderLocation = data => {
-    //console.log('provider', data)
-    const provider = {
-      id: data.id,
-      info: data.info,
-      lat: data.lat,
-      lng: data.lng,
+  onProviderLocation = async data => {
+    if (typeof this.state.providers[0] !== 'undefined') {
+      if (data.id === this.state.providers[0].id) {
+        //console.log('provider', data)
+        const provider = {
+          id: data.id,
+          info: data.info,
+          lat: data.lat,
+          lng: data.lng,
+        }
+        var tmp = this.state.providers
+        const index = tmp.findIndex(o => o.id === provider.id)
+        if (index !== -1) {
+          //if the user is already on the list
+          //just only udate the user by index
+          tmp[index] = provider
+        } else {
+          //add the provider to the list
+          tmp.push(provider)
+        }
+        tmp = await this.filterProviders(tmp, this.props.providerId)
+        //update the state
+        this.setState({ providers: [tmp] })
+      }
     }
-    var tmp = this.state.providers
-    const index = tmp.findIndex(o => o.id === provider.id)
-    if (index !== -1) {
-      //if the user is already on the list
-      //just only udate the user by index
-      tmp[index] = provider
-    } else {
-      //add the provider to the list
-      tmp.push(provider)
-    }
-    //update the state
-    this.setState({ providers: tmp })
   }
 
   // catch when a provider has disconnected
-  onProviderDisconnected = data => {
+  onProviderDisconnected = async data => {
     // id : provider id
     const { id } = data
 
@@ -194,12 +219,13 @@ class MapServiceTacking extends Component {
       //just only udate the user by index
       tmp[index].connected = false
     }
+    tmp = await this.filterProviders(tmp, this.props.providerId)
     //update the state
-    this.setState({ providers: tmp })
+    this.setState({ providers: [tmp] })
   }
 
   // catch when the inService status of a one provider has changed
-  onProviderInService = data => {
+  onProviderInService = async data => {
     //console.log('onProviderInService', data)
     // id : provider id
     // inService: it can be a stringNumber or a null, if the value is null the provider is available to new orders
@@ -213,8 +239,9 @@ class MapServiceTacking extends Component {
       //just only udate the user by index
       tmp[index].inService = inService
     }
+    tmp = await this.filterProviders(tmp, this.props.providerId)
     //update the state
-    this.setState({ providers: tmp })
+    this.setState({ providers: [tmp] })
   }
   centerClients = e => {
     e.preventDefault()

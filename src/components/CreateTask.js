@@ -99,7 +99,7 @@ export default class CreateTask extends Component {
         error: '',
       },
       provider: {
-        value: '',
+        value: 0,
         error: '',
       },
       comment: {
@@ -128,7 +128,6 @@ export default class CreateTask extends Component {
   }
 
   getClient = (inputValue, callback) => {
-    //this.setState({ isLoading: true })
     if (!this.state.isLoading && inputValue) {
       let options = []
       if (this.state.keyWord !== '') {
@@ -147,7 +146,16 @@ export default class CreateTask extends Component {
           )
           .then(async result => {
             options = await result.data.clients.map(client => {
-              return { id: client.id, label: client.name, value: client.id }
+              return {
+                id: client.id,
+                label:
+                  client.name +
+                  ' ' +
+                  client.lastName +
+                  ' / Telf: ' +
+                  client.phone,
+                value: client.id,
+              }
             })
 
             setTimeout(() => {
@@ -526,7 +534,11 @@ export default class CreateTask extends Component {
         </InputContainer>
         <textarea onChange={this.setComment} placeholder="Comentario" />
         {this.state.mapShow ? (
-          <MapServiceLocator userId={1} setLocation={this.setLocation} />
+          <MapServiceLocator
+            userId={this.state.clientId}
+            providerId={this.state.provider.value}
+            setLocation={this.setLocation}
+          />
         ) : (
           ''
         )}

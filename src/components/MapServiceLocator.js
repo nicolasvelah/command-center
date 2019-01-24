@@ -36,6 +36,9 @@ class MapServiceLocator extends Component {
     this.state = {
       userId: 2,
       clients: [],
+      client: [],
+      providers: [],
+      provider: [],
       draggable: true,
       center: {
         lat: -0.1865934,
@@ -56,6 +59,7 @@ class MapServiceLocator extends Component {
     this.google = window.google = window.google ? window.google : {}
 
     await this.getClients() //get a client list with the last know location
+    await this.getProviders() //get a provider list with the last know location
 
     //connect with the websocket
     this.socket = io(process.env.WS_URL, {
@@ -68,31 +72,29 @@ class MapServiceLocator extends Component {
     })
     this.socket.on(`user-${userId}-socketId`, this.onSockedId)
     this.socket.on('onClientLocation', this.onClientLocation)
+    this.socket.on('onProviderLocation', this.onProviderLocation) //to check gps providers updates
+    this.socket.on('onProviderInService', this.onProviderInService) //to check if a provider is in service
+    this.socket.on('onProviderDisconnected', this.onProviderInService) //to check if a provider has disconnected
   }
   //GEOLOCALIZATION
   async getClients() {
     try {
       const res = await axios({
         method: 'POST',
-        url: 'https://websockets.it-zam.com/api/v1/clients',
+        url: `${process.env.WS_URL}/api/v1/clients`,
         headers: {
           jwt: token,
         },
       })
-      let users = null
-      let lat = null
-      let lng = null
-      const context = this
-      res.data.map(user => {
-        if (user.id === context.props.userId) {
-          users = user
-          lat = user.lat
-          lng = user.lng
-        }
-        return user
-      })
+
+      const filterC = await this.filterClient(res.data, this.props.userId)
+      let users = filterC.user
+      let lat = filterC.lat
+      let lng = filterC.lng
+
       await this.setState({
-        clients: [users],
+        clients: res.data,
+        client: [users],
         center: {
           lat: lat,
           lng: lng,
@@ -102,52 +104,164 @@ class MapServiceLocator extends Component {
           lng: lng,
         },
       })
-      this.props.setLocation(lat, lng)
     } catch (error) {
       console.error(error)
     }
   }
-  onSockedId = id => {
-    console.log('connected with socketID', id)
-  }
-  onClientLocation = data => {
-    const client = {
-      id: data.id,
-      info: data.info,
-      lat: data.lat,
-      lng: data.lng,
+  filterClient = async (users, userId) => {
+    let response = {
+      lat: null,
+      lng: null,
+      user: null,
     }
-    var tmpClients = this.state.clients
-    const index = tmpClients.findIndex(o => o.userId === data.userId)
+    await users.map(user => {
+      if (user.id === userId) {
+        response = {
+          lat: user.lat,
+          lng: user.lng,
+          user: user,
+        }
+      }
+      return user
+    })
+    return response
+  }
+  async getProviders() {
+    console.log('this.props.providerId', this.props.providerId)
+    try {
+      const res = await axios({
+        method: 'POST',
+        url: `${process.env.WS_URL}/api/v1/providers`,
+        headers: {
+          jwt: token,
+        },
+      })
+
+      await this.setState({ providers: res.data })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  onProviderLocation = async data => {
+    console.log('this.props.providerId', this.props.providerId)
+    if (this.props.providerId !== 0) {
+      console.log('Paso data.id ', data.id)
+      if (data.id === this.props.providerId) {
+        console.log('provider', data)
+        const provider = {
+          id: data.id,
+          info: data.info,
+          lat: data.lat,
+          lng: data.lng,
+        }
+        var tmp = this.state.providers
+        const index = tmp.findIndex(o => o.id === provider.id)
+        if (index !== -1) {
+          //if the user is already on the list
+          //just only udate the user by index
+          tmp[index] = provider
+        } else {
+          //add the provider to the list
+          tmp.push(provider)
+        }
+        tmp = await this.filterProviders(
+          this.state.providers,
+          this.props.providerId
+        )
+        //update the state
+        this.setState({ provider: [tmp] })
+      }
+    }
+  }
+
+  // catch when a provider has disconnected
+  onProviderDisconnected = async data => {
+    // id : provider id
+    const { id } = data
+
+    //update the providers arrays
+    var tmp = this.state.providers
+    const index = tmp.findIndex(o => o.id === id)
     if (index !== -1) {
       //if the user is already on the list
       //just only udate the user by index
-      tmpClients[index] = client
-    } else {
-      //add the client to the list
-      tmpClients.push(client)
+      tmp[index].connected = false
     }
-    //update tne state
-    this.setState({
-      clients: tmpClients,
-      center: {
-        lat: client.lat,
-        lng: client.lng,
-      },
-      pointer: {
-        lat: client.lat,
-        lng: client.lng,
-      },
+    tmp = await this.filterProviders(tmp, this.props.providerId)
+    //update the state
+    this.setState({ providers: [tmp] })
+  }
+  filterProviders = async (users, providerId) => {
+    let response = null
+    await users.map(user => {
+      if (user.id === providerId) {
+        response = user
+      }
+      return user
     })
+    console.log(response)
+    return response
+  }
+  // catch when the inService status of a one provider has changed
+  onProviderInService = async data => {
+    //console.log('onProviderInService', data)
+    // id : provider id
+    // inService: it can be a stringNumber or a null, if the value is null the provider is available to new orders
+    const { id, inService } = data
+
+    //update the providers arrays
+    var tmp = this.state.providers
+    const index = tmp.findIndex(o => o.id === id)
+    if (index !== -1) {
+      //if the user is already on the list
+      //just only udate the user by index
+      tmp[index].inService = inService
+    }
+    tmp = await this.filterProviders(tmp, this.props.providerId)
+    //update the state
+    this.setState({ providers: [tmp] })
+  }
+  onSockedId = id => {
+    console.log('connected with socketID', id)
+  }
+  onClientLocation = async data => {
+    if (data.id === this.state.client[0].id) {
+      const client = {
+        id: data.id,
+        info: data.info,
+        lat: data.lat,
+        lng: data.lng,
+      }
+      var tmpClients = this.state.client
+      const index = tmpClients.findIndex(o => o.userId === data.userId)
+      if (index !== -1) {
+        //if the user is already on the list
+        //just only udate the user by index
+        tmpClients[index] = client
+      } else {
+        //add the client to the list
+        tmpClients.push(client)
+      }
+      //update tne state
+
+      tmpClients = await this.filterClient(
+        this.state.clients,
+        this.props.userId
+      )
+
+      this.setState({
+        client: [tmpClients.user],
+      })
+    }
   }
   centerClients = e => {
     e.preventDefault()
     let bounds = new this.google.maps.LatLngBounds()
-    if (this.state.clients.length === 0) {
+    if (this.state.client.length === 0) {
       alert('No hay marcadores para centrar')
       return
-    } else if (this.state.clients.length === 1) {
-      const client = this.state.clients[0]
+    } else if (this.state.client.length === 1) {
+      const client = this.state.client[0]
       this.setState({
         center: {
           lat: client.lat,
@@ -160,7 +274,7 @@ class MapServiceLocator extends Component {
       })
       return
     }
-    this.state.clients.forEach(p => {
+    this.state.client.forEach(p => {
       bounds.extend(new this.google.maps.LatLng(p.lat, p.lng))
     })
     // GET NW, SE BY NE, SW
@@ -217,7 +331,7 @@ class MapServiceLocator extends Component {
   }
 
   render() {
-    const { clients, center, zoom } = this.state
+    const { client, provider, center, zoom } = this.state
     return (
       <div className="map-container">
         <Autocomplete
@@ -237,7 +351,7 @@ class MapServiceLocator extends Component {
           onChildMouseUp={this.activeDraggable}
           onChildMouseMove={this.onCircleInteraction}
         >
-          {clients.map((client, index) => (
+          {client.map((client, index) => (
             <CMarker
               key={index}
               lat={client.lat}
@@ -246,6 +360,19 @@ class MapServiceLocator extends Component {
               info={client.info}
             />
           ))}
+          {this.props.providerId !== 0
+            ? provider.map((item, index) => (
+                <CMarker
+                  key={index}
+                  lat={item.lat}
+                  lng={item.lng}
+                  isProvider={true}
+                  id={item.id}
+                  info={item.info}
+                  donde={'tacker poroviders'}
+                />
+              ))
+            : ''}
           <CMarkerSelector
             key={20}
             id={20}
