@@ -59,7 +59,9 @@ export default class Board extends Component {
         context.chatNotifications(notification.orderId)
       } else {
         context.getMyTasks()
-        context.MsmNewTask(payload.notification.title)
+        if (notification.type !== 'updateOrder') {
+          context.MsmNewTask(payload.notification.title)
+        }
       }
     })
     window.addEventListener(

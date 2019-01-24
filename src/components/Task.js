@@ -38,7 +38,7 @@ export default class Task extends Component {
     }
   }
   sendMenssage = async e => {
-    if (this.state.Menssage != '') {
+    if (this.state.Menssage !== '') {
       const result = await axios.post(
         `${process.env.API_URL}/sendMessage`,
         {
@@ -133,7 +133,15 @@ export default class Task extends Component {
                   this.state.showHideMap ? 'trakingMap mapActive' : 'trakingMap'
                 }
               >
-                <MapServiceTacking userId={1} setLocation={this.setLocation} />
+                <MapServiceTacking
+                  userId={this.props.task[0].clientId}
+                  lat={this.props.task[0].lat}
+                  len={this.props.task[0].len}
+                  providerId={this.props.task[0].providerId}
+                  latProvider={this.props.task[0].latProvider}
+                  lenProvider={this.props.task[0].lenProvider}
+                  setLocation={this.setLocation}
+                />
               </div>
               <div onClick={this.showHideMap} className="hideShowMap">
                 Mapa de actores{' '}
@@ -238,7 +246,7 @@ export default class Task extends Component {
                     sendMenssage={this.sendMenssage}
                     sendMenssageByEnter={this.sendMenssageByEnter}
                     isClientTo={false}
-                    userId={this.props.task[0].provider.id}
+                    userId={this.props.task[0].provider.user.id}
                     messagesTask={this.props.messagesTask.provider}
                     id="chatProvider"
                     idInput="provider"

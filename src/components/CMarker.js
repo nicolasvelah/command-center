@@ -2,10 +2,12 @@ import React from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
-  position: relative;
+  position: absolute;
   width: 30px;
   height: 30px;
-  background-color: #2962ff;
+  margin-left: -15px;
+  margin-top: -15px;
+  z-index: 999;
   border: 2px solid #fff;
   border-radius: 50%;
   user-select: none;
@@ -23,7 +25,7 @@ const Wrapper = styled.div`
     bottom: 38px;
     width: 200px;
     padding: 10px;
-    background-color: #2979ff;
+
     border-radius: 3px;
     color: #fff;
     left: -95px;
@@ -53,17 +55,20 @@ export default class CMarker extends React.Component {
   }
 
   render() {
-    const { id, info } = this.props
+    const { id, info, isProvider } = this.props
     const { active } = this.state
-
     return (
       <Wrapper
         className={`${active ? 'active' : ''}`}
+        style={{ backgroundColor: isProvider ? '#ff0000' : '#2962ff' }}
         onClick={() => this.setState({ active: !active })}
       >
         {`${info.name.charAt(0)}${info.lastName.charAt(0)}`}
 
-        <div className="info">
+        <div
+          className="info"
+          style={{ backgroundColor: isProvider ? '#ff0000' : '#2962ff' }}
+        >
           <p style={{ margin: 0, padding: 0 }}>
             <b>ID: {id}</b>
           </p>

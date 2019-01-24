@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import GoogleMapReact from 'google-map-react'
 import { fitBounds } from 'google-map-react/utils'
 import CMarker from './CMarker'
+import CMarkerClientServicePointer from './CMarkerClientServicePointer'
 import Autocomplete from 'react-google-autocomplete'
 import io from 'socket.io-client'
 import styled from 'styled-components'
@@ -35,12 +36,9 @@ class MapServiceTacking extends Component {
     this.state = {
       userId: 2,
       clients: [],
+      providers: [],
       draggable: true,
       center: {
-        lat: -0.1865934,
-        lng: -78.4480523,
-      },
-      pointer: {
         lat: -0.1865934,
         lng: -78.4480523,
       },
@@ -55,6 +53,7 @@ class MapServiceTacking extends Component {
     this.google = window.google = window.google ? window.google : {}
 
     await this.getClients() //get a client list with the last know location
+    await this.getProviders() //get a provider list with the last know location
 
     //connect with the websocket
     this.socket = io(process.env.WS_URL, {
@@ -67,17 +66,21 @@ class MapServiceTacking extends Component {
     })
     this.socket.on(`user-${userId}-socketId`, this.onSockedId)
     this.socket.on('onClientLocation', this.onClientLocation)
+    this.socket.on('onProviderLocation', this.onProviderLocation) //to check gps providers updates
+    this.socket.on('onProviderInService', this.onProviderInService) //to check if a provider is in service
+    this.socket.on('onProviderDisconnected', this.onProviderInService) //to check if a provider has disconnected
   }
   //GEOLOCALIZATION
   async getClients() {
     try {
       const res = await axios({
         method: 'POST',
-        url: 'https://websockets.it-zam.com/api/v1/clients',
+        url: `${process.env.WS_URL}/api/v1/clients`,
         headers: {
           jwt: token,
         },
       })
+      //console.log('Clientes', res.data)
       let users = null
       let lat = null
       let lng = null
@@ -90,13 +93,10 @@ class MapServiceTacking extends Component {
         }
         return user
       })
+      console.log('Clientes [users]', users)
       await this.setState({
         clients: [users],
         center: {
-          lat: lat,
-          lng: lng,
-        },
-        pointer: {
           lat: lat,
           lng: lng,
         },
@@ -105,8 +105,37 @@ class MapServiceTacking extends Component {
       console.error(error)
     }
   }
+  async getProviders() {
+    if (this.props.providerId !== 0) {
+      try {
+        const res = await axios({
+          method: 'POST',
+          url: `${process.env.WS_URL}/api/v1/providers`,
+          headers: {
+            jwt: token,
+          },
+        })
+
+        let users = null
+        const context = this
+        res.data.map(user => {
+          if (user.id === context.props.providerId) {
+            console.log('----------user.id', user.id)
+            console.log('context.props.providerId', context.props.providerId)
+            console.log('Provider ', user)
+            users = user
+          }
+          return user
+        })
+        console.log('providers: [users]', users)
+        await this.setState({ providers: [users] })
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
   onSockedId = id => {
-    console.log('connected with socketID', id)
+    //console.log('connected with socketID', id)
   }
   onClientLocation = data => {
     const client = {
@@ -128,15 +157,64 @@ class MapServiceTacking extends Component {
     //update tne state
     this.setState({
       clients: tmpClients,
-      center: {
-        lat: client.lat,
-        lng: client.lng,
-      },
-      pointer: {
-        lat: client.lat,
-        lng: client.lng,
-      },
     })
+  }
+  onProviderLocation = data => {
+    //console.log('provider', data)
+    const provider = {
+      id: data.id,
+      info: data.info,
+      lat: data.lat,
+      lng: data.lng,
+    }
+    var tmp = this.state.providers
+    const index = tmp.findIndex(o => o.id === provider.id)
+    if (index !== -1) {
+      //if the user is already on the list
+      //just only udate the user by index
+      tmp[index] = provider
+    } else {
+      //add the provider to the list
+      tmp.push(provider)
+    }
+    //update the state
+    this.setState({ providers: tmp })
+  }
+
+  // catch when a provider has disconnected
+  onProviderDisconnected = data => {
+    // id : provider id
+    const { id } = data
+
+    //update the providers arrays
+    var tmp = this.state.providers
+    const index = tmp.findIndex(o => o.id === id)
+    if (index !== -1) {
+      //if the user is already on the list
+      //just only udate the user by index
+      tmp[index].connected = false
+    }
+    //update the state
+    this.setState({ providers: tmp })
+  }
+
+  // catch when the inService status of a one provider has changed
+  onProviderInService = data => {
+    //console.log('onProviderInService', data)
+    // id : provider id
+    // inService: it can be a stringNumber or a null, if the value is null the provider is available to new orders
+    const { id, inService } = data
+
+    //update the providers arrays
+    var tmp = this.state.providers
+    const index = tmp.findIndex(o => o.id === id)
+    if (index !== -1) {
+      //if the user is already on the list
+      //just only udate the user by index
+      tmp[index].inService = inService
+    }
+    //update the state
+    this.setState({ providers: tmp })
   }
   centerClients = e => {
     e.preventDefault()
@@ -148,10 +226,6 @@ class MapServiceTacking extends Component {
       const client = this.state.clients[0]
       this.setState({
         center: {
-          lat: client.lat,
-          lng: client.lng,
-        },
-        pointer: {
           lat: client.lat,
           lng: client.lng,
         },
@@ -173,27 +247,11 @@ class MapServiceTacking extends Component {
     this.setState({ center, zoom })
   }
 
-  onMarkerDragEnd = map => {
-    //Si si... optimizar.... :(
-    let url = map.mapUrl.split('?')
-    url = url[1].split('&')
-    url = url[0].split('=')
-    url = url[1].split(',')
-    this.setState({
-      center: {
-        lat: Number(url[0]),
-        lng: Number(url[1]),
-      },
-    })
-  }
+  onMarkerDragEnd = map => {}
 
   handlerLocalization = place => {
     this.setState({
       center: {
-        lat: place.geometry.viewport.ma.l,
-        lng: place.geometry.viewport.fa.l,
-      },
-      pointer: {
         lat: place.geometry.viewport.ma.l,
         lng: place.geometry.viewport.fa.l,
       },
@@ -203,10 +261,6 @@ class MapServiceTacking extends Component {
     // function is just a stub to test callbacks
     this.setState({
       draggable: false,
-      pointer: {
-        lat: mouse.lat,
-        lng: mouse.lng,
-      },
     })
   }
   activeDraggable(childKey, childProps, mouse) {
@@ -214,7 +268,8 @@ class MapServiceTacking extends Component {
   }
 
   render() {
-    const { clients, center, zoom } = this.state
+    const { clients, providers, center, zoom } = this.state
+    console.log('providers to print', this.state.providers)
     return (
       <div className="map-container-traking">
         <Autocomplete
@@ -240,9 +295,29 @@ class MapServiceTacking extends Component {
               lat={client.lat}
               lng={client.lng}
               id={client.id}
+              isProvider={false}
               info={client.info}
+              donde={'tacker cliente'}
             />
           ))}
+          {this.props.providerId !== 0
+            ? providers.map((provider, index) => (
+                <CMarker
+                  key={index}
+                  lat={provider.lat}
+                  lng={provider.lng}
+                  isProvider={true}
+                  id={provider.id}
+                  info={provider.info}
+                  donde={'tacker poroviders'}
+                />
+              ))
+            : ''}
+          <CMarkerClientServicePointer
+            lat={this.props.lat}
+            lng={this.props.len}
+            id={'solicitud_' + this.props.userId}
+          />
         </GoogleMapReact>
 
         <Button onClick={this.centerClients}>
