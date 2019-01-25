@@ -324,7 +324,7 @@ export default class CreateTask extends Component {
     })
   }
   handleProviderChange = async option => {
-    this.setState({
+    await this.setState({
       provider: { value: option.value },
     })
   }
@@ -537,6 +537,7 @@ export default class CreateTask extends Component {
           <MapServiceLocator
             userId={this.state.clientId}
             providerId={this.state.provider.value}
+            provider={this.state.provider}
             setLocation={this.setLocation}
           />
         ) : (

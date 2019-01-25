@@ -76,6 +76,47 @@ class MapServiceLocator extends Component {
     this.socket.on('onProviderInService', this.onProviderInService) //to check if a provider is in service
     this.socket.on('onProviderDisconnected', this.onProviderInService) //to check if a provider has disconnected
   }
+  async shouldComponentUpdate() {
+    await this.updateMap()
+  }
+  async updateMap() {
+    console.log('Updtae map userId', this.props.userId)
+    console.log('Updtae map provider', this.props.providerId)
+    console.log(this.state.providers)
+    if (typeof this.state.client[0] !== 'undefined') {
+      if (this.props.userId !== this.state.client[0].id) {
+        const filterC = await this.filterClient(
+          this.state.clients,
+          this.props.userId
+        )
+        let users = filterC.user
+        let lat = filterC.lat
+        let lng = filterC.lng
+
+        await this.setState({
+          client: [users],
+          center: {
+            lat: lat,
+            lng: lng,
+          },
+          pointer: {
+            lat: lat,
+            lng: lng,
+          },
+        })
+      }
+    }
+    if (typeof this.state.provider[0] !== 'undefined') {
+      if (this.props.providerId !== this.state.provider[0].id) {
+        const prov = await this.filterProviders(
+          this.state.providers,
+          this.props.providerId
+        )
+        //update the state
+        this.setState({ provider: [prov] })
+      }
+    }
+  }
   //GEOLOCALIZATION
   async getClients() {
     try {
@@ -136,7 +177,7 @@ class MapServiceLocator extends Component {
           jwt: token,
         },
       })
-
+      console.log(res.data)
       await this.setState({ providers: res.data })
     } catch (error) {
       console.error(error)
@@ -189,7 +230,7 @@ class MapServiceLocator extends Component {
     }
     tmp = await this.filterProviders(tmp, this.props.providerId)
     //update the state
-    this.setState({ providers: [tmp] })
+    this.setState({ provider: [tmp] })
   }
   filterProviders = async (users, providerId) => {
     let response = null
@@ -219,7 +260,7 @@ class MapServiceLocator extends Component {
     }
     tmp = await this.filterProviders(tmp, this.props.providerId)
     //update the state
-    this.setState({ providers: [tmp] })
+    this.setState({ provider: [tmp] })
   }
   onSockedId = id => {
     console.log('connected with socketID', id)
