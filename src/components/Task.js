@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import MapServiceTacking from './MapServiceTacking'
+import AsignProvider from './AsignProvider'
 import Chat from './Chat'
 import Notes from './Notes'
 import phone from '../images/phone.svg'
@@ -19,6 +20,7 @@ export default class Task extends Component {
       orderId: null,
       isClientTo: true,
       note: '',
+      update: false,
     }
     this.setNote = this.setNote.bind(this)
     this.sendNote = this.sendNote.bind(this)
@@ -205,53 +207,65 @@ export default class Task extends Component {
                 </div>
               </div>
               <div className="provider column">
-                <div className="flex">
-                  <div className="data">
-                    <h2 className="title-tool">
-                      Proveedor{' '}
-                      <span className="callButton">
-                        <img src={phone} alt="Call client" />{' '}
-                      </span>
-                    </h2>
+                {this.props.task[0].provider.user.name !== 'N/A' ? (
+                  <div className="flex">
                     <div className="data">
-                      <div>
-                        <b>Nombre:</b>{' '}
-                        <span className="actorNameP">
-                          {this.props.task[0].provider.user.name +
-                            ' ' +
-                            this.props.task[0].provider.user.lastName}
+                      <h2 className="title-tool">
+                        Proveedor{' '}
+                        <span className="callButton">
+                          <img src={phone} alt="Call client" />{' '}
                         </span>
-                      </div>
-                      <div>
-                        <b>Nombre del negocio:</b>{' '}
-                        {this.props.task[0].provider.busnessName}
-                      </div>
-                      <div>
-                        <b>Description:</b>{' '}
-                        {this.props.task[0].provider.descriptio}
-                      </div>
-                      <div>
-                        <b>Rate:</b> {this.props.task[0].provider.rate}
-                      </div>
-                      <div>
-                        <b>Email:</b> {this.props.task[0].provider.user.email}
-                      </div>
-                      <div>
-                        <b>Phone:</b> {this.props.task[0].provider.user.phone}
+                      </h2>
+                      <div className="data">
+                        <div>
+                          <b>Nombre:</b>{' '}
+                          <span className="actorNameP">
+                            {this.props.task[0].provider.user.name +
+                              ' ' +
+                              this.props.task[0].provider.user.lastName}
+                          </span>
+                        </div>
+                        <div>
+                          <b>Nombre del negocio:</b>{' '}
+                          {this.props.task[0].provider.busnessName}
+                        </div>
+                        <div>
+                          <b>Description:</b>{' '}
+                          {this.props.task[0].provider.descriptio}
+                        </div>
+                        <div>
+                          <b>Rate:</b> {this.props.task[0].provider.rate}
+                        </div>
+                        <div>
+                          <b>Email:</b> {this.props.task[0].provider.user.email}
+                        </div>
+                        <div>
+                          <b>Phone:</b> {this.props.task[0].provider.user.phone}
+                        </div>
                       </div>
                     </div>
+                    <Chat
+                      setMenssage={this.setMenssage}
+                      sendMenssage={this.sendMenssage}
+                      sendMenssageByEnter={this.sendMenssageByEnter}
+                      isClientTo={false}
+                      userId={this.props.task[0].provider.user.id}
+                      messagesTask={this.props.messagesTask.provider}
+                      id="chatProvider"
+                      idInput="provider"
+                    />
                   </div>
-                  <Chat
-                    setMenssage={this.setMenssage}
-                    sendMenssage={this.sendMenssage}
-                    sendMenssageByEnter={this.sendMenssageByEnter}
-                    isClientTo={false}
-                    userId={this.props.task[0].provider.user.id}
-                    messagesTask={this.props.messagesTask.provider}
-                    id="chatProvider"
-                    idInput="provider"
-                  />
-                </div>
+                ) : (
+                  <div className="flex">
+                    <div className="data">
+                      <AsignProvider
+                        orderId={this.props.task[0].id}
+                        getMyTasks={this.props.getMyTasks}
+                        setModal={this.props.setModal}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <br />

@@ -43,6 +43,7 @@ export default class Board extends Component {
     this.getMessages = this.getMessages.bind(this)
     this.addMensages = this.addMensages.bind(this)
     this.addNote = this.addNote.bind(this)
+    this.getMyTasks = this.getMyTasks.bind(this)
   }
 
   async componentDidMount() {
@@ -418,6 +419,8 @@ export default class Board extends Component {
               addMensages={this.addMensages}
               addNote={this.addNote}
               notesTask={this.state.notesTask}
+              getMyTasks={this.getMyTasks}
+              setModal={this.setModal}
             />
           </Modal>
         ) : (
