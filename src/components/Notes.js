@@ -22,7 +22,7 @@ export default class Chat extends React.Component {
                 <div className="date">{item.date}</div>
               </div>
               <div className="note">
-                <span className="noteSpan">{item.contend}</span>
+                <span className="noteSpan">{item.content}</span>
               </div>
               <div className="tools">
                 <div className="edit">Editar - </div>

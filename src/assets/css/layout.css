@@ -612,6 +612,7 @@ pre tt:after {
   margin: 10px 0px;
   padding: 5px 10px;
   font-family: 'Yantramanav', sans-serif;
+  cursor: pointer;
 }
 .text-center {
   text-align: center;

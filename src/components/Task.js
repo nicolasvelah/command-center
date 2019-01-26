@@ -87,6 +87,7 @@ export default class Task extends Component {
       })
     }
   }
+
   sendNote = async e => {
     try {
       await axios.post(
@@ -104,7 +105,7 @@ export default class Task extends Component {
       )
       const note = {
         id: 100,
-        contend: this.state.note,
+        content: this.state.note,
         name: 'Nicolas Vela',
         type: 'operator',
         date: '00/00/0000 00:00',
@@ -207,55 +208,78 @@ export default class Task extends Component {
                 </div>
               </div>
               <div className="provider column">
-                {this.props.task[0].provider.user.name !== 'N/A' ? (
-                  <div className="flex">
-                    <div className="data">
-                      <h2 className="title-tool">
-                        Proveedor{' '}
-                        <span className="callButton">
-                          <img src={phone} alt="Call client" />{' '}
-                        </span>
-                      </h2>
+                {this.props.chageProviderVal === false ? (
+                  this.props.task[0].provider.user.name !== 'N/A' ? (
+                    <div className="flex">
                       <div className="data">
-                        <div>
-                          <b>Nombre:</b>{' '}
-                          <span className="actorNameP">
-                            {this.props.task[0].provider.user.name +
-                              ' ' +
-                              this.props.task[0].provider.user.lastName}
+                        <button
+                          className="btn"
+                          onClick={() => this.props.chageProvider()}
+                        >
+                          Reasignar a otro Proveedor
+                        </button>
+                        <h2 className="title-tool">
+                          Proveedor{' '}
+                          <span className="callButton">
+                            <img src={phone} alt="Call client" />{' '}
                           </span>
-                        </div>
-                        <div>
-                          <b>Nombre del negocio:</b>{' '}
-                          {this.props.task[0].provider.busnessName}
-                        </div>
-                        <div>
-                          <b>Description:</b>{' '}
-                          {this.props.task[0].provider.descriptio}
-                        </div>
-                        <div>
-                          <b>Rate:</b> {this.props.task[0].provider.rate}
-                        </div>
-                        <div>
-                          <b>Email:</b> {this.props.task[0].provider.user.email}
-                        </div>
-                        <div>
-                          <b>Phone:</b> {this.props.task[0].provider.user.phone}
+                        </h2>
+                        <div className="data">
+                          <div>
+                            <b>Nombre:</b>{' '}
+                            <span className="actorNameP">
+                              {this.props.task[0].provider.user.name +
+                                ' ' +
+                                this.props.task[0].provider.user.lastName}
+                            </span>
+                          </div>
+                          <div>
+                            <b>Nombre del negocio:</b>{' '}
+                            {this.props.task[0].provider.busnessName}
+                          </div>
+                          <div>
+                            <b>Description:</b>{' '}
+                            {this.props.task[0].provider.descriptio}
+                          </div>
+                          <div>
+                            <b>Rate:</b> {this.props.task[0].provider.rate}
+                          </div>
+                          <div>
+                            <b>Email:</b>{' '}
+                            {this.props.task[0].provider.user.email}
+                          </div>
+                          <div>
+                            <b>Phone:</b>{' '}
+                            {this.props.task[0].provider.user.phone}
+                          </div>
                         </div>
                       </div>
+                      <Chat
+                        setMenssage={this.setMenssage}
+                        sendMenssage={this.sendMenssage}
+                        sendMenssageByEnter={this.sendMenssageByEnter}
+                        isClientTo={false}
+                        userId={this.props.task[0].provider.user.id}
+                        messagesTask={this.props.messagesTask.provider}
+                        id="chatProvider"
+                        idInput="provider"
+                      />
                     </div>
-                    <Chat
-                      setMenssage={this.setMenssage}
-                      sendMenssage={this.sendMenssage}
-                      sendMenssageByEnter={this.sendMenssageByEnter}
-                      isClientTo={false}
-                      userId={this.props.task[0].provider.user.id}
-                      messagesTask={this.props.messagesTask.provider}
-                      id="chatProvider"
-                      idInput="provider"
-                    />
-                  </div>
+                  ) : (
+                    <div className="flex">
+                      <div className="data">
+                        <AsignProvider
+                          orderId={this.props.task[0].id}
+                          getMyTasks={this.props.getMyTasks}
+                          setModal={this.props.setModal}
+                        />
+                      </div>
+                    </div>
+                  )
                 ) : (
+                  ''
+                )}
+                {this.props.chageProviderVal === true ? (
                   <div className="flex">
                     <div className="data">
                       <AsignProvider
@@ -265,6 +289,8 @@ export default class Task extends Component {
                       />
                     </div>
                   </div>
+                ) : (
+                  ''
                 )}
               </div>
             </div>

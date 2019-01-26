@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify'
 
 import Modal from './modal'
 import Task from './Task'
+import Filter from './Filter'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../assets/css/board.css'
@@ -24,24 +25,13 @@ export default class Board extends Component {
       curTask: [],
       dragStard: false,
       messagesTask: [],
-      notesTask: [
-        {
-          id: 1,
-          contend: 'laksdajsd laks jd',
-          name: 'Nicolas Vela',
-          type: 'operator',
-          date: '00/00/0000 00:00',
-        },
-        {
-          id: 2,
-          contend: 'laksdajsd laks jd',
-          name: 'Ricardo',
-          type: 'supervisor',
-          date: '00/00/0000 00:00',
-        },
-      ],
+      filterOption: '',
+      notesTask: [],
+      chageProviderVal: false,
     }
     this.getMessages = this.getMessages.bind(this)
+    this.getNotes = this.getNotes.bind(this)
+    this.chageProvider = this.chageProvider.bind(this)
     this.addMensages = this.addMensages.bind(this)
     this.addNote = this.addNote.bind(this)
     this.getMyTasks = this.getMyTasks.bind(this)
@@ -78,6 +68,11 @@ export default class Board extends Component {
       false
     )
   }
+  chageProvider = () => {
+    this.setState({
+      chageProviderVal: true,
+    })
+  }
   //ALERTS
   MsmNewTask = title => toast(title)
 
@@ -98,10 +93,14 @@ export default class Board extends Component {
   }
   //NOTIFICATIONS
   notificationMessages = (id, type) => {
-    console.log('entra', { id: id, type: type })
     document.getElementById('taskid_' + id).classList.add('haveNotification')
-
     document.getElementById('taskid_' + id).classList.add('not_' + type)
+    return ''
+  }
+  //NOTIFICATIONS
+  notificationOff = (id, type) => {
+    document.getElementById('taskid_' + id).classList.remove('haveNotification')
+    document.getElementById('taskid_' + id).classList.remove('not_' + type)
     return ''
   }
 
@@ -119,6 +118,7 @@ export default class Board extends Component {
         },
       }
     )
+    console.log('messages ------------- ', messages)
     this.setState({
       messagesTask: messages.data,
     })
@@ -132,6 +132,24 @@ export default class Board extends Component {
     })
   }
   //NOTES
+  getNotes = async id => {
+    const notes = await axios.post(
+      `${process.env.API_URL}/orders/getNotes`,
+      {
+        orderId: id,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': getUser().token,
+        },
+      }
+    )
+    this.setState({
+      notesTask: notes.data.notes,
+    })
+    return notes
+  }
   addNote = async msm => {
     let { notesTask } = this.state
     notesTask.push(msm)
@@ -151,10 +169,12 @@ export default class Board extends Component {
     })
 
     await this.getMessages(task[0].id)
-
+    await this.getNotes(task[0].id)
+    this.notificationOff(task[0].id, 'provider')
     this.setState({
       curTask: task,
       showModal: true,
+      chageProviderVal: false,
     })
   }
   closeModal = () => {
@@ -254,6 +274,13 @@ export default class Board extends Component {
 
     return
   }
+  handleFilterChange = option => {
+    if (option) {
+      this.setState({ filterOption: option.value })
+    } else {
+      this.setState({ filterOption: '' })
+    }
+  }
 
   render() {
     //TASK STATES
@@ -267,87 +294,97 @@ export default class Board extends Component {
     }
 
     //TASK ITEMS
-    this.state.tasks.forEach(t => {
-      let icon = t.service.categories.name
-      icon =
-        icon
-          .toString()
-          .toLowerCase()
-          .replace(/\s+/g, '-')
-          .replace(/[^\w]+/g, '')
-          .replace(/^-+/, '')
-          .replace(/-+$/, '') + '.svg'
+    this.state.tasks
+      .filter(item => {
+        return this.state.filterOption
+          ? item.client.idCard === this.state.filterOption
+          : true
+      })
+      .forEach(t => {
+        let icon = t.service.categories.name
+        icon =
+          icon
+            .toString()
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w]+/g, '')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '') + '.svg'
 
-      tasks[t.status.name].push(
-        <div
-          key={t.id}
-          onDragStart={e => this.onDragStart(e, 'id_' + t.id)}
-          draggable
-          className={'draggable task ' + t.cssClasses}
-          onClick={e => this.setModal(t.id)}
-          id={'taskid_' + t.id}
-        >
-          <div className="task-header">
-            <div className="category-icon">
+        tasks[t.status.name].push(
+          <div
+            key={t.id}
+            onDragStart={e => this.onDragStart(e, 'id_' + t.id)}
+            draggable
+            className={'draggable task ' + t.cssClasses}
+            onClick={e => this.setModal(t.id)}
+            id={'taskid_' + t.id}
+          >
+            <div className="task-header">
+              <div className="category-icon">
+                <img
+                  src={require('../images/' + icon)}
+                  alt={t.service.category}
+                />
+              </div>
+              <h3>{t.service.name}</h3>
+              {getUser().type !== 'operator' ? (
+                <div className="operator">
+                  {t.operator !== null ? (
+                    <div>
+                      <span>
+                        {t.operator.name.charAt(0) +
+                          t.operator.lastName.charAt(0)}
+                      </span>
+                      <div className="dropdownOperatorData">
+                        <b>Nombre:</b>{' '}
+                        {t.operator.name + ' ' + t.operator.lastName} <br />
+                        <b>Email:</b> {t.operator.email} <br />
+                        <b>Teléfono:</b> {t.operator.phone}
+                        <br />
+                        <b>Tipo:</b> {t.operator.type}
+                        <br />
+                      </div>
+                    </div>
+                  ) : (
+                    <Link to="" className="btn-nbg">
+                      Asignar <img src={arrowDownIcon} alt="Asignar" />
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                ''
+              )}
+            </div>
+            <p className="task-data">
+              <b>Cliente:</b> {t.client.name + ' ' + t.client.lastName} <br />
+              <b>Proveedor:</b> {t.provider.busnessName} <br />
+              <b>Creada el:</b> {t.provider.createdAt} <br />
+            </p>
+            <div className="task-footer">
               <img
-                src={require('../images/' + icon)}
-                alt={t.service.category}
+                src={notifications}
+                alt="notifications"
+                className="notificationIcon notProvider"
+              />
+              <img
+                src={notifications}
+                alt="notifications"
+                className="notificationIcon notClient"
               />
             </div>
-            <h3>{t.service.name}</h3>
-            {getUser().type !== 'operator' ? (
-              <div className="operator">
-                {t.operator !== null ? (
-                  <div>
-                    <span>
-                      {t.operator.name.charAt(0) +
-                        t.operator.lastName.charAt(0)}
-                    </span>
-                    <div className="dropdownOperatorData">
-                      <b>Nombre:</b>{' '}
-                      {t.operator.name + ' ' + t.operator.lastName} <br />
-                      <b>Email:</b> {t.operator.email} <br />
-                      <b>Teléfono:</b> {t.operator.phone}
-                      <br />
-                      <b>Tipo:</b> {t.operator.type}
-                      <br />
-                    </div>
-                  </div>
-                ) : (
-                  <Link to="" className="btn-nbg">
-                    Asignar <img src={arrowDownIcon} alt="Asignar" />
-                  </Link>
-                )}
-              </div>
-            ) : (
-              ''
-            )}
           </div>
-          <p className="task-data">
-            <b>Cliente:</b> {t.client.name + ' ' + t.client.lastName} <br />
-            <b>Proveedor:</b> {t.provider.busnessName} <br />
-            <b>Creada el:</b> {t.provider.createdAt} <br />
-          </p>
-          <div className="task-footer">
-            <img
-              src={notifications}
-              alt="notifications"
-              className="notificationIcon notProvider"
-            />
-            <img
-              src={notifications}
-              alt="notifications"
-              className="notificationIcon notClient"
-            />
-          </div>
-        </div>
-      )
-    })
+        )
+      })
 
     //DASHBOARD
     return (
       <div className={this.state.dragStard ? 'dragging' : ''}>
         <div className="Welcome">Bienvenido {getUser().name}</div>
+        <Filter
+          filterOption={this.state.filterOption}
+          onFilterChange={this.handleFilterChange}
+        />
         <div className="board">
           {getUser().type !== 'operator' ? (
             <div
@@ -438,6 +475,9 @@ export default class Board extends Component {
               notesTask={this.state.notesTask}
               getMyTasks={this.getMyTasks}
               setModal={this.setModal}
+              getNotes={this.getNotes}
+              chageProvider={this.chageProvider}
+              chageProviderVal={this.state.chageProviderVal}
             />
           </Modal>
         ) : (
