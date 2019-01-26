@@ -132,8 +132,9 @@ class MapServiceTacking extends Component {
         })
 
         let users = await this.filterProviders(res.data, this.props.providerId)
-
-        await this.setState({ providers: [users] })
+        if (users !== null) {
+          await this.setState({ providers: [users] })
+        }
       } catch (error) {
         console.error(error)
       }
@@ -296,7 +297,7 @@ class MapServiceTacking extends Component {
 
   render() {
     const { clients, providers, center, zoom } = this.state
-    console.log('providers to print', this.state.providers)
+    console.log('providers to print', providers)
     return (
       <div className="map-container-traking">
         <Autocomplete
@@ -327,7 +328,7 @@ class MapServiceTacking extends Component {
               donde={'tacker cliente'}
             />
           ))}
-          {this.props.providerId !== 0
+          {this.props.providerId !== 0 && providers.length > 0
             ? providers.map((provider, index) => (
                 <CMarker
                   key={index}

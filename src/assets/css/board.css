@@ -88,7 +88,8 @@
   margin-bottom: 5px;
 }
 .operator {
-  position: relative;
+  position: absolute;
+  right: 27px;
 }
 .operator span {
   text-transform: uppercase;
@@ -114,6 +115,7 @@
   font-size: 11px;
   line-height: normal;
   min-width: 200px;
+  z-index: 3;
 }
 .operator:hover .dropdownOperatorData {
   display: block;
@@ -140,4 +142,21 @@
 .Welcome {
   margin: 13px 0px 0px 15px;
   font-family: 'Yantramanav', sans-serif;
+}
+.task-footer {
+  position: relative;
+}
+.notificationIcon {
+  max-width: 20px;
+  margin-bottom: 0px;
+  float: right;
+  position: relative;
+  bottom: 25px;
+  display: none;
+}
+.haveNotification.not_provider .notProvider {
+  display: block;
+}
+.haveNotification.not_client .notClient {
+  display: block;
 }

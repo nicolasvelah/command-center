@@ -5,6 +5,7 @@ import { Link } from 'gatsby'
 import axios from 'axios'
 
 import arrowDownIcon from '../images/arrow-down.svg'
+import notifications from '../images/notifications_none.svg'
 import { askForPermissioToReceiveNotifications } from '../services/push-notification'
 import { ToastContainer, toast } from 'react-toastify'
 
@@ -98,6 +99,9 @@ export default class Board extends Component {
   //NOTIFICATIONS
   notificationMessages = (id, type) => {
     console.log('entra', { id: id, type: type })
+    document.getElementById('taskid_' + id).classList.add('haveNotification')
+
+    document.getElementById('taskid_' + id).classList.add('not_' + type)
     return ''
   }
 
@@ -281,6 +285,7 @@ export default class Board extends Component {
           draggable
           className={'draggable task ' + t.cssClasses}
           onClick={e => this.setModal(t.id)}
+          id={'taskid_' + t.id}
         >
           <div className="task-header">
             <div className="category-icon">
@@ -323,6 +328,18 @@ export default class Board extends Component {
             <b>Proveedor:</b> {t.provider.busnessName} <br />
             <b>Creada el:</b> {t.provider.createdAt} <br />
           </p>
+          <div className="task-footer">
+            <img
+              src={notifications}
+              alt="notifications"
+              className="notificationIcon notProvider"
+            />
+            <img
+              src={notifications}
+              alt="notifications"
+              className="notificationIcon notClient"
+            />
+          </div>
         </div>
       )
     })
