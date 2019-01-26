@@ -56,8 +56,16 @@ export default class Task extends Component {
           },
         }
       )
+      const today = new Date()
+      const dd = today.getDate()
+      const mm = today.getMonth() + 1
+      const yyyy = today.getFullYear()
+      const hour = today.getHours()
+      const minute = today.getMinutes()
+      const second = today.getSeconds()
       const msm = {
-        date: '17/01/2019 12:01:00',
+        date:
+          dd + '/' + mm + '/' + yyyy + ' ' + hour + ':' + minute + ':' + second,
         id: 100,
         message: this.state.Menssage,
         name: getUser().name + getUser().lastName,
@@ -212,18 +220,13 @@ export default class Task extends Component {
                   this.props.task[0].provider.user.name !== 'N/A' ? (
                     <div className="flex">
                       <div className="data">
-                        <button
-                          className="btn"
-                          onClick={() => this.props.chageProvider()}
-                        >
-                          Reasignar a otro Proveedor
-                        </button>
                         <h2 className="title-tool">
                           Proveedor{' '}
                           <span className="callButton">
                             <img src={phone} alt="Call client" />{' '}
                           </span>
                         </h2>
+
                         <div className="data">
                           <div>
                             <b>Nombre:</b>{' '}
@@ -253,6 +256,12 @@ export default class Task extends Component {
                             {this.props.task[0].provider.user.phone}
                           </div>
                         </div>
+                        <button
+                          className="btn"
+                          onClick={() => this.props.chageProvider()}
+                        >
+                          Reasignar a otro Proveedor
+                        </button>
                       </div>
                       <Chat
                         setMenssage={this.setMenssage}
