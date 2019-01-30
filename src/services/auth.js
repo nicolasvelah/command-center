@@ -18,7 +18,7 @@ export const handleLogin = async ({ username, password }) => {
     const response = await axios.post(`${process.env.API_URL}/login`, {
       email: username,
       password: password,
-      isclient: false,
+      isClient: false,
     })
     if (response.data.token != null && response.data.auth === true) {
       getUserData(response.data.token)
@@ -46,7 +46,7 @@ const getUserData = async token => {
       response.data.token = token
       setUser(response.data)
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log(error)
     })
 }

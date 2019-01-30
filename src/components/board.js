@@ -28,6 +28,8 @@ export default class Board extends Component {
       filterOption: '',
       notesTask: [],
       chageProviderVal: false,
+      filterByoperator: null,
+      operators: []
     }
     this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)
@@ -35,6 +37,7 @@ export default class Board extends Component {
     this.addMensages = this.addMensages.bind(this)
     this.addNote = this.addNote.bind(this)
     this.getMyTasks = this.getMyTasks.bind(this)
+    this.getOperators = this.getOperators.bind(this)
   }
 
   async componentDidMount() {
@@ -44,7 +47,7 @@ export default class Board extends Component {
     //Push Notifications
     const messaging = await askForPermissioToReceiveNotifications()
     const context = this
-    messaging.onMessage(function(payload) {
+    messaging.onMessage(function (payload) {
       console.log('Frond Message received. ', payload)
       const notification = JSON.parse(payload.notification.body)
       if (notification.type === 'chat') {
@@ -58,7 +61,7 @@ export default class Board extends Component {
     })
     window.addEventListener(
       'focus',
-      function(event) {
+      function (event) {
         context.getMyTasks(context.state.curTask)
         if (typeof context.state.curTask[0] !== 'undefined') {
           console.log('entro para traer mensajes')
@@ -67,6 +70,10 @@ export default class Board extends Component {
       },
       false
     )
+    //OERADORES
+    if (getUser().type !== 'operator') {
+      this.getOperators()
+    }
   }
   chageProvider = () => {
     this.setState({
@@ -281,7 +288,34 @@ export default class Board extends Component {
       this.setState({ filterOption: '' })
     }
   }
-
+  handleFilterOperatorChange = option => {
+    if (option) {
+      this.setState({ filterByoperator: option })
+    } else {
+      this.setState({ filterByoperator: null })
+    }
+  }
+  //OPERATORS
+  getOperators = async () => {
+    try {
+      const data = await axios
+        .post(
+          `${process.env.API_URL}/getOperators`,
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': getUser().token,
+            },
+          }
+        )
+      this.setState({ operators: data.data.users })
+      return data
+    } catch (err) {
+      console.log(err.message)
+      return []
+    }
+  }
   render() {
     //TASK STATES
     let tasks = {
@@ -294,13 +328,18 @@ export default class Board extends Component {
     }
 
     //TASK ITEMS
+    const context = this
     this.state.tasks
-      .filter(item => {
-        return this.state.filterOption
-          ? item.client.idCard === this.state.filterOption
-          : true
+      .sort(function (a, b) {
+        return b.priority - a.priority;
       })
-      .forEach(t => {
+      .filter(function (c) {
+        if (context.state.filterByoperator !== null) {
+          return c.operator.id === context.state.filterByoperator
+        }
+        return c
+      })
+      .map(t => {
         let icon = t.service.categories.name
         icon =
           icon
@@ -347,14 +386,14 @@ export default class Board extends Component {
                       </div>
                     </div>
                   ) : (
-                    <Link to="" className="btn-nbg">
-                      Asignar <img src={arrowDownIcon} alt="Asignar" />
-                    </Link>
-                  )}
+                      <Link to="" className="btn-nbg">
+                        Asignar <img src={arrowDownIcon} alt="Asignar" />
+                      </Link>
+                    )}
                 </div>
               ) : (
-                ''
-              )}
+                  ''
+                )}
             </div>
             <p className="task-data">
               <b>Cliente:</b> {t.client.name + ' ' + t.client.lastName} <br />
@@ -375,16 +414,24 @@ export default class Board extends Component {
             </div>
           </div>
         )
+        return true
       })
 
     //DASHBOARD
     return (
       <div className={this.state.dragStard ? 'dragging' : ''}>
         <div className="Welcome">Bienvenido {getUser().name}</div>
-        <Filter
-          filterOption={this.state.filterOption}
-          onFilterChange={this.handleFilterChange}
-        />
+
+        {getUser().type !== 'operator' ? (
+          <Filter
+            filterOption={this.state.filterOption}
+            onFilterChange={this.handleFilterChange}
+            handleFilterOperatorChange={this.handleFilterOperatorChange}
+            operators={this.state.operators}
+          />
+        ) : (
+            ''
+          )}
         <div className="board">
           {getUser().type !== 'operator' ? (
             <div
@@ -398,8 +445,8 @@ export default class Board extends Component {
               {tasks.backlog}
             </div>
           ) : (
-            <div />
-          )}
+              <div />
+            )}
           <div
             className="asigned b-column"
             onDragOver={e => this.onDragOver(e)}
@@ -459,8 +506,8 @@ export default class Board extends Component {
                 </button>
               </div>
             ) : (
-              ''
-            )}
+                ''
+              )}
           </div>
         </div>
         <ToastContainer />
@@ -481,8 +528,8 @@ export default class Board extends Component {
             />
           </Modal>
         ) : (
-          ''
-        )}
+            ''
+          )}
       </div>
     )
   }
