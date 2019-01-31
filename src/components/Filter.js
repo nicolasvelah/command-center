@@ -49,7 +49,6 @@ const Filter = ({ filterOption, onFilterChange, handleFilterOperatorChange, oper
           placeholder="Buscar Tarea"
         />
       </FilterOption>*/}
-      <h4>Operadores</h4>
       {operators.map(operator =>
         (<OperatorsContainer key={operator.id} >
           <button onClick={() => handleFilterOperatorChange(operator.id)}>{operator.name.charAt(0) + operator.lastName.charAt(0)}</button>

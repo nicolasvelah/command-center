@@ -104,3 +104,23 @@ button:focus {
 .delete {
   cursor: pointer;
 }
+#ProviderState {
+  display: none;
+  font-size: 12px;
+  display: block;
+  height: 23px;
+  right: 45px;
+  position: relative;
+  top: 3px;
+  border-radius: 5px;
+  color: #fff;
+  padding: 0 10px;
+}
+.WORKINPROGRESS #ProviderState {
+  background: #188038;
+  display: block;
+}
+.WORKFINISHED #ProviderState {
+  background: red;
+  display: block;
+}

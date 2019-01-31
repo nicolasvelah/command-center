@@ -29,7 +29,8 @@ export default class Board extends Component {
       notesTask: [],
       chageProviderVal: false,
       filterByoperator: null,
-      operators: []
+      operators: [],
+      providerState: 'WIP'
     }
     this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)
@@ -52,7 +53,9 @@ export default class Board extends Component {
       const notification = JSON.parse(payload.notification.body)
       if (notification.type === 'chat') {
         context.chatNotifications(notification.orderId)
-      } else {
+      } else if (notification.type === 'WORKINPROGRESS' || notification.type === 'WORKFINISHED') {
+        context.providerState(notification.orderId, notification.type)
+      }else {
         context.getMyTasks()
         if (notification.type !== 'updateOrder') {
           context.MsmNewTask(payload.notification.title)
@@ -82,6 +85,13 @@ export default class Board extends Component {
   }
   //ALERTS
   MsmNewTask = title => toast(title)
+  //WORKSTATES
+  providerState = (id, type) => {
+    document.getElementById('taskid_' + id).classList.add(type)
+    this.setState({
+      providerState: type
+    })
+  }
 
   //CHAT
   chatNotifications = id => {
@@ -367,6 +377,7 @@ export default class Board extends Component {
                 />
               </div>
               <h3>{t.service.name}</h3>
+              <div id="ProviderState">{this.state.providerState}</div>
               {getUser().type !== 'operator' ? (
                 <div className="operator">
                   {t.operator !== null ? (
