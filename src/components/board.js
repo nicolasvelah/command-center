@@ -30,7 +30,7 @@ export default class Board extends Component {
       chageProviderVal: false,
       filterByoperator: null,
       operators: [],
-      providerState: 'WIP'
+      providerState: '',
     }
     this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)
@@ -48,14 +48,17 @@ export default class Board extends Component {
     //Push Notifications
     const messaging = await askForPermissioToReceiveNotifications()
     const context = this
-    messaging.onMessage(function (payload) {
+    messaging.onMessage(function(payload) {
       console.log('Frond Message received. ', payload)
       const notification = JSON.parse(payload.notification.body)
       if (notification.type === 'chat') {
         context.chatNotifications(notification.orderId)
-      } else if (notification.type === 'WORKINPROGRESS' || notification.type === 'WORKFINISHED') {
+      } else if (
+        notification.type === 'WORKINPROGRESS' ||
+        notification.type === 'WORKFINISHED'
+      ) {
         context.providerState(notification.orderId, notification.type)
-      }else {
+      } else {
         context.getMyTasks()
         if (notification.type !== 'updateOrder') {
           context.MsmNewTask(payload.notification.title)
@@ -64,7 +67,7 @@ export default class Board extends Component {
     })
     window.addEventListener(
       'focus',
-      function (event) {
+      function(event) {
         context.getMyTasks(context.state.curTask)
         if (typeof context.state.curTask[0] !== 'undefined') {
           console.log('entro para traer mensajes')
@@ -87,9 +90,30 @@ export default class Board extends Component {
   MsmNewTask = title => toast(title)
   //WORKSTATES
   providerState = (id, type) => {
+    const { tasks } = this.state
+    var index = tasks
+      .map(function(x) {
+        return x.id
+      })
+      .indexOf(id)
+    console.log('tasks[index]', tasks[index])
+
+    if (type === 'WORKINPROGRESS' || type === 'STARTED') {
+      type = 'wip'
+      tasks[index].appStatus = 'STARTED'
+      if (tasks[index].status.name === 'asigned') {
+        tasks[index].status.name = 'standby'
+      }
+    } else if (type === 'WORKFINISHED' || type === 'FINISHED') {
+      type = 'wf'
+      tasks[index].appStatus = 'FINISHED'
+    }
+
     document.getElementById('taskid_' + id).classList.add(type)
+
     this.setState({
-      providerState: type
+      providerState: 'WIP',
+      tasks,
     })
   }
 
@@ -114,7 +138,6 @@ export default class Board extends Component {
     document.getElementById('taskid_' + id).classList.add('not_' + type)
     return ''
   }
-  //NOTIFICATIONS
   notificationOff = (id, type) => {
     document.getElementById('taskid_' + id).classList.remove('haveNotification')
     document.getElementById('taskid_' + id).classList.remove('not_' + type)
@@ -213,7 +236,7 @@ export default class Board extends Component {
           },
         }
       )
-      console.log(tasks)
+      console.log('tasks', tasks.data.tasks)
       this.setState({
         tasks: tasks.data.tasks,
       })
@@ -308,17 +331,16 @@ export default class Board extends Component {
   //OPERATORS
   getOperators = async () => {
     try {
-      const data = await axios
-        .post(
-          `${process.env.API_URL}/getOperators`,
-          {},
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': getUser().token,
-            },
-          }
-        )
+      const data = await axios.post(
+        `${process.env.API_URL}/getOperators`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
       this.setState({ operators: data.data.users })
       return data
     } catch (err) {
@@ -340,10 +362,10 @@ export default class Board extends Component {
     //TASK ITEMS
     const context = this
     this.state.tasks
-      .sort(function (a, b) {
-        return b.priority - a.priority;
+      .sort(function(a, b) {
+        return b.priority - a.priority
       })
-      .filter(function (c) {
+      .filter(function(c) {
         if (context.state.filterByoperator !== null) {
           return c.operator.id === context.state.filterByoperator
         }
@@ -365,7 +387,20 @@ export default class Board extends Component {
             key={t.id}
             onDragStart={e => this.onDragStart(e, 'id_' + t.id)}
             draggable
-            className={'draggable task ' + t.cssClasses}
+            className={
+              'draggable task ' +
+              t.cssClasses +
+              ' ' +
+              (t.appStatus === 'WORKFINISHED' || t.appStatus === 'FINISHED'
+                ? 'wf'
+                : '') +
+              ' ' +
+              (t.appStatus === 'WORKINPROGRESS' || t.appStatus === 'STARTED'
+                ? 'wip'
+                : '') +
+              ' ' +
+              (t.appStatus === 'GOING' ? 'going' : '')
+            }
             onClick={e => this.setModal(t.id)}
             id={'taskid_' + t.id}
           >
@@ -377,7 +412,7 @@ export default class Board extends Component {
                 />
               </div>
               <h3>{t.service.name}</h3>
-              <div id="ProviderState">{this.state.providerState}</div>
+              <div id="ProviderState">{t.appStatus}</div>
               {getUser().type !== 'operator' ? (
                 <div className="operator">
                   {t.operator !== null ? (
@@ -397,19 +432,19 @@ export default class Board extends Component {
                       </div>
                     </div>
                   ) : (
-                      <Link to="" className="btn-nbg">
-                        Asignar <img src={arrowDownIcon} alt="Asignar" />
-                      </Link>
-                    )}
+                    <Link to="" className="btn-nbg">
+                      Asignar <img src={arrowDownIcon} alt="Asignar" />
+                    </Link>
+                  )}
                 </div>
               ) : (
-                  ''
-                )}
+                ''
+              )}
             </div>
             <p className="task-data">
               <b>Cliente:</b> {t.client.name + ' ' + t.client.lastName} <br />
               <b>Proveedor:</b> {t.provider.busnessName} <br />
-              <b>Creada el:</b> {t.provider.createdAt} <br />
+              <b>Creada el:</b> {t.createdAt} <br />
             </p>
             <div className="task-footer">
               <img
@@ -441,8 +476,8 @@ export default class Board extends Component {
             operators={this.state.operators}
           />
         ) : (
-            ''
-          )}
+          ''
+        )}
         <div className="board">
           {getUser().type !== 'operator' ? (
             <div
@@ -456,8 +491,8 @@ export default class Board extends Component {
               {tasks.backlog}
             </div>
           ) : (
-              <div />
-            )}
+            <div />
+          )}
           <div
             className="asigned b-column"
             onDragOver={e => this.onDragOver(e)}
@@ -485,7 +520,7 @@ export default class Board extends Component {
               onDragOver={e => this.onDragOver(e)}
               onDrop={e => this.onDrop(e, 'standby')}
             >
-              <span className="column-header">En espera</span>
+              <span className="column-header">Work in progress</span>
               {tasks.standby}
             </div>
             <div
@@ -517,8 +552,8 @@ export default class Board extends Component {
                 </button>
               </div>
             ) : (
-                ''
-              )}
+              ''
+            )}
           </div>
         </div>
         <ToastContainer />
@@ -539,8 +574,8 @@ export default class Board extends Component {
             />
           </Modal>
         ) : (
-            ''
-          )}
+          ''
+        )}
       </div>
     )
   }

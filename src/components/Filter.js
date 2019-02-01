@@ -22,20 +22,26 @@ const Container = styled.div`
   }
 `*/
 const OperatorsContainer = styled.div`
-  display:inline-block;
-  button{
-    width: 40px;
-    height:40px;
-    background:#dedede;
+  display: inline-block;
+  button {
+    width: 43px;
+    height: 43px;
+    background: #dedede;
     color: #999;
-    border:none;
-    border-radius:50%;
+    border: none;
+    border-radius: 50%;
+    border: 3px solid #fff;
     text-transform: uppercase;
-    margin-right: 5px;
-    cursor:pointer;
+    margin-right: -5px;
+    cursor: pointer;
   }
 `
-const Filter = ({ filterOption, onFilterChange, handleFilterOperatorChange, operators }) => {
+const Filter = ({
+  filterOption,
+  onFilterChange,
+  handleFilterOperatorChange,
+  operators,
+}) => {
   console.log('operators', operators)
   return (
     <Container>
@@ -49,11 +55,14 @@ const Filter = ({ filterOption, onFilterChange, handleFilterOperatorChange, oper
           placeholder="Buscar Tarea"
         />
       </FilterOption>*/}
-      {operators.map(operator =>
-        (<OperatorsContainer key={operator.id} >
-          <button onClick={() => handleFilterOperatorChange(operator.id)}>{operator.name.charAt(0) + operator.lastName.charAt(0)}</button>
-        </OperatorsContainer>)
-      )}
+      <label htmlFor="branchFilter">Operadores: </label>
+      {operators.map(operator => (
+        <OperatorsContainer key={operator.id}>
+          <button onClick={() => handleFilterOperatorChange(operator.id)}>
+            {operator.name.charAt(0) + operator.lastName.charAt(0)}
+          </button>
+        </OperatorsContainer>
+      ))}
       <OperatorsContainer>
         <button onClick={() => handleFilterOperatorChange(null)}>X</button>
       </OperatorsContainer>

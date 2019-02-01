@@ -160,3 +160,26 @@
 .haveNotification.not_client .notClient {
   display: block;
 }
+#ProviderState {
+  display: none;
+  font-size: 8px;
+  height: 23px;
+  right: 42px;
+  position: relative;
+  top: 3px;
+  border-radius: 5px;
+  color: #fff;
+  padding: 0 5px;
+}
+.going #ProviderState {
+  background: rgba(0, 204, 255, 0.767);
+  display: block;
+}
+.wip #ProviderState {
+  background: #28b954c9;
+  display: block;
+}
+.wf #ProviderState {
+  background: rgba(185, 30, 30, 0.616);
+  display: block;
+}
