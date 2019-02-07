@@ -1,5 +1,5 @@
 import React from 'react'
-import { isLoggedIn } from '../services/auth'
+import { isLoggedIn, getUser } from '../services/auth'
 import { navigate } from 'gatsby'
 
 const IndexPage = () => {
@@ -9,7 +9,11 @@ const IndexPage = () => {
     }
   } else {
     if (typeof window !== 'undefined') {
-      navigate(`/app/board`)
+      let redirect = `/app/board`
+      if (getUser().type === '911') {
+        redirect = `/app/911`
+      }
+      navigate(redirect)
     }
   }
 

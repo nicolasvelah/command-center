@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import MapServiceTacking from './MapServiceTacking'
-import AsignProvider from './AsignProvider'
 import Chat from './Chat'
-import Notes from './Notes'
 import phone from '../images/phone.svg'
 import circleDown from '../images/circle-down.svg'
 import axios from 'axios'
@@ -22,8 +20,6 @@ export default class Task extends Component {
       note: '',
       update: false,
     }
-    this.setNote = this.setNote.bind(this)
-    this.sendNote = this.sendNote.bind(this)
   }
 
   componentDidMount() {}
@@ -96,40 +92,6 @@ export default class Task extends Component {
     }
   }
 
-  sendNote = async e => {
-    try {
-      await axios.post(
-        `${process.env.API_URL}/orders/addNote`,
-        {
-          content: this.state.note,
-          orderId: this.state.orderId,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
-          },
-        }
-      )
-      const note = {
-        id: 100,
-        content: this.state.note,
-        name: 'Nicolas Vela',
-        type: 'operator',
-        date: '00/00/0000 00:00',
-      }
-      this.props.addNote(note)
-    } catch (err) {
-      console.log(err)
-    }
-  }
-  setNote = e => {
-    this.setState({
-      note: e.target.value,
-      orderId: this.props.task[0].id,
-    })
-  }
-
   render() {
     console.log(this.props.task)
     return (
@@ -139,9 +101,6 @@ export default class Task extends Component {
         this.props.task.length > 0 ? (
           <div>
             <h1 className="popUpTitle">{this.props.task[0].service.name}</h1>
-            <div className="taskState">
-              <b>Estado:</b> {this.props.task[0].status.name}
-            </div>
 
             <div className="row">
               <div className="client column">
@@ -190,105 +149,11 @@ export default class Task extends Component {
                   />
                 </div>
               </div>
-              <div className="provider column">
-                {this.props.chageProviderVal === false ? (
-                  this.props.task[0].provider.user.name !== 'N/A' ? (
-                    <div className="flex">
-                      <div className="data">
-                        <h2 className="title-tool">
-                          Proveedor{' '}
-                          <span className="callButton">
-                            <img src={phone} alt="Call client" />{' '}
-                          </span>
-                        </h2>
-
-                        <div className="data">
-                          <div>
-                            <b>Nombre:</b>{' '}
-                            <span className="actorNameP">
-                              {this.props.task[0].provider.user.name +
-                                ' ' +
-                                this.props.task[0].provider.user.lastName}
-                            </span>
-                          </div>
-                          <div>
-                            <b>Nombre del negocio:</b>{' '}
-                            {this.props.task[0].provider.busnessName}
-                          </div>
-                          <div>
-                            <b>Description:</b>{' '}
-                            {this.props.task[0].provider.descriptio}
-                          </div>
-                          <div>
-                            <b>Rate:</b> {this.props.task[0].provider.rate}
-                          </div>
-                          <div>
-                            <b>Email:</b>{' '}
-                            {this.props.task[0].provider.user.email}
-                          </div>
-                          <div>
-                            <b>Phone:</b>{' '}
-                            {this.props.task[0].provider.user.phone}
-                          </div>
-                        </div>
-                        <button
-                          className="btn"
-                          onClick={() => this.props.chageProvider()}
-                        >
-                          Reasignar a otro Proveedor
-                        </button>
-                      </div>
-                      <Chat
-                        setMenssage={this.setMenssage}
-                        sendMenssage={this.sendMenssage}
-                        sendMenssageByEnter={this.sendMenssageByEnter}
-                        isClientTo={false}
-                        userId={this.props.task[0].provider.user.id}
-                        messagesTask={this.props.messagesTask.provider}
-                        id="chatProvider"
-                        idInput="provider"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex">
-                      <div className="data">
-                        <AsignProvider
-                          orderId={this.props.task[0].id}
-                          getMyTasks={this.props.getMyTasks}
-                          setModal={this.props.setModal}
-                        />
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  ''
-                )}
-                {this.props.chageProviderVal === true ? (
-                  <div className="flex">
-                    <div className="data">
-                      <AsignProvider
-                        orderId={this.props.task[0].id}
-                        getMyTasks={this.props.getMyTasks}
-                        setModal={this.props.setModal}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  ''
-                )}
-              </div>
+              <div className="provider column" />
             </div>
             <br />
             <br />
             <div className="mapContainer">
-              <div onClick={this.showHideMap} className="hideShowMap">
-                Mapa de actores{' '}
-                <img
-                  src={circleDown}
-                  alt="Mapa"
-                  className={this.state.showHideMap ? 'trakingMapIcon' : ''}
-                />
-              </div>
               <div
                 className={
                   this.state.showHideMap ? 'trakingMap mapActive' : 'trakingMap'
@@ -304,16 +169,17 @@ export default class Task extends Component {
                   setLocation={this.setLocation}
                 />
               </div>
+              <div onClick={this.showHideMap} className="hideShowMap">
+                Mapa de actores{' '}
+                <img
+                  src={circleDown}
+                  alt="Mapa"
+                  className={this.state.showHideMap ? 'trakingMapIcon' : ''}
+                />
+              </div>
             </div>
             <br />
             <br />
-            <div>
-              <Notes
-                setNote={this.setNote}
-                sendNote={this.sendNote}
-                notesTask={this.props.notesTask}
-              />
-            </div>
           </div>
         ) : (
           ''

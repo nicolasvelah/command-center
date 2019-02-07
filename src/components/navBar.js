@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { navigate } from 'gatsby'
-import { isLoggedIn, logout } from '../services/auth'
+import { isLoggedIn, logout, getUser } from '../services/auth'
 import Modal from './modal'
 import CreateTask from './CreateTask'
 import '../assets/css/menu.css'
@@ -43,9 +43,14 @@ export default class navBar extends Component {
             </div>
             {isLoggedIn() ? (
               <div>
-                <div onClick={this.setModal} className="menuItem">
-                  Crear Tarea <img src={plus} alt="" className="icon" />
-                </div>
+                {getUser().type !== '911' ? (
+                  <div onClick={this.setModal} className="menuItem">
+                    Crear Tarea <img src={plus} alt="" className="icon" />
+                  </div>
+                ) : (
+                  ''
+                )}
+
                 <div
                   onClick={event => {
                     event.preventDefault()

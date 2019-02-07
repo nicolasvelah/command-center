@@ -36,7 +36,7 @@ class Login extends React.Component {
           method="post"
           onSubmit={event => {
             this.handleSubmit(event)
-            navigate(`/app/profile`)
+            //navigate(`/app/board`)
           }}
         >
           <label>

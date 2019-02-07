@@ -6,7 +6,8 @@
 .chat {
   border: 1px solid #dedede;
   width: 100%;
-  border-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
   overflow-x: auto;
   background: #f7f0eb;
   height: 500px;
@@ -22,15 +23,16 @@
   padding-bottom: 90px;
 }
 .mensagessForm {
-  position: absolute;
   bottom: 10px;
   left: 5%;
   margin: auto;
-  width: 90%;
+  width: 100%;
   background: #fff;
   padding: 5px 10px 3px;
-  box-shadow: 1px 1px 2px #dedede;
-  border-radius: 40px;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
   z-index: 1;
 }
 .mensagessForm input {

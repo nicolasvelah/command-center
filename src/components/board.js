@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { getUser, logout } from '../services/auth'
-import { Link } from 'gatsby'
+import { Link, navigate } from 'gatsby'
 
 import axios from 'axios'
 
@@ -42,6 +42,11 @@ export default class Board extends Component {
   }
 
   async componentDidMount() {
+    if (getUser().type === '911') {
+      navigate(`/app/911`)
+    } else if (getUser().type === 'provider') {
+      logout()
+    }
     //Tasks
     await this.getMyTasks()
 
@@ -76,7 +81,7 @@ export default class Board extends Component {
       },
       false
     )
-    //OERADORES
+    //OPERADORES
     if (getUser().type !== 'operator') {
       this.getOperators()
     }
