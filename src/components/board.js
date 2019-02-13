@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getUser, logout } from '../services/auth'
+import { getUser, logout, isLoggedIn } from '../services/auth'
 import { Link, navigate } from 'gatsby'
 
 import axios from 'axios'
@@ -48,6 +48,7 @@ export default class Board extends Component {
       logout()
     }
     //Tasks
+    console.log('init traer ordenes en did mount')
     await this.getMyTasks()
 
     //Push Notifications
@@ -73,10 +74,12 @@ export default class Board extends Component {
     window.addEventListener(
       'focus',
       function(event) {
-        context.getMyTasks(context.state.curTask)
-        if (typeof context.state.curTask[0] !== 'undefined') {
-          console.log('entro para traer mensajes')
-          context.chatNotifications(context.state.curTask[0].id)
+        if (isLoggedIn()) {
+          context.getMyTasks(context.state.curTask)
+          if (typeof context.state.curTask[0] !== 'undefined') {
+            console.log('entro para traer mensajes')
+            context.chatNotifications(context.state.curTask[0].id)
+          }
         }
       },
       false
@@ -231,6 +234,7 @@ export default class Board extends Component {
 
   //TASKS
   getMyTasks = async () => {
+    console.log('init traer ordenes')
     try {
       const tasks = await axios.post(
         `${process.env.API_URL}/orders/getOrders`,

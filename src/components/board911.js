@@ -11,7 +11,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import Task911 from './Task911'
 
 import 'react-toastify/dist/ReactToastify.css'
-import '../assets/css/board.css'
+import '../assets/css/911board.css'
 
 export default class Board extends Component {
   constructor(props) {
@@ -111,6 +111,7 @@ export default class Board extends Component {
     return messages
   }
   addMensages = (msm, type) => {
+    console.log(type)
     let { messagesTask } = this.state
     messagesTask[type].push(msm)
     this.setState({
@@ -174,6 +175,7 @@ export default class Board extends Component {
             key={t.id}
             onClick={e => this.setContent(t.id)}
             id={'taskid_' + t.id}
+            className="task911ListItem"
           >
             <div className="task-header">
               <div className="category-icon">
@@ -204,22 +206,25 @@ export default class Board extends Component {
     return (
       <div>
         <div className="Welcome">Bienvenido {getUser().name}</div>
-
-        <div className="board">
-          <div className="asigned b-column">
-            <span className="column-header">911</span>
-            {tasks.asigned}
+        <div className="container911">
+          <div className="board911">
+            <div className="b-column-911">
+              <span className="column-header">Emergencias asignadas</span>
+              {tasks.asigned}
+            </div>
+          </div>
+          <div className="task911">
+            <Task911
+              task={this.state.curTask}
+              messagesTask={this.state.messagesTask}
+              getMessages={this.getMessages}
+              addMensages={this.addMensages}
+              getMyTasks={this.getMyTasks}
+              setContent={this.setContent}
+            />
           </div>
         </div>
         <ToastContainer />
-        <Task911
-          task={this.state.curTask}
-          messagesTask={this.state.messagesTask}
-          getMessages={this.getMessages}
-          addMensages={this.addMensages}
-          getMyTasks={this.getMyTasks}
-          setContent={this.setContent}
-        />
       </div>
     )
   }

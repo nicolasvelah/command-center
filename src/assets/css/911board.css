@@ -1,0 +1,66 @@
+.container911 {
+  width: 100%;
+  display: flex;
+  font-family: 'Yantramanav', sans-serif;
+  margin-top: 10px;
+}
+.board911 {
+  width: 15%;
+}
+.b-column-911 {
+  width: 100%;
+  height: 100vh;
+  background: #eee;
+  padding: 10px;
+  border-radius: 5px;
+}
+.task911 {
+  width: 85%;
+  padding-left: 20px;
+}
+.container911 .column {
+  width: 100%;
+}
+.container911 .data {
+  width: 30%;
+}
+.container911 .mapContainer {
+  width: 60%;
+}
+.container911 .chatContainer {
+  margin: 20px 0;
+  width: 90%;
+}
+.container911 .chat {
+  height: 300px;
+}
+.container911 .mensagessContainer,
+.container911 .mensagess {
+  min-height: 300px;
+}
+.container911 .trakingMap.mapActive {
+  min-height: 600px;
+}
+.container911 .map-container-traking {
+  height: 600px;
+}
+.task911ListItem {
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.container911 .task-header {
+  display: inline-block;
+  width: 100%;
+}
+.container911 .task-header h3,
+.container911 .category-icon {
+  display: inline-block;
+}
+.container911 .category-icon img {
+  margin: 0px;
+}
+.container911 .task-header h3 {
+  margin: 0px 0px 0px 10px;
+}

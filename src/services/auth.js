@@ -46,7 +46,7 @@ const getUserData = async token => {
       response.data.token = token
       setUser(response.data)
     })
-    .catch(function (error) {
+    .catch(function(error) {
       console.log(error)
     })
 }
@@ -55,7 +55,16 @@ export const isLoggedIn = () => {
   return !!user.name
 }
 
-export const logout = callback => {
+export const logout = async callback => {
+  await axios.post(
+    `${process.env.API_URL}/logout`,
+    {},
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'x-access-token': getUser().token,
+      },
+    }
+  )
   setUser({})
-  callback()
 }

@@ -21,12 +21,21 @@ export default class Task extends Component {
       isClientTo: true,
       note: '',
       update: false,
+      have911: false,
+      id911: null,
     }
     this.setNote = this.setNote.bind(this)
     this.sendNote = this.sendNote.bind(this)
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    if (this.props.task[0].assignedTo_911 != null) {
+      this.setState({
+        have911: true,
+        id911: this.props.task[0].assignedTo_911,
+      })
+    }
+  }
 
   showHideMap = () => {
     this.setState({
@@ -40,6 +49,7 @@ export default class Task extends Component {
     }
   }
   sendMenssage = async e => {
+    console.log('inicai envio')
     if (this.state.Menssage !== '') {
       const result = await axios.post(
         `${process.env.API_URL}/sendMessage`,
@@ -56,6 +66,7 @@ export default class Task extends Component {
           },
         }
       )
+      console.log('inicai envio 2')
       const today = new Date()
       const dd = today.getDate()
       const mm = today.getMonth() + 1
@@ -76,7 +87,9 @@ export default class Task extends Component {
         userType = 'client'
       }
       this.props.addMensages(msm, userType)
+      console.log('inicai envio 3')
       document.getElementById('chat-' + userType).reset()
+      console.log('inicai envio 4')
       this.setState({
         Menssage: '',
       })
@@ -130,6 +143,31 @@ export default class Task extends Component {
     })
   }
 
+  asigne911 = async e => {
+    console.log(this.props.task[0].id)
+    try {
+      const response = await axios.post(
+        `${process.env.API_URL}/orders/assignTo911`,
+        {
+          orderId: this.props.task[0].id,
+          country: 'ECUADOR',
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      console.log(response.data)
+      this.setState({
+        have911: true,
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   render() {
     console.log(this.props.task)
     return (
@@ -141,6 +179,11 @@ export default class Task extends Component {
             <h1 className="popUpTitle">{this.props.task[0].service.name}</h1>
             <div className="taskState">
               <b>Estado:</b> {this.props.task[0].status.name}
+            </div>
+            <div>
+              <div className="asigne911" onClick={this.asigne911}>
+                Asignar al 911
+              </div>
             </div>
 
             <div className="row">
@@ -191,65 +234,80 @@ export default class Task extends Component {
                 </div>
               </div>
               <div className="provider column">
-                {this.props.chageProviderVal === false ? (
-                  this.props.task[0].provider.user.name !== 'N/A' ? (
-                    <div className="flex">
-                      <div className="data">
-                        <h2 className="title-tool">
-                          Proveedor{' '}
-                          <span className="callButton">
-                            <img src={phone} alt="Call client" />{' '}
-                          </span>
-                        </h2>
-
+                <div>
+                  {this.props.chageProviderVal === false ? (
+                    this.props.task[0].provider.user.name !== 'N/A' ? (
+                      <div className="flex">
                         <div className="data">
-                          <div>
-                            <b>Nombre:</b>{' '}
-                            <span className="actorNameP">
-                              {this.props.task[0].provider.user.name +
-                                ' ' +
-                                this.props.task[0].provider.user.lastName}
+                          <h2 className="title-tool">
+                            Proveedor{' '}
+                            <span className="callButton">
+                              <img src={phone} alt="Call client" />{' '}
                             </span>
+                          </h2>
+
+                          <div className="data">
+                            <div>
+                              <b>Nombre:</b>{' '}
+                              <span className="actorNameP">
+                                {this.props.task[0].provider.user.name +
+                                  ' ' +
+                                  this.props.task[0].provider.user.lastName}
+                              </span>
+                            </div>
+                            <div>
+                              <b>Nombre del negocio:</b>{' '}
+                              {this.props.task[0].provider.busnessName}
+                            </div>
+                            <div>
+                              <b>Description:</b>{' '}
+                              {this.props.task[0].provider.descriptio}
+                            </div>
+                            <div>
+                              <b>Rate:</b> {this.props.task[0].provider.rate}
+                            </div>
+                            <div>
+                              <b>Email:</b>{' '}
+                              {this.props.task[0].provider.user.email}
+                            </div>
+                            <div>
+                              <b>Phone:</b>{' '}
+                              {this.props.task[0].provider.user.phone}
+                            </div>
                           </div>
-                          <div>
-                            <b>Nombre del negocio:</b>{' '}
-                            {this.props.task[0].provider.busnessName}
-                          </div>
-                          <div>
-                            <b>Description:</b>{' '}
-                            {this.props.task[0].provider.descriptio}
-                          </div>
-                          <div>
-                            <b>Rate:</b> {this.props.task[0].provider.rate}
-                          </div>
-                          <div>
-                            <b>Email:</b>{' '}
-                            {this.props.task[0].provider.user.email}
-                          </div>
-                          <div>
-                            <b>Phone:</b>{' '}
-                            {this.props.task[0].provider.user.phone}
-                          </div>
+                          <button
+                            className="btn"
+                            onClick={() => this.props.chageProvider()}
+                          >
+                            Reasignar a otro Proveedor
+                          </button>
                         </div>
-                        <button
-                          className="btn"
-                          onClick={() => this.props.chageProvider()}
-                        >
-                          Reasignar a otro Proveedor
-                        </button>
+                        <Chat
+                          setMenssage={this.setMenssage}
+                          sendMenssage={this.sendMenssage}
+                          sendMenssageByEnter={this.sendMenssageByEnter}
+                          isClientTo={false}
+                          userId={this.props.task[0].provider.user.id}
+                          messagesTask={this.props.messagesTask.provider}
+                          id="chatProvider"
+                          idInput="provider"
+                        />
                       </div>
-                      <Chat
-                        setMenssage={this.setMenssage}
-                        sendMenssage={this.sendMenssage}
-                        sendMenssageByEnter={this.sendMenssageByEnter}
-                        isClientTo={false}
-                        userId={this.props.task[0].provider.user.id}
-                        messagesTask={this.props.messagesTask.provider}
-                        id="chatProvider"
-                        idInput="provider"
-                      />
-                    </div>
+                    ) : (
+                      <div className="flex">
+                        <div className="data">
+                          <AsignProvider
+                            orderId={this.props.task[0].id}
+                            getMyTasks={this.props.getMyTasks}
+                            setModal={this.props.setModal}
+                          />
+                        </div>
+                      </div>
+                    )
                   ) : (
+                    ''
+                  )}
+                  {this.props.chageProviderVal === true ? (
                     <div className="flex">
                       <div className="data">
                         <AsignProvider
@@ -259,23 +317,38 @@ export default class Task extends Component {
                         />
                       </div>
                     </div>
-                  )
-                ) : (
-                  ''
-                )}
-                {this.props.chageProviderVal === true ? (
-                  <div className="flex">
-                    <div className="data">
-                      <AsignProvider
-                        orderId={this.props.task[0].id}
-                        getMyTasks={this.props.getMyTasks}
-                        setModal={this.props.setModal}
-                      />
+                  ) : (
+                    ''
+                  )}
+                </div>
+                <div>
+                  <div className="sos-chat">
+                    <div className="flex">
+                      <div className="data">
+                        <h2 className="title-tool">
+                          911{' '}
+                          <span className="callButton">
+                            <img src={phone} alt="Call client" />{' '}
+                          </span>
+                        </h2>
+                      </div>
+                      {this.state.have911 ? (
+                        <Chat
+                          setMenssage={this.setMenssage}
+                          sendMenssage={this.sendMenssage}
+                          sendMenssageByEnter={this.sendMenssageByEnter}
+                          isClientTo={false}
+                          userId={this.state.id911}
+                          messagesTask={this.props.messagesTask['911']}
+                          id="chat911"
+                          idInput="sos"
+                        />
+                      ) : (
+                        ''
+                      )}
                     </div>
                   </div>
-                ) : (
-                  ''
-                )}
+                </div>
               </div>
             </div>
             <br />

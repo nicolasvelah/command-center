@@ -23,6 +23,7 @@ const Container = styled.div`
 `*/
 const OperatorsContainer = styled.div`
   display: inline-block;
+  position: relative;
   button {
     width: 43px;
     height: 43px;
@@ -58,13 +59,28 @@ const Filter = ({
       <label htmlFor="branchFilter">Operadores: </label>
       {operators.map(operator => (
         <OperatorsContainer key={operator.id}>
-          <button onClick={() => handleFilterOperatorChange(operator.id)}>
+          <button
+            onClick={() => handleFilterOperatorChange(operator.id)}
+            className="operatorFilter"
+          >
             {operator.name.charAt(0) + operator.lastName.charAt(0)}
+            <div className="dropdownOperatorDataFilter">
+              {operator.name + ' ' + operator.lastName} <br />
+              <b>Email:</b> {operator.email} <br />
+              <b>Teléfono:</b> {operator.phone}
+              <br />
+              <b>Tipo:</b> {operator.type}
+            </div>
           </button>
         </OperatorsContainer>
       ))}
       <OperatorsContainer>
-        <button onClick={() => handleFilterOperatorChange(null)}>X</button>
+        <button
+          onClick={() => handleFilterOperatorChange(null)}
+          className="FilterReset"
+        >
+          X
+        </button>
       </OperatorsContainer>
     </Container>
   )

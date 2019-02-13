@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import MapServiceTacking from './MapServiceTacking'
 import Chat from './Chat'
 import phone from '../images/phone.svg'
-import circleDown from '../images/circle-down.svg'
 import axios from 'axios'
 import { getUser } from '../services/auth'
 
@@ -24,11 +23,6 @@ export default class Task extends Component {
 
   componentDidMount() {}
 
-  showHideMap = () => {
-    this.setState({
-      showHideMap: !this.state.showHideMap,
-    })
-  }
   sendMenssageByEnter = e => {
     if (e.key === 'Enter') {
       e.preventDefault()
@@ -36,6 +30,7 @@ export default class Task extends Component {
     }
   }
   sendMenssage = async e => {
+    console.log('enviando ms')
     if (this.state.Menssage !== '') {
       const result = await axios.post(
         `${process.env.API_URL}/sendMessage`,
@@ -67,15 +62,13 @@ export default class Task extends Component {
         name: getUser().name + getUser().lastName,
         type: getUser().type,
       }
-      let userType = 'provider'
-      if (this.state.isClientTo) {
-        userType = 'client'
-      }
+      let userType = '911'
       this.props.addMensages(msm, userType)
-      document.getElementById('chat-' + userType).reset()
+      document.getElementById('chat-input').reset()
       this.setState({
         Menssage: '',
       })
+      console.log('termiono envio ms')
       return result
     } else {
       return
@@ -100,8 +93,6 @@ export default class Task extends Component {
         this.props.task !== null &&
         this.props.task.length > 0 ? (
           <div>
-            <h1 className="popUpTitle">{this.props.task[0].service.name}</h1>
-
             <div className="row">
               <div className="client column">
                 <div className="flex">
@@ -136,48 +127,56 @@ export default class Task extends Component {
                     <div>
                       <b>Phone:</b> {this.props.task[0].client.phone}
                     </div>
+                    <br />
+                    <br />
+                    <h2 className="title-tool">
+                      Operador{' '}
+                      <span className="callButton">
+                        <img src={phone} alt="Call client" />{' '}
+                      </span>
+                    </h2>
+                    <div>
+                      <b>Nombre:</b>{' '}
+                      <span className="actorNameC">
+                        {this.props.task[0].operator.name +
+                          ' ' +
+                          this.props.task[0].operator.lastName}
+                      </span>
+                    </div>
+                    <Chat
+                      setMenssage={this.setMenssage}
+                      sendMenssage={this.sendMenssage}
+                      sendMenssageByEnter={this.sendMenssageByEnter}
+                      isClientTo={false}
+                      userId={this.props.task[0].operator.id}
+                      messagesTask={this.props.messagesTask['911']}
+                      id="chat-911"
+                      idInput="input"
+                    />
                   </div>
-                  <Chat
-                    setMenssage={this.setMenssage}
-                    sendMenssage={this.sendMenssage}
-                    sendMenssageByEnter={this.sendMenssageByEnter}
-                    isClientTo={true}
-                    userId={this.props.task[0].client.id}
-                    messagesTask={this.props.messagesTask.client}
-                    id="chatClient"
-                    idInput="client"
-                  />
+                  <div className="mapContainer">
+                    <div
+                      className={
+                        this.state.showHideMap
+                          ? 'trakingMap mapActive'
+                          : 'trakingMap'
+                      }
+                    >
+                      <MapServiceTacking
+                        userId={this.props.task[0].clientId}
+                        lat={this.props.task[0].lat}
+                        len={this.props.task[0].len}
+                        providerId={this.props.task[0].providerId}
+                        latProvider={this.props.task[0].latProvider}
+                        lenProvider={this.props.task[0].lenProvider}
+                        setLocation={this.setLocation}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="provider column" />
             </div>
-            <br />
-            <br />
-            <div className="mapContainer">
-              <div
-                className={
-                  this.state.showHideMap ? 'trakingMap mapActive' : 'trakingMap'
-                }
-              >
-                <MapServiceTacking
-                  userId={this.props.task[0].clientId}
-                  lat={this.props.task[0].lat}
-                  len={this.props.task[0].len}
-                  providerId={this.props.task[0].providerId}
-                  latProvider={this.props.task[0].latProvider}
-                  lenProvider={this.props.task[0].lenProvider}
-                  setLocation={this.setLocation}
-                />
-              </div>
-              <div onClick={this.showHideMap} className="hideShowMap">
-                Mapa de actores{' '}
-                <img
-                  src={circleDown}
-                  alt="Mapa"
-                  className={this.state.showHideMap ? 'trakingMapIcon' : ''}
-                />
-              </div>
-            </div>
+
             <br />
             <br />
           </div>

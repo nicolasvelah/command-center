@@ -117,11 +117,28 @@
   min-width: 200px;
   z-index: 3;
 }
-.operator:hover .dropdownOperatorData {
-  display: block;
+.dropdownOperatorDataFilter {
+  display: none;
+  position: absolute;
+  top: 100%;
+  background: #fff;
+  border: 1px solid #dedede;
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 11px;
+  line-height: normal;
+  min-width: 200px;
+  z-index: 3;
+}
+.operator:hover .dropdownOperatorData,
+.operatorFilter:hover .dropdownOperatorDataFilter {
+  display: block !important;
 }
 .operator a {
   float: left;
+}
+.FilterReset {
+  background: red;
 }
 
 .column-footer {

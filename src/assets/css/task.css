@@ -46,7 +46,9 @@
   font-size: 14px;
   line-height: 15px;
 }
-
+.sos-chat {
+  margin-top: 30px;
+}
 .taskState {
   float: right;
   font-family: 'Yantramanav', sans-serif;
@@ -103,4 +105,10 @@ button:focus {
 }
 .delete {
   cursor: pointer;
+}
+.asigne911 {
+  cursor: pointer;
+}
+.chat911Container {
+  width: 100%;
 }

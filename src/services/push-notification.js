@@ -23,7 +23,6 @@ export const askForPermissioToReceiveNotifications = async () => {
     const messaging = firebase.messaging()
     await messaging.requestPermission()
     const token = await messaging.getToken()
-    console.log('token do usuário:', token)
 
     await axios.post(
       `${process.env.API_URL}/updateToken`,
@@ -36,6 +35,7 @@ export const askForPermissioToReceiveNotifications = async () => {
         },
       }
     )
+    console.log('token de usuário:', token)
     return messaging
   } catch (error) {
     console.error(error)
