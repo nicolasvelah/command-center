@@ -3,13 +3,18 @@ const { navigate } = require('gatsby')
 
 export const isBrowser = () => typeof window !== 'undefined'
 
+export const getFbtk = () =>
+  isBrowser() && window.localStorage.getItem('fbtk')
+    ? window.localStorage.getItem('fbtk')
+    : null
+
 export const getUser = () =>
-  isBrowser() && window.localStorage.getItem('gatsbyUser')
-    ? JSON.parse(window.localStorage.getItem('gatsbyUser'))
+  isBrowser() && window.localStorage.getItem('user')
+    ? JSON.parse(window.localStorage.getItem('user'))
     : {}
 
 const setUser = user => {
-  window.localStorage.setItem('gatsbyUser', JSON.stringify(user))
+  window.localStorage.setItem('user', JSON.stringify(user))
   navigate(`/`)
 }
 
@@ -67,8 +72,10 @@ export const logout = async callback => {
     }
   )
   setUser({})
+  window.localStorage.setItem('fbtk', '')
 }
 
 export const logoutLocal = async callback => {
   setUser({})
+  window.localStorage.setItem('fbtk', '')
 }

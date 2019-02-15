@@ -1,5 +1,5 @@
 .chatContainer {
-  margin-left: 25px;
+  margin-left: 0;
   width: 100%;
   position: relative;
 }
@@ -11,6 +11,7 @@
   overflow-x: auto;
   background: #f7f0eb;
   height: 500px;
+  min-width: 300px;
 }
 .mensagessContainer {
   min-height: 500px;

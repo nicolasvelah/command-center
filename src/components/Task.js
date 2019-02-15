@@ -187,114 +187,129 @@ export default class Task extends Component {
             </div>
 
             <div className="row">
-              <div className="client column">
-                <div className="flex">
-                  <div className="data">
-                    <h2 className="title-tool">
-                      Cliente{' '}
-                      <span className="callButton">
-                        <img src={phone} alt="Call client" />{' '}
-                      </span>
-                    </h2>
-                    <div>
-                      <b>Nombre:</b>{' '}
-                      <span className="actorNameC">
-                        {this.props.task[0].client.name +
-                          ' ' +
-                          this.props.task[0].client.lastName}
-                      </span>
-                    </div>
-                    <div>
-                      <b>Cédula:</b> {this.props.task[0].client.idCard}
-                    </div>
-                    <div>
-                      <b>Tipo de sangre:</b>{' '}
-                      {this.props.task[0].client.bloodType}
-                    </div>
-                    <div>
-                      <b>Email:</b> {this.props.task[0].client.email}
-                    </div>
-                    <div>
-                      <b>Cumpleaños:</b> {this.props.task[0].client.birthday}
-                    </div>
-                    <div>
-                      <b>Phone:</b> {this.props.task[0].client.phone}
-                    </div>
-                  </div>
-                  <Chat
-                    setMenssage={this.setMenssage}
-                    sendMenssage={this.sendMenssage}
-                    sendMenssageByEnter={this.sendMenssageByEnter}
-                    isClientTo={true}
-                    userId={this.props.task[0].client.id}
-                    messagesTask={this.props.messagesTask.client}
-                    id="chatClient"
-                    idInput="client"
-                  />
-                </div>
-              </div>
-              <div className="provider column">
-                <div>
-                  {this.props.chageProviderVal === false ? (
-                    this.props.task[0].provider.user.name !== 'N/A' ? (
-                      <div className="flex">
-                        <div className="data">
-                          <h2 className="title-tool">
-                            Proveedor{' '}
-                            <span className="callButton">
-                              <img src={phone} alt="Call client" />{' '}
-                            </span>
-                          </h2>
-
-                          <div className="data">
-                            <div>
-                              <b>Nombre:</b>{' '}
-                              <span className="actorNameP">
-                                {this.props.task[0].provider.user.name +
-                                  ' ' +
-                                  this.props.task[0].provider.user.lastName}
-                              </span>
-                            </div>
-                            <div>
-                              <b>Nombre del negocio:</b>{' '}
-                              {this.props.task[0].provider.busnessName}
-                            </div>
-                            <div>
-                              <b>Description:</b>{' '}
-                              {this.props.task[0].provider.descriptio}
-                            </div>
-                            <div>
-                              <b>Rate:</b> {this.props.task[0].provider.rate}
-                            </div>
-                            <div>
-                              <b>Email:</b>{' '}
-                              {this.props.task[0].provider.user.email}
-                            </div>
-                            <div>
-                              <b>Phone:</b>{' '}
-                              {this.props.task[0].provider.user.phone}
-                            </div>
-                          </div>
-                          <button
-                            className="btn"
-                            onClick={() => this.props.chageProvider()}
-                          >
-                            Reasignar a otro Proveedor
-                          </button>
-                        </div>
-                        <Chat
-                          setMenssage={this.setMenssage}
-                          sendMenssage={this.sendMenssage}
-                          sendMenssageByEnter={this.sendMenssageByEnter}
-                          isClientTo={false}
-                          userId={this.props.task[0].provider.user.id}
-                          messagesTask={this.props.messagesTask.provider}
-                          id="chatProvider"
-                          idInput="provider"
-                        />
+              <div className="chatRow">
+                <div className="client column">
+                  <div className="">
+                    <div className="data">
+                      <h2 className="title-tool">
+                        Cliente{' '}
+                        <span className="callButton">
+                          <img src={phone} alt="Call client" />{' '}
+                        </span>
+                      </h2>
+                      <div>
+                        <b>Nombre:</b>{' '}
+                        <span className="actorNameC">
+                          {this.props.task[0].client.name +
+                            ' ' +
+                            this.props.task[0].client.lastName}
+                        </span>
                       </div>
+                      <div>
+                        <b>Cédula:</b> {this.props.task[0].client.idCard}
+                      </div>
+                      <div>
+                        <b>Tipo de sangre:</b>{' '}
+                        {this.props.task[0].client.bloodType}
+                      </div>
+                      <div>
+                        <b>Email:</b> {this.props.task[0].client.email}
+                      </div>
+                      <div>
+                        <b>Cumpleaños:</b> {this.props.task[0].client.birthday}
+                      </div>
+                      <div>
+                        <b>Phone:</b> {this.props.task[0].client.phone}
+                      </div>
+                    </div>
+                    <Chat
+                      setMenssage={this.setMenssage}
+                      sendMenssage={this.sendMenssage}
+                      sendMenssageByEnter={this.sendMenssageByEnter}
+                      isClientTo={true}
+                      userId={this.props.task[0].client.id}
+                      messagesTask={this.props.messagesTask.client}
+                      id="chatClient"
+                      idInput="client"
+                    />
+                  </div>
+                </div>
+                <div className="provider column">
+                  <div>
+                    {this.props.chageProviderVal === false ? (
+                      this.props.task[0].provider.user.name !== 'N/A' ? (
+                        <div className="">
+                          <div className="data">
+                            <h2 className="title-tool">
+                              Proveedor{' '}
+                              <span className="callButton">
+                                <img src={phone} alt="Call client" />{' '}
+                              </span>
+                            </h2>
+
+                            <div className="data">
+                              <div>
+                                <b>Nombre:</b>{' '}
+                                <span className="actorNameP">
+                                  {this.props.task[0].provider.user.name +
+                                    ' ' +
+                                    this.props.task[0].provider.user.lastName}
+                                </span>
+                              </div>
+                              <div>
+                                <b>Nombre del negocio:</b>{' '}
+                                {this.props.task[0].provider.busnessName}
+                              </div>
+                              <div>
+                                <b>Description:</b>{' '}
+                                {this.props.task[0].provider.descriptio}
+                              </div>
+                              <div>
+                                <b>Rate:</b> {this.props.task[0].provider.rate}
+                              </div>
+                              <div>
+                                <b>Email:</b>{' '}
+                                {this.props.task[0].provider.user.email}
+                              </div>
+                              <div>
+                                <b>Phone:</b>{' '}
+                                {this.props.task[0].provider.user.phone}
+                              </div>
+                            </div>
+                            <button
+                              className="btn"
+                              onClick={() => this.props.chageProvider()}
+                            >
+                              Reasignar a otro Proveedor
+                            </button>
+                          </div>
+                          <Chat
+                            setMenssage={this.setMenssage}
+                            sendMenssage={this.sendMenssage}
+                            sendMenssageByEnter={this.sendMenssageByEnter}
+                            isClientTo={false}
+                            userId={this.props.task[0].provider.user.id}
+                            messagesTask={this.props.messagesTask.provider}
+                            id="chatProvider"
+                            idInput="provider"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex">
+                          <div className="data">
+                            <AsignProvider
+                              orderId={this.props.task[0].id}
+                              getMyTasks={this.props.getMyTasks}
+                              setModal={this.props.setModal}
+                            />
+                          </div>
+                        </div>
+                      )
                     ) : (
-                      <div className="flex">
+                      ''
+                    )}
+                    {this.props.chageProviderVal === true ? (
+                      <div className="">
                         <div className="data">
                           <AsignProvider
                             orderId={this.props.task[0].id}
@@ -303,50 +318,35 @@ export default class Task extends Component {
                           />
                         </div>
                       </div>
-                    )
-                  ) : (
-                    ''
-                  )}
-                  {this.props.chageProviderVal === true ? (
-                    <div className="flex">
-                      <div className="data">
-                        <AsignProvider
-                          orderId={this.props.task[0].id}
-                          getMyTasks={this.props.getMyTasks}
-                          setModal={this.props.setModal}
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    ''
-                  )}
+                    ) : (
+                      ''
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <div className="sos-chat">
-                    <div className="flex">
-                      <div className="data">
-                        <h2 className="title-tool">
-                          911{' '}
-                          <span className="callButton">
-                            <img src={phone} alt="Call client" />{' '}
-                          </span>
-                        </h2>
-                      </div>
-                      {this.state.have911 ? (
-                        <Chat
-                          setMenssage={this.setMenssage}
-                          sendMenssage={this.sendMenssage}
-                          sendMenssageByEnter={this.sendMenssageByEnter}
-                          isClientTo={false}
-                          userId={this.state.id911}
-                          messagesTask={this.props.messagesTask['911']}
-                          id="chat911"
-                          idInput="sos"
-                        />
-                      ) : (
-                        ''
-                      )}
+                <div className="provider column">
+                  <div className="">
+                    <div className="data">
+                      <h2 className="title-tool">
+                        911{' '}
+                        <span className="callButton">
+                          <img src={phone} alt="Call client" />{' '}
+                        </span>
+                      </h2>
                     </div>
+                    {this.state.have911 ? (
+                      <Chat
+                        setMenssage={this.setMenssage}
+                        sendMenssage={this.sendMenssage}
+                        sendMenssageByEnter={this.sendMenssageByEnter}
+                        isClientTo={false}
+                        userId={this.state.id911}
+                        messagesTask={this.props.messagesTask['911']}
+                        id="chat911"
+                        idInput="sos"
+                      />
+                    ) : (
+                      ''
+                    )}
                   </div>
                 </div>
               </div>

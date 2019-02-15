@@ -112,3 +112,8 @@ button:focus {
 .chat911Container {
   width: 100%;
 }
+.chatRow {
+  min-width: 100%;
+  overflow-x: auto;
+  display: inline-flex;
+}

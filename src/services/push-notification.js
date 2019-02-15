@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/messaging'
 import axios from 'axios'
-import { getUser } from '../services/auth'
+import { getUser, getFbtk } from '../services/auth'
 
 export const initializeFirebase = () => {
   if (typeof window !== 'undefined') {
@@ -20,27 +20,33 @@ export const initializeFirebase = () => {
 
 export const askForPermissioToReceiveNotifications = async () => {
   try {
-    console.log('paso 1')
-    const messaging = firebase.messaging()
-    console.log('paso 2')
-    await messaging.requestPermission()
-    console.log('paso 3')
-    const token = await messaging.getToken()
-    console.log('paso 4')
+    console.log('getFbtk() ', getFbtk())
 
-    await axios.post(
-      `${process.env.API_URL}/updateToken`,
-      {},
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
-          token: token,
-        },
-      }
-    )
-    console.log('token de usuário:', token)
-    return messaging
+    if (getFbtk() === null) {
+      const messaging = firebase.messaging()
+
+      console.log('paso 2 messaging', messaging)
+      await messaging.requestPermission()
+      console.log('solicito permiso')
+      const token = await messaging.getToken()
+      console.log('paso 4 ')
+
+      await axios.post(
+        `${process.env.API_URL}/updateToken`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+            token: token,
+          },
+        }
+      )
+      console.log('token de usuário:', token)
+      window.localStorage.setItem('fbtk', token)
+      return messaging
+    }
+    return false
   } catch (error) {
     console.error('Errtor de FB perimisos', error)
     return error

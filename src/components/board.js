@@ -42,35 +42,39 @@ export default class Board extends Component {
   }
 
   async componentDidMount() {
+    this._ismounted = true
     if (getUser().type === '911') {
       navigate(`/app/911`)
     } else if (getUser().type === 'provider') {
       logout()
     }
     //Tasks
-    console.log('init traer ordenes en did mount')
+    console.log('init traer ordenes en did mount ')
     await this.getMyTasks()
 
     //Push Notifications
     const messaging = await askForPermissioToReceiveNotifications()
+
     const context = this
-    messaging.onMessage(function(payload) {
-      console.log('Frond Message received. ', payload)
-      const notification = JSON.parse(payload.notification.body)
-      if (notification.type === 'chat') {
-        context.chatNotifications(notification.orderId)
-      } else if (
-        notification.type === 'WORKINPROGRESS' ||
-        notification.type === 'WORKFINISHED'
-      ) {
-        context.providerState(notification.orderId, notification.type)
-      } else {
-        context.getMyTasks()
-        if (notification.type !== 'updateOrder') {
-          context.MsmNewTask(payload.notification.title)
+    if (messaging !== false) {
+      messaging.onMessage(function(payload) {
+        console.log('Frond Message received.', payload)
+        const notification = JSON.parse(payload.notification.body)
+        if (notification.type === 'chat') {
+          context.chatNotifications(notification.orderId)
+        } else if (
+          notification.type === 'WORKINPROGRESS' ||
+          notification.type === 'WORKFINISHED'
+        ) {
+          context.providerState(notification.orderId, notification.type)
+        } else {
+          context.getMyTasks()
+          if (notification.type !== 'updateOrder') {
+            context.MsmNewTask(payload.notification.title)
+          }
         }
-      }
-    })
+      })
+    }
     window.addEventListener(
       'focus',
       function(event) {
@@ -88,6 +92,10 @@ export default class Board extends Component {
     if (getUser().type !== 'operator') {
       this.getOperators()
     }
+  }
+
+  componentWillUnmount() {
+    this._ismounted = false
   }
   chageProvider = () => {
     this.setState({
@@ -245,10 +253,12 @@ export default class Board extends Component {
           },
         }
       )
-      console.log('tasks', tasks.data.tasks)
-      this.setState({
-        tasks: tasks.data.tasks,
-      })
+      console.log('tasks ', tasks.data.tasks)
+      if (this._ismounted) {
+        this.setState({
+          tasks: tasks.data.tasks,
+        })
+      }
     } catch (err) {
       console.log(err)
       logoutLocal()
