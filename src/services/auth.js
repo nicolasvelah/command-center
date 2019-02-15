@@ -68,3 +68,7 @@ export const logout = async callback => {
   )
   setUser({})
 }
+
+export const logoutLocal = async callback => {
+  setUser({})
+}

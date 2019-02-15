@@ -383,6 +383,7 @@ class MapServiceLocator extends Component {
           placeholder="Introduce una ubicación (Opcional)"
         />
         <GoogleMapReact
+          bootstrapURLKeys={{ key: 'AIzaSyCW_VtwnO2cCNOYEGkd3tigdoCxeRxAnU4' }}
           center={center}
           zoom={zoom}
           onDrag={this.onMarkerDragEnd}

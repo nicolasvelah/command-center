@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getUser, logout, isLoggedIn } from '../services/auth'
+import { getUser, logout, isLoggedIn, logoutLocal } from '../services/auth'
 import { Link, navigate } from 'gatsby'
 
 import axios from 'axios'
@@ -251,7 +251,7 @@ export default class Board extends Component {
       })
     } catch (err) {
       console.log(err)
-      logout()
+      logoutLocal()
     }
     return true
   }

@@ -20,9 +20,13 @@ export const initializeFirebase = () => {
 
 export const askForPermissioToReceiveNotifications = async () => {
   try {
+    console.log('paso 1')
     const messaging = firebase.messaging()
+    console.log('paso 2')
     await messaging.requestPermission()
+    console.log('paso 3')
     const token = await messaging.getToken()
+    console.log('paso 4')
 
     await axios.post(
       `${process.env.API_URL}/updateToken`,
@@ -38,7 +42,7 @@ export const askForPermissioToReceiveNotifications = async () => {
     console.log('token de usuário:', token)
     return messaging
   } catch (error) {
-    console.error(error)
+    console.error('Errtor de FB perimisos', error)
     return error
   }
 }

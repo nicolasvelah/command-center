@@ -309,6 +309,7 @@ class MapServiceTacking extends Component {
         />
         <GoogleMapReact
           center={center}
+          bootstrapURLKeys={{ key: 'AIzaSyCW_VtwnO2cCNOYEGkd3tigdoCxeRxAnU4' }}
           zoom={zoom}
           onDrag={this.onMarkerDragEnd}
           yesIWantToUseGoogleMapApiInternals={true}

@@ -62,11 +62,15 @@ export default class Layout extends React.Component {
         render={data => (
           <>
             <Helmet>
-              <script
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCW_VtwnO2cCNOYEGkd3tigdoCxeRxAnU4&libraries=places"
-                async
-                defer
-              />
+              {!window.google ? (
+                <script
+                  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCW_VtwnO2cCNOYEGkd3tigdoCxeRxAnU4&libraries=places"
+                  async
+                  defer
+                />
+              ) : (
+                ''
+              )}
               <link
                 href="https://fonts.googleapis.com/css?family=Teko:500|Yantramanav:300"
                 rel="stylesheet"
