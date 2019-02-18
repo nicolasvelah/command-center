@@ -10,17 +10,17 @@
   border-top-right-radius: 10px;
   overflow-x: auto;
   background: #f7f0eb;
-  height: 500px;
+  height: 400px;
   min-width: 300px;
 }
 .mensagessContainer {
-  min-height: 500px;
+  min-height: 400px;
   width: 100%;
 }
 .mensagess {
   padding: 20px;
   background: #f7f0eb;
-  min-height: 500px;
+  min-height: 400px;
   padding-bottom: 90px;
 }
 .mensagessForm {

@@ -23,6 +23,8 @@ export default class Task extends Component {
       update: false,
       have911: false,
       id911: null,
+      showCD: false,
+      showPD: false,
     }
     this.setNote = this.setNote.bind(this)
     this.sendNote = this.sendNote.bind(this)
@@ -142,6 +144,23 @@ export default class Task extends Component {
       orderId: this.props.task[0].id,
     })
   }
+  openClose = id => {
+    console.log('id', id)
+    switch (id) {
+      case 'showCD':
+        this.setState({
+          showCD: !this.state.showCD,
+        })
+        break
+      case 'showPD':
+        this.setState({
+          showPD: !this.state.showPD,
+        })
+        break
+      default:
+      // code block
+    }
+  }
 
   asigne911 = async e => {
     console.log(this.props.task[0].id)
@@ -181,9 +200,13 @@ export default class Task extends Component {
               <b>Estado:</b> {this.props.task[0].status.name}
             </div>
             <div>
-              <div className="asigne911" onClick={this.asigne911}>
-                Asignar al 911
-              </div>
+              {!this.state.have911 ? (
+                <div className="asigne911 btn" onClick={this.asigne911}>
+                  Asignar al 911
+                </div>
+              ) : (
+                ''
+              )}
             </div>
 
             <div className="row">
@@ -191,35 +214,55 @@ export default class Task extends Component {
                 <div className="client column">
                   <div className="">
                     <div className="data">
-                      <h2 className="title-tool">
-                        Cliente{' '}
-                        <span className="callButton">
-                          <img src={phone} alt="Call client" />{' '}
-                        </span>
-                      </h2>
-                      <div>
-                        <b>Nombre:</b>{' '}
-                        <span className="actorNameC">
-                          {this.props.task[0].client.name +
-                            ' ' +
-                            this.props.task[0].client.lastName}
-                        </span>
+                      <div
+                        className="titleHeader"
+                        onClick={() => this.openClose('showCD')}
+                      >
+                        <h2 className="title-tool">
+                          <span className="callButton">
+                            <img src={phone} alt="Call client" />{' '}
+                          </span>
+                          <b>Cliente:</b>{' '}
+                          <span className="actorNameC">
+                            {this.props.task[0].client.name +
+                              ' ' +
+                              this.props.task[0].client.lastName}
+                          </span>
+                        </h2>
+                        <img
+                          src={circleDown}
+                          alt="Mapa"
+                          className={
+                            this.state.showCD
+                              ? 'upIcon ddIco'
+                              : 'downIcon ddIco'
+                          }
+                        />
                       </div>
-                      <div>
-                        <b>Cédula:</b> {this.props.task[0].client.idCard}
-                      </div>
-                      <div>
-                        <b>Tipo de sangre:</b>{' '}
-                        {this.props.task[0].client.bloodType}
-                      </div>
-                      <div>
-                        <b>Email:</b> {this.props.task[0].client.email}
-                      </div>
-                      <div>
-                        <b>Cumpleaños:</b> {this.props.task[0].client.birthday}
-                      </div>
-                      <div>
-                        <b>Phone:</b> {this.props.task[0].client.phone}
+                      <div
+                        className={
+                          this.state.showCD
+                            ? 'dropDownData openDD'
+                            : 'dropDownData closeDD'
+                        }
+                      >
+                        <div>
+                          <b>Cédula:</b> {this.props.task[0].client.idCard}
+                        </div>
+                        <div>
+                          <b>Tipo de sangre:</b>{' '}
+                          {this.props.task[0].client.bloodType}
+                        </div>
+                        <div>
+                          <b>Email:</b> {this.props.task[0].client.email}
+                        </div>
+                        <div>
+                          <b>Cumpleaños:</b>{' '}
+                          {this.props.task[0].client.birthday}
+                        </div>
+                        <div>
+                          <b>Phone:</b> {this.props.task[0].client.phone}
+                        </div>
                       </div>
                     </div>
                     <Chat
@@ -240,22 +283,46 @@ export default class Task extends Component {
                       this.props.task[0].provider.user.name !== 'N/A' ? (
                         <div className="">
                           <div className="data">
-                            <h2 className="title-tool">
-                              Proveedor{' '}
-                              <span className="callButton">
-                                <img src={phone} alt="Call client" />{' '}
-                              </span>
-                            </h2>
-
-                            <div className="data">
-                              <div>
-                                <b>Nombre:</b>{' '}
+                            <button
+                              className="btn reasign"
+                              onClick={() => this.props.chageProvider()}
+                            >
+                              Reasignar
+                            </button>
+                            <div
+                              className="titleHeader"
+                              onClick={() => this.openClose('showPD')}
+                            >
+                              <h2 className="title-tool">
+                                <span className="callButton">
+                                  <img src={phone} alt="Call client" />{' '}
+                                </span>
+                                <b>Proveedor:</b>{' '}
                                 <span className="actorNameP">
                                   {this.props.task[0].provider.user.name +
                                     ' ' +
                                     this.props.task[0].provider.user.lastName}
                                 </span>
-                              </div>
+                              </h2>
+
+                              <img
+                                src={circleDown}
+                                alt="Mapa"
+                                className={
+                                  this.state.showPD
+                                    ? 'upIcon ddIco'
+                                    : 'downIcon ddIco'
+                                }
+                              />
+                            </div>
+
+                            <div
+                              className={
+                                this.state.showPD
+                                  ? 'dropDownData openDD'
+                                  : 'dropDownData closeDD'
+                              }
+                            >
                               <div>
                                 <b>Nombre del negocio:</b>{' '}
                                 {this.props.task[0].provider.busnessName}
@@ -276,12 +343,6 @@ export default class Task extends Component {
                                 {this.props.task[0].provider.user.phone}
                               </div>
                             </div>
-                            <button
-                              className="btn"
-                              onClick={() => this.props.chageProvider()}
-                            >
-                              Reasignar a otro Proveedor
-                            </button>
                           </div>
                           <Chat
                             setMenssage={this.setMenssage}
@@ -323,17 +384,18 @@ export default class Task extends Component {
                     )}
                   </div>
                 </div>
-                <div className="provider column">
-                  <div className="">
-                    <div className="data">
-                      <h2 className="title-tool">
-                        911{' '}
-                        <span className="callButton">
-                          <img src={phone} alt="Call client" />{' '}
-                        </span>
-                      </h2>
-                    </div>
-                    {this.state.have911 ? (
+                {this.state.have911 ? (
+                  <div className="provider column">
+                    <div className="">
+                      <div className="data">
+                        <h2 className="title-tool">
+                          <span className="callButton">
+                            <img src={phone} alt="Call client" />{' '}
+                          </span>
+                          911{' '}
+                        </h2>
+                      </div>
+
                       <Chat
                         setMenssage={this.setMenssage}
                         sendMenssage={this.sendMenssage}
@@ -344,11 +406,11 @@ export default class Task extends Component {
                         id="chat911"
                         idInput="sos"
                       />
-                    ) : (
-                      ''
-                    )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  ''
+                )}
               </div>
             </div>
             <br />

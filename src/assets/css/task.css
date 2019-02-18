@@ -10,6 +10,7 @@
   margin: 10px 20px 0px 0px;
   border-radius: 10px;
   width: 50%;
+  position: relative;
 }
 .flex {
   display: inline-flex;
@@ -25,7 +26,7 @@
   align-items: center;
   justify-content: flex-start;
   margin-top: 0px;
-  font-size: 22px;
+  font-size: 18px;
 }
 .callButton {
   cursor: pointer;
@@ -36,7 +37,7 @@
   display: block;
   text-align: center;
   padding: 9px 0px 0px;
-  margin: 0px 0px 0px 20px;
+  margin: 0px 10px 0px 0px;
 }
 .callButton img {
   width: 20px;
@@ -45,6 +46,9 @@
 .data {
   font-size: 14px;
   line-height: 15px;
+}
+.data b {
+  font-weight: bolder;
 }
 .sos-chat {
   margin-top: 30px;
@@ -116,4 +120,48 @@ button:focus {
   min-width: 100%;
   overflow-x: auto;
   display: inline-flex;
+}
+.asigne911 {
+  float: left;
+}
+
+.reasign {
+  position: absolute;
+  top: -11px;
+  right: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0;
+}
+.titleHeader {
+  position: relative;
+}
+.data img.ddIco {
+  max-width: 20px;
+  padding: 0px;
+  margin: 0 0 0 10px;
+  transition: all 1s;
+  position: absolute;
+  right: 0;
+  top: 10px;
+  cursor: pointer;
+}
+.dropDownData {
+  transition: all 1s;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.openDD {
+  max-height: auto;
+}
+.closeDD {
+  max-height: 0;
+}
+.ddIco {
+  transition: all 1s;
+}
+.downIcon {
+  transform: rotate(180deg);
+}
+.upIcon {
+  transform: rotate(0deg);
 }

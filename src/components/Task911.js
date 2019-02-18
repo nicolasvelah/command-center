@@ -98,10 +98,10 @@ export default class Task extends Component {
                 <div className="flex">
                   <div className="data">
                     <h2 className="title-tool">
-                      Cliente{' '}
                       <span className="callButton">
                         <img src={phone} alt="Call client" />{' '}
                       </span>
+                      Cliente{' '}
                     </h2>
                     <div>
                       <b>Nombre:</b>{' '}
@@ -130,10 +130,10 @@ export default class Task extends Component {
                     <br />
                     <br />
                     <h2 className="title-tool">
-                      Operador{' '}
                       <span className="callButton">
                         <img src={phone} alt="Call client" />{' '}
                       </span>
+                      Operador{' '}
                     </h2>
                     <div>
                       <b>Nombre:</b>{' '}
