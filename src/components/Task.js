@@ -163,7 +163,6 @@ export default class Task extends Component {
   }
 
   asigne911 = async e => {
-    console.log(this.props.task[0].id)
     try {
       const response = await axios.post(
         `${process.env.API_URL}/orders/assignTo911`,
@@ -178,7 +177,8 @@ export default class Task extends Component {
           },
         }
       )
-      console.log(response.data)
+      console.log(response.data.message)
+      this.props.update911state(response.data.message)
       this.setState({
         have911: true,
       })

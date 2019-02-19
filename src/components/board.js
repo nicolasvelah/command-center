@@ -39,6 +39,7 @@ export default class Board extends Component {
     this.addNote = this.addNote.bind(this)
     this.getMyTasks = this.getMyTasks.bind(this)
     this.getOperators = this.getOperators.bind(this)
+    this.update911state = this.update911state.bind(this)
   }
 
   async componentDidMount() {
@@ -231,6 +232,21 @@ export default class Board extends Component {
       curTask: task,
       showModal: true,
       chageProviderVal: false,
+    })
+  }
+  update911state = async id => {
+    console.log('id del 911 user:', id)
+    let { tasks, curTask } = this.state
+    await tasks.map((item, index) => {
+      if (item.id === curTask[0].id) {
+        tasks[index].assignedTo_911 = id
+      }
+      return item
+    })
+    curTask[0].assignedTo_911 = id
+    this.setState({
+      tasks,
+      curTask,
     })
   }
   closeModal = () => {
@@ -590,6 +606,7 @@ export default class Board extends Component {
               getNotes={this.getNotes}
               chageProvider={this.chageProvider}
               chageProviderVal={this.state.chageProviderVal}
+              update911state={this.update911state}
             />
           </Modal>
         ) : (
