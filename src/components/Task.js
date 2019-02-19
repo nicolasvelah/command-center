@@ -277,86 +277,102 @@ export default class Task extends Component {
                     />
                   </div>
                 </div>
-                <div className="provider column">
-                  <div>
-                    {this.props.chageProviderVal === false ? (
-                      this.props.task[0].provider.user.name !== 'N/A' ? (
-                        <div className="">
-                          <div className="data">
-                            <button
-                              className="btn reasign"
-                              onClick={() => this.props.chageProvider()}
-                            >
-                              Reasignar
-                            </button>
-                            <div
-                              className="titleHeader"
-                              onClick={() => this.openClose('showPD')}
-                            >
-                              <h2 className="title-tool">
-                                <span className="callButton">
-                                  <img src={phone} alt="Call client" />{' '}
-                                </span>
-                                <b>Proveedor:</b>{' '}
-                                <span className="actorNameP">
-                                  {this.props.task[0].provider.user.name +
-                                    ' ' +
-                                    this.props.task[0].provider.user.lastName}
-                                </span>
-                              </h2>
+                {this.props.task[0].provider.user.name !== '911' ? (
+                  <div className="provider column">
+                    <div>
+                      {this.props.chageProviderVal === false ? (
+                        this.props.task[0].provider.user.name !== 'N/A' ? (
+                          <div className="">
+                            <div className="data">
+                              <button
+                                className="btn reasign"
+                                onClick={() => this.props.chageProvider()}
+                              >
+                                Reasignar
+                              </button>
+                              <div
+                                className="titleHeader"
+                                onClick={() => this.openClose('showPD')}
+                              >
+                                <h2 className="title-tool">
+                                  <span className="callButton">
+                                    <img src={phone} alt="Call client" />{' '}
+                                  </span>
+                                  <b>Proveedor:</b>{' '}
+                                  <span className="actorNameP">
+                                    {this.props.task[0].provider.user.name +
+                                      ' ' +
+                                      this.props.task[0].provider.user.lastName}
+                                  </span>
+                                </h2>
 
-                              <img
-                                src={circleDown}
-                                alt="Mapa"
+                                <img
+                                  src={circleDown}
+                                  alt="Mapa"
+                                  className={
+                                    this.state.showPD
+                                      ? 'upIcon ddIco'
+                                      : 'downIcon ddIco'
+                                  }
+                                />
+                              </div>
+
+                              <div
                                 className={
                                   this.state.showPD
-                                    ? 'upIcon ddIco'
-                                    : 'downIcon ddIco'
+                                    ? 'dropDownData openDD'
+                                    : 'dropDownData closeDD'
                                 }
+                              >
+                                <div>
+                                  <b>Nombre del negocio:</b>{' '}
+                                  {this.props.task[0].provider.busnessName}
+                                </div>
+                                <div>
+                                  <b>Description:</b>{' '}
+                                  {this.props.task[0].provider.descriptio}
+                                </div>
+                                <div>
+                                  <b>Rate:</b>{' '}
+                                  {this.props.task[0].provider.rate}
+                                </div>
+                                <div>
+                                  <b>Email:</b>{' '}
+                                  {this.props.task[0].provider.user.email}
+                                </div>
+                                <div>
+                                  <b>Phone:</b>{' '}
+                                  {this.props.task[0].provider.user.phone}
+                                </div>
+                              </div>
+                            </div>
+                            <Chat
+                              setMenssage={this.setMenssage}
+                              sendMenssage={this.sendMenssage}
+                              sendMenssageByEnter={this.sendMenssageByEnter}
+                              isClientTo={false}
+                              userId={this.props.task[0].provider.user.id}
+                              messagesTask={this.props.messagesTask.provider}
+                              id="chatProvider"
+                              idInput="provider"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex">
+                            <div className="data">
+                              <AsignProvider
+                                orderId={this.props.task[0].id}
+                                getMyTasks={this.props.getMyTasks}
+                                setModal={this.props.setModal}
                               />
                             </div>
-
-                            <div
-                              className={
-                                this.state.showPD
-                                  ? 'dropDownData openDD'
-                                  : 'dropDownData closeDD'
-                              }
-                            >
-                              <div>
-                                <b>Nombre del negocio:</b>{' '}
-                                {this.props.task[0].provider.busnessName}
-                              </div>
-                              <div>
-                                <b>Description:</b>{' '}
-                                {this.props.task[0].provider.descriptio}
-                              </div>
-                              <div>
-                                <b>Rate:</b> {this.props.task[0].provider.rate}
-                              </div>
-                              <div>
-                                <b>Email:</b>{' '}
-                                {this.props.task[0].provider.user.email}
-                              </div>
-                              <div>
-                                <b>Phone:</b>{' '}
-                                {this.props.task[0].provider.user.phone}
-                              </div>
-                            </div>
                           </div>
-                          <Chat
-                            setMenssage={this.setMenssage}
-                            sendMenssage={this.sendMenssage}
-                            sendMenssageByEnter={this.sendMenssageByEnter}
-                            isClientTo={false}
-                            userId={this.props.task[0].provider.user.id}
-                            messagesTask={this.props.messagesTask.provider}
-                            id="chatProvider"
-                            idInput="provider"
-                          />
-                        </div>
+                        )
                       ) : (
-                        <div className="flex">
+                        ''
+                      )}
+                      {this.props.chageProviderVal === true ? (
+                        <div className="">
                           <div className="data">
                             <AsignProvider
                               orderId={this.props.task[0].id}
@@ -365,25 +381,14 @@ export default class Task extends Component {
                             />
                           </div>
                         </div>
-                      )
-                    ) : (
-                      ''
-                    )}
-                    {this.props.chageProviderVal === true ? (
-                      <div className="">
-                        <div className="data">
-                          <AsignProvider
-                            orderId={this.props.task[0].id}
-                            getMyTasks={this.props.getMyTasks}
-                            setModal={this.props.setModal}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      ''
-                    )}
+                      ) : (
+                        ''
+                      )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  ''
+                )}
                 {this.state.have911 ? (
                   <div className="provider column">
                     <div className="">

@@ -109,3 +109,6 @@
 .message .userType {
   font-size: 10px;
 }
+.message img {
+  max-width: 300px;
+}

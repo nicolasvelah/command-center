@@ -43,6 +43,7 @@ class MapServiceTacking extends Component {
         lng: -78.4480523,
       },
       zoom: 14,
+      address: '',
     }
     this.onCircleInteraction = this.onCircleInteraction.bind(this)
     this.activeDraggable = this.activeDraggable.bind(this)
@@ -51,6 +52,7 @@ class MapServiceTacking extends Component {
     //Geolocalizacion
     const { userId } = this.state
     this.google = window.google = window.google ? window.google : {}
+    this.geocodeLatLng(this.props.lat, this.props.len)
 
     await this.getClients() //get a client list with the last know location
     await this.getProviders() //get a provider list with the last know location
@@ -294,6 +296,31 @@ class MapServiceTacking extends Component {
   activeDraggable(childKey, childProps, mouse) {
     this.setState({ draggable: true })
   }
+  async geocodeLatLng(lat, lng) {
+    var latlng = { lat: parseFloat(lat), lng: parseFloat(lng) }
+    let geocoder = new this.google.maps.Geocoder()
+    const context = this
+    return await geocoder.geocode({ location: latlng }, function(
+      results,
+      status
+    ) {
+      if (status === 'OK') {
+        if (results[0]) {
+          console.log('result', results[0].formatted_address)
+          context.setState({
+            address: results[0].formatted_address,
+          })
+          return results[0].formatted_address
+        } else {
+          console.log('Geocoder: No results found')
+          return ''
+        }
+      } else {
+        console.log('Geocoder failed due to: ' + status)
+        return ''
+      }
+    })
+  }
 
   render() {
     const { clients, providers, center, zoom } = this.state
@@ -318,6 +345,12 @@ class MapServiceTacking extends Component {
           onChildMouseUp={this.activeDraggable}
           onChildMouseMove={this.onCircleInteraction}
         >
+          <CMarkerClientServicePointer
+            lat={this.props.lat}
+            lng={this.props.len}
+            id={'solicitud_' + this.props.userId}
+            address={this.state.address}
+          />
           {clients.map((client, index) => (
             <CMarker
               key={index}
@@ -342,11 +375,6 @@ class MapServiceTacking extends Component {
                 />
               ))
             : ''}
-          <CMarkerClientServicePointer
-            lat={this.props.lat}
-            lng={this.props.len}
-            id={'solicitud_' + this.props.userId}
-          />
         </GoogleMapReact>
 
         <Button onClick={this.centerClients}>

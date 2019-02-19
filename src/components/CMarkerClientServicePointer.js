@@ -3,26 +3,37 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   position: absolute;
-  user-select: none;
-  align-items: center;
-  justify-content: center;
-  cursor: default;
-  width: 80px;
-  background: #e52e4c;
-  border-radius: 5px;
-  padding: 5px;
-  color: #fff;
+  z-index: 1000;
   text-align: center;
-  top: -15px;
-  left: -15px;
-  opacity: 0.8;
-  .line {
-    background: #e52e4c;
+  width: 0px;
+  height: 0px;
+  .relative {
+    position: relative;
+  }
+  .cord-0-0 {
     position: absolute;
+    bottom: -30px;
+    left: -80px;
+  }
+  .line {
     width: 2px;
     height: 10px;
-    bottom: -10px;
-    left: 38px;
+    margin: auto;
+    background: #e52e4c;
+  }
+  .addressText {
+    width: auto;
+    max-width: 200px;
+    min-width: 150px;
+    background: #e52e4c;
+    border-radius: 5px;
+    opacity: 0.8;
+    padding: 5px;
+    color: #fff;
+    user-select: none;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
   }
 `
 
@@ -30,9 +41,15 @@ export default class CMarkerClientServicePointer extends React.Component {
   render() {
     return (
       <Wrapper>
-        <div>
-          Punto de encuentro
-          <div className="line" />
+        <div className="relative">
+          <div className="cord-0-0">
+            <div className="addressText">
+              {this.props.address !== ''
+                ? this.props.address
+                : 'No hay datos de direccion'}
+            </div>
+            <div className="line" />
+          </div>
         </div>
       </Wrapper>
     )

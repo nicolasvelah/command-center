@@ -48,7 +48,13 @@ export default class Chat extends React.Component {
                             <span className="userType">{item.type}</span>
                           </div>
                         </div>
-                        <div className="message">{item.message}</div>
+                        <div className="message">
+                          {item.isImage ? (
+                            <img src={item.message} alt="msnImg" />
+                          ) : (
+                            item.message
+                          )}
+                        </div>
                         <div className="msmDate">{item.date}</div>
                       </div>
                     </div>
