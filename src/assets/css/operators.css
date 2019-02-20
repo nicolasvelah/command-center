@@ -1,0 +1,42 @@
+h2.operatorsTitle {
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+}
+.icon img {
+  margin: 0px 5px 0px 0px !important;
+}
+.operatorsPage {
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+}
+.operatorPage {
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  float: left;
+  background: #eee;
+  padding: 20px;
+  margin: 5px;
+}
+.dataRest {
+  font-size: 14px;
+}
+.teamLeader {
+  max-width: 25px;
+}
+.headerOperator {
+  display: inline-flex;
+}
+.parendDropDown {
+  position: relative;
+  float: left;
+}
+.dropDown {
+  display: none;
+  position: absolute;
+  top: 25px;
+  left: 0;
+  background: #fff;
+  border: 1px solid #999;
+  font-size: 10px;
+  padding: 0 5px;
+}
+.parendDropDown:hover .dropDown {
+  display: block;
+}
