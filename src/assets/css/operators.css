@@ -13,6 +13,8 @@ h2.operatorsTitle {
   background: #eee;
   padding: 20px;
   margin: 5px;
+  width: 32%;
+  line-height: 22px;
 }
 .dataRest {
   font-size: 14px;
@@ -39,4 +41,39 @@ h2.operatorsTitle {
 }
 .parendDropDown:hover .dropDown {
   display: block;
+}
+.operatorsTasks {
+  display: inline-flex;
+}
+.taskCounter {
+  margin: 3px;
+  border: 1px solid #999;
+  text-align: center;
+}
+.taskCounterHead {
+  padding: 5px;
+  border-bottom: 1px solid #999;
+  font-weight: bold;
+}
+.taskCounterNumber {
+  padding: 5px;
+}
+.asignCounter {
+  color: #af2d0e;
+}
+.incourseCounter {
+  color: #ffc200;
+}
+.resolveCounter {
+  color: #167711;
+}
+.totalCounter {
+  color: #0073bd;
+}
+.operatorsCharts {
+  float: left;
+  width: 100%;
+  margin-top: 50px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { getUser } from '../services/auth'
+import Chart from 'react-google-charts'
 import '../assets/css/operators.css'
 import flag from '../images/flag.svg'
 import star from '../images/star-full.svg'
@@ -68,20 +69,54 @@ export default class Operators extends Component {
                 <b>Email:</b> {operator.email} <br />
                 <b>Teléfono:</b> {operator.phone}
                 <br />
+                <b>Ordenes:</b>
+                <br />
                 <div className="operatorsTasks">
-                  <div>
-                    <b>Asignadas:</b> 0
+                  <div className="taskCounter asignCounter">
+                    <div className="taskCounterHead">Asignadas</div>{' '}
+                    <div className="taskCounterNumber">0</div>
                   </div>
-                  <div>
-                    <b>En curso:</b> 0
+                  <div className="taskCounter incourseCounter">
+                    <div className="taskCounterHead">En curso</div>{' '}
+                    <div className="taskCounterNumber">0</div>
                   </div>
-                  <div>
-                    <b>Resueltos:</b> 0
+                  <div className="taskCounter resolveCounter">
+                    <div className="taskCounterHead">Resueltas</div>{' '}
+                    <div className="taskCounterNumber">0</div>
+                  </div>
+                  <div className="taskCounter totalCounter">
+                    <div className="taskCounterHead">Total / mes</div>{' '}
+                    <div className="taskCounterNumber">0</div>
                   </div>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+        <div className="operatorsCharts">
+          <h2>Reportes de rendimiento</h2>
+          <Chart
+            width={'500px'}
+            height={'300px'}
+            chartType="Bar"
+            loader={<div>Loading Chart</div>}
+            data={[
+              ['Year', 'Sales', 'Expenses', 'Profit'],
+              ['2014', 1000, 400, 200],
+              ['2015', 1170, 460, 250],
+              ['2016', 660, 1120, 300],
+              ['2017', 1030, 540, 350],
+            ]}
+            options={{
+              // Material design options
+              chart: {
+                title: 'Company Performance',
+                subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+              },
+            }}
+            // For tests
+            rootProps={{ 'data-testid': '2' }}
+          />
         </div>
       </div>
     )
