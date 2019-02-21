@@ -50,7 +50,7 @@ export default class navBar extends Component {
               <div>
                 {getUser().type !== '911' ? (
                   <div>
-                    <div onClick={this.setModal} className="menuItem">
+                    <div className="menuItem">
                       Buscar <img src={search} alt="" className="icon" />
                     </div>
                     <div

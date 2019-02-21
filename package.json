@@ -21,6 +21,7 @@
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-google-autocomplete": "^1.0.18",
+    "react-google-charts": "^3.0.10",
     "react-helmet": "^5.2.0",
     "react-input-mask": "^2.0.4",
     "react-select": "^2.2.0",
