@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/messaging'
 import axios from 'axios'
-import { getUser, getFbtk } from '../services/auth'
+import { getUser } from '../services/auth'
 
 export const initializeFirebase = () => {
   if (typeof window !== 'undefined') {
@@ -20,9 +20,6 @@ export const initializeFirebase = () => {
 
 export const askForPermissioToReceiveNotifications = async () => {
   try {
-    console.log('getFbtk() ', getFbtk())
-
-    //if (getFbtk() === null) {
     const messaging = firebase.messaging()
     console.log('paso 2 messaging', messaging)
     await messaging.requestPermission()
@@ -42,7 +39,6 @@ export const askForPermissioToReceiveNotifications = async () => {
       }
     )
     console.log('token de usuário:', token)
-    window.localStorage.setItem('fbtk', token)
     return messaging
     //}
   } catch (error) {

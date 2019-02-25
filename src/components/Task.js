@@ -25,6 +25,7 @@ export default class Task extends Component {
       id911: null,
       showCD: false,
       showPD: false,
+      is911: false,
     }
     this.setNote = this.setNote.bind(this)
     this.sendNote = this.sendNote.bind(this)
@@ -84,12 +85,15 @@ export default class Task extends Component {
         name: getUser().name + getUser().lastName,
         type: getUser().type,
       }
-      let userType = 'provider'
-      if (this.state.isClientTo) {
-        userType = 'client'
+      let userType = '911'
+      if (!this.state.is911) {
+        userType = 'provider'
+        if (this.state.isClientTo) {
+          userType = 'client'
+        }
       }
       this.props.addMensages(msm, userType)
-      console.log('inicai envio 3')
+      console.log('inicai envio 3 userType', userType)
       document.getElementById('chat-' + userType).reset()
       console.log('inicai envio 4')
       this.setState({
@@ -100,13 +104,14 @@ export default class Task extends Component {
       return
     }
   }
-  setMenssage = (e, isClientTo, userId) => {
+  setMenssage = (e, isClientTo, userId, is911) => {
     if (typeof e.target !== 'undefined') {
       this.setState({
         Menssage: e.target.value,
         to: userId,
         orderId: this.props.task[0].id,
         isClientTo: isClientTo,
+        is911: is911,
       })
     }
   }
@@ -274,6 +279,7 @@ export default class Task extends Component {
                       messagesTask={this.props.messagesTask.client}
                       id="chatClient"
                       idInput="client"
+                      is911={false}
                     />
                   </div>
                 </div>
@@ -355,6 +361,7 @@ export default class Task extends Component {
                               messagesTask={this.props.messagesTask.provider}
                               id="chatProvider"
                               idInput="provider"
+                              is911={false}
                             />
                           </div>
                         ) : (
@@ -408,8 +415,9 @@ export default class Task extends Component {
                         isClientTo={false}
                         userId={this.state.id911}
                         messagesTask={this.props.messagesTask['911']}
-                        id="chat911"
-                        idInput="sos"
+                        id="chatsos"
+                        idInput="911"
+                        is911={true}
                       />
                     </div>
                   </div>

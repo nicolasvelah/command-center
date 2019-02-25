@@ -56,26 +56,12 @@ export default class Board extends Component {
 
     //Push Notifications
     const messaging = await askForPermissioToReceiveNotifications()
-
     const context = this
     if (messaging !== false) {
-      messaging.onMessage(function(payload) {
-        console.log('Frond Message received.', payload)
-        const notification = JSON.parse(payload.notification.body)
-        if (notification.type === 'chat') {
-          context.chatNotifications(notification.orderId)
-        } else if (
-          notification.type === 'WORKINPROGRESS' ||
-          notification.type === 'WORKFINISHED'
-        ) {
-          context.providerState(notification.orderId, notification.type)
-        } else {
-          context.getMyTasks()
-          if (notification.type !== 'updateOrder') {
-            context.MsmNewTask(payload.notification.title)
-          }
-        }
-      })
+      this.startNotifications(messaging)
+    } else {
+      const messaging2 = await askForPermissioToReceiveNotifications()
+      this.startNotifications(messaging2)
     }
     window.addEventListener(
       'focus',
@@ -94,6 +80,26 @@ export default class Board extends Component {
     if (getUser().type !== 'operator') {
       this.getOperators()
     }
+  }
+  startNotifications(messaging) {
+    const context = this
+    messaging.onMessage(function(payload) {
+      console.log('Frond Message received.', payload)
+      const notification = JSON.parse(payload.notification.body)
+      if (notification.type === 'chat') {
+        context.chatNotifications(notification.orderId)
+      } else if (
+        notification.type === 'WORKINPROGRESS' ||
+        notification.type === 'WORKFINISHED'
+      ) {
+        context.providerState(notification.orderId, notification.type)
+      } else {
+        context.getMyTasks()
+        if (notification.type !== 'updateOrder') {
+          context.MsmNewTask(payload.notification.title)
+        }
+      }
+    })
   }
 
   componentWillUnmount() {
@@ -184,6 +190,7 @@ export default class Board extends Component {
   }
   addMensages = (msm, type) => {
     let { messagesTask } = this.state
+    console.log('messagesTask ', messagesTask)
     messagesTask[type].push(msm)
     this.setState({
       messagesTask,

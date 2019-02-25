@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { getUser } from '../services/auth'
-import Chart from 'react-google-charts'
+//import Chart from 'react-google-charts'
 import '../assets/css/operators.css'
 import flag from '../images/flag.svg'
 import star from '../images/star-full.svg'
@@ -14,8 +14,8 @@ export default class Operators extends Component {
     }
   }
 
-  componentDidMount() {
-    this.getOperators()
+  async componentDidMount() {
+    await this.getOperators()
   }
   //OPERATORS
   getOperators = async () => {
@@ -30,12 +30,44 @@ export default class Operators extends Component {
           },
         }
       )
-      this.setState({ operators: data.data.users })
+      console.log('data.data.users XXXXXX', data.data.users)
+      await this.setState({ operators: data.data.users })
+      this.getOperatorsTasks()
+
       return data
     } catch (err) {
       console.log(err.message)
       return []
     }
+  }
+  getOperatorsTasks = async () => {
+    let { operators } = this.state
+    operators = await operators.map(async item => {
+      try {
+        const data = await axios.post(
+          `${process.env.API_URL}/getOperatorsTasks/` + item.id,
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': getUser().token,
+            },
+          }
+        )
+        console.log('getOperatorsTasks: ', data.data)
+        item.tasks = data.data.tasks
+        return item
+      } catch (err) {
+        console.log(err.message)
+        return 'error'
+      }
+    })
+    operators = await Promise.all(operators)
+
+    console.log('data.data.users XXXXXX operators', operators)
+    this.setState({ operators })
+
+    return operators
   }
   render() {
     return (
@@ -74,26 +106,34 @@ export default class Operators extends Component {
                 <div className="operatorsTasks">
                   <div className="taskCounter asignCounter">
                     <div className="taskCounterHead">Asignadas</div>{' '}
-                    <div className="taskCounterNumber">0</div>
+                    <div className="taskCounterNumber">
+                      {operator.tasks ? operator.tasks.asignet : '0'}
+                    </div>
                   </div>
                   <div className="taskCounter incourseCounter">
                     <div className="taskCounterHead">En curso</div>{' '}
-                    <div className="taskCounterNumber">0</div>
+                    <div className="taskCounterNumber">
+                      {operator.tasks ? operator.tasks.incourse : '0'}
+                    </div>
                   </div>
                   <div className="taskCounter resolveCounter">
                     <div className="taskCounterHead">Resueltas</div>{' '}
-                    <div className="taskCounterNumber">0</div>
+                    <div className="taskCounterNumber">
+                      {operator.tasks ? operator.tasks.resolve : '0'}
+                    </div>
                   </div>
                   <div className="taskCounter totalCounter">
                     <div className="taskCounterHead">Total / mes</div>{' '}
-                    <div className="taskCounterNumber">0</div>
+                    <div className="taskCounterNumber">
+                      {operator.tasks ? operator.tasks.total : '0'}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-        <div className="operatorsCharts">
+        {/* <div className="operatorsCharts">
           <h2>Reportes de rendimiento</h2>
           <Chart
             width={'500px'}
@@ -117,7 +157,7 @@ export default class Operators extends Component {
             // For tests
             rootProps={{ 'data-testid': '2' }}
           />
-        </div>
+          </div>*/}
       </div>
     )
   }

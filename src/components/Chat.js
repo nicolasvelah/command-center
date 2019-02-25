@@ -80,7 +80,8 @@ export default class Chat extends React.Component {
                 this.props.setMenssage(
                   e,
                   this.props.isClientTo,
-                  this.props.userId
+                  this.props.userId,
+                  this.props.is911
                 )
               }
               onKeyPress={this.props.sendMenssageByEnter}
