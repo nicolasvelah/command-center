@@ -31,6 +31,7 @@ export default class Board extends Component {
       filterByoperator: null,
       operators: [],
       providerState: '',
+      messaging: null,
     }
     this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)

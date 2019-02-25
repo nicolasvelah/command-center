@@ -22,33 +22,31 @@ export const askForPermissioToReceiveNotifications = async () => {
   try {
     console.log('getFbtk() ', getFbtk())
 
-    if (getFbtk() === null) {
-      const messaging = firebase.messaging()
+    //if (getFbtk() === null) {
+    const messaging = firebase.messaging()
+    console.log('paso 2 messaging', messaging)
+    await messaging.requestPermission()
+    console.log('solicito permiso')
+    const token = await messaging.getToken()
+    console.log('paso 4 ')
 
-      console.log('paso 2 messaging', messaging)
-      await messaging.requestPermission()
-      console.log('solicito permiso')
-      const token = await messaging.getToken()
-      console.log('paso 4 ')
-
-      await axios.post(
-        `${process.env.API_URL}/updateToken`,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
-            token: token,
-          },
-        }
-      )
-      console.log('token de usuário:', token)
-      window.localStorage.setItem('fbtk', token)
-      return messaging
-    }
-    return false
+    await axios.post(
+      `${process.env.API_URL}/updateToken`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': getUser().token,
+          token: token,
+        },
+      }
+    )
+    console.log('token de usuário:', token)
+    window.localStorage.setItem('fbtk', token)
+    return messaging
+    //}
   } catch (error) {
     console.error('Errtor de FB perimisos', error)
-    return error
+    return false
   }
 }
