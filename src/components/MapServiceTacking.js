@@ -49,7 +49,7 @@ class MapServiceTacking extends Component {
     this.activeDraggable = this.activeDraggable.bind(this)
   }
   async componentDidMount() {
-    //token = await getUser().token
+    token = await getUser().token
     //Geolocalizacion
     const { userId } = this.state
     this.google = window.google = window.google ? window.google : {}

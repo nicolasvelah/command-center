@@ -28,7 +28,7 @@ const Button = styled.button`
   zindex: 1;
 `
 
-const token = getUser().token
+let token = getUser().token
 
 class MapServiceLocator extends Component {
   constructor(props) {
@@ -54,6 +54,7 @@ class MapServiceLocator extends Component {
     this.activeDraggable = this.activeDraggable.bind(this)
   }
   async componentDidMount() {
+    token = await getUser().token
     //Geolocalizacion
     const { userId } = this.state
     this.google = window.google = window.google ? window.google : {}
