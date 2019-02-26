@@ -28,7 +28,7 @@ const Button = styled.button`
   zindex: 1;
 `
 
-const token = getUser().token
+let token = getUser().token
 
 class MapServiceTacking extends Component {
   constructor(props) {
@@ -49,6 +49,7 @@ class MapServiceTacking extends Component {
     this.activeDraggable = this.activeDraggable.bind(this)
   }
   async componentDidMount() {
+    //token = await getUser().token
     //Geolocalizacion
     const { userId } = this.state
     this.google = window.google = window.google ? window.google : {}
@@ -74,6 +75,7 @@ class MapServiceTacking extends Component {
   }
   //GEOLOCALIZATION
   async getClients() {
+    console.log('token :', token)
     try {
       const res = await axios({
         method: 'POST',
@@ -123,6 +125,7 @@ class MapServiceTacking extends Component {
     //console.log('connected with socketID', id)
   }
   async getProviders() {
+    console.log('token :', token)
     if (this.props.providerId !== 0) {
       try {
         const res = await axios({
