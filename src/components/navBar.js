@@ -3,6 +3,7 @@ import { navigate } from 'gatsby'
 import { isLoggedIn, logout, getUser } from '../services/auth'
 import Modal from './modal'
 import CreateTask from './CreateTask'
+import Search from './Seacrh'
 import '../assets/css/menu.css'
 import search from '../images/search.svg'
 import rocket from '../images/rocket.svg'
@@ -20,10 +21,17 @@ export default class navBar extends Component {
     this.state = {
       showModal: false,
       menuActive: false,
+      content: <CreateTask />,
     }
   }
-  setModal = () => {
-    this.setState({ showModal: !this.state.showModal })
+  setModal = ct => {
+    let { content } = this.state
+    if (ct === 'ct') {
+      content = <CreateTask />
+    } else if (ct === 'bs') {
+      content = <Search />
+    }
+    this.setState({ showModal: !this.state.showModal, content })
   }
   activeMenu = () => {
     this.setState({ menuActive: !this.state.menuActive })
@@ -50,7 +58,10 @@ export default class navBar extends Component {
               <div>
                 {getUser().type !== '911' ? (
                   <div>
-                    <div className="menuItem">
+                    <div
+                      onClick={() => this.setModal('bs')}
+                      className="menuItem"
+                    >
                       Buscar <img src={search} alt="" className="icon" />
                     </div>
                     <div
@@ -62,7 +73,10 @@ export default class navBar extends Component {
                     >
                       Tablero <img src={board} alt="" className="icon" />
                     </div>
-                    <div onClick={this.setModal} className="menuItem">
+                    <div
+                      onClick={() => this.setModal('ct')}
+                      className="menuItem"
+                    >
                       Crear Tarea <img src={plus} alt="" className="icon" />
                     </div>
                     {getUser().type === 'supervisor' ? (
@@ -119,7 +133,7 @@ export default class navBar extends Component {
           </nav>
           {isLoggedIn() && this.state.showModal ? (
             <Modal closeModal={this.setModal} showModal={this.state.showModal}>
-              <CreateTask />
+              {this.state.content}
             </Modal>
           ) : (
             ''
