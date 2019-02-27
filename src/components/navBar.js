@@ -3,7 +3,7 @@ import { navigate } from 'gatsby'
 import { isLoggedIn, logout, getUser } from '../services/auth'
 import Modal from './modal'
 import CreateTask from './CreateTask'
-import Search from './Search'
+import SearchPage from './SearchPage'
 import '../assets/css/menu.css'
 import searchIcon from '../images/search.svg'
 import rocket from '../images/rocket.svg'
@@ -29,7 +29,7 @@ export default class navBar extends Component {
     if (ct === 'ct') {
       content = <CreateTask />
     } else if (ct === 'bs') {
-      content = <Search />
+      content = <SearchPage />
     }
     this.setState({ showModal: !this.state.showModal, content })
   }

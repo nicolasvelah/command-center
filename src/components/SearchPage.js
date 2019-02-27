@@ -58,7 +58,7 @@ const InputContainer = styled.div`
   position: relative;
 `
 
-export default class Search extends Component {
+export default class SearchPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
