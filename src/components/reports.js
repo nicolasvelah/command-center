@@ -6,12 +6,16 @@ import Select from 'react-select'
 import Async from 'react-select/lib/Async'
 import styled from 'styled-components'
 import axios from 'axios'
+import moment from 'moment'
 import { getUser } from '../services/auth'
 
 import 'rc-datepicker/lib/style.css'
 import '../assets/css/deliveries.css'
 
-const date = '2019-06-26' // or Date or Moment.js
+const date = moment().format('YYYY-MM-DD')
+const firstDate = moment()
+  .startOf('month')
+  .format('YYYY-MM-DD hh:mm')
 
 const StyledAutocomplete = styled(Async)`
   .Select-control {
@@ -155,7 +159,7 @@ export default class Reports extends Component {
             <span>Desde:</span>
             <DatePickerInput
               onChange={this.onChange}
-              value={date}
+              value={firstDate}
               className="my-custom-datepicker-component"
             />
           </div>

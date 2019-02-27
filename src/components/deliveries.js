@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
+import moment from 'moment'
 import 'moment/locale/es.js'
 import { DatePickerInput } from 'rc-datepicker'
-import Select from 'react-select'
 
 import 'rc-datepicker/lib/style.css'
 import '../assets/css/deliveries.css'
 
-const date = '2019-06-26' // or Date or Moment.js
+const date = moment().format('YYYY-MM-DD')
+const firstDate = moment()
+  .startOf('month')
+  .format('YYYY-MM-DD hh:mm')
 export default class Deliveries extends Component {
   onChange = (jsDate, dateString) => {
     console.log(jsDate)
@@ -20,7 +23,7 @@ export default class Deliveries extends Component {
             <span>Desde:</span>
             <DatePickerInput
               onChange={this.onChange}
-              value={date}
+              value={firstDate}
               className="my-custom-datepicker-component"
             />
           </div>
@@ -30,20 +33,6 @@ export default class Deliveries extends Component {
               onChange={this.onChange}
               value={date}
               className="my-custom-datepicker-component"
-            />
-          </div>
-          <div className="inputContainer">
-            <Select
-              className="input"
-              classNamePrefix="pais"
-              placeholder="Pais"
-              isClearable={true}
-              isSearchable={true}
-              name="category"
-              options={[
-                { value: 'ec', label: 'Ecuador' },
-                { value: 'mx', label: 'Mexico' },
-              ]}
             />
           </div>
         </div>
