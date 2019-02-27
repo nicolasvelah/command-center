@@ -10,7 +10,7 @@ const StyledAutocomplete = styled(Async)`
     border-radius: 0 !important;
     box-shadow: none;
     color: ${props => props.theme.black};
-    height: 40px;
+    height: 41px;
 
     .Select-multi-value-wrapper {
       .Select-placeholder {
