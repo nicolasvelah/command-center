@@ -3,9 +3,9 @@ import { navigate } from 'gatsby'
 import { isLoggedIn, logout, getUser } from '../services/auth'
 import Modal from './modal'
 import CreateTask from './CreateTask'
-import Search from './Seacrh'
+import Search from './Search'
 import '../assets/css/menu.css'
-import search from '../images/search.svg'
+import searchIcon from '../images/search.svg'
 import rocket from '../images/rocket.svg'
 import radar from '../images/radar.svg'
 import board from '../images/board.svg'
@@ -62,7 +62,7 @@ export default class navBar extends Component {
                       onClick={() => this.setModal('bs')}
                       className="menuItem"
                     >
-                      Buscar <img src={search} alt="" className="icon" />
+                      Buscar <img src={searchIcon} alt="" className="icon" />
                     </div>
                     <div
                       onClick={event => {
