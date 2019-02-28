@@ -7,7 +7,7 @@ import Select from 'react-select'
 import { getUser, logoutLocal } from '../services/auth'
 import Modal from './modal'
 import Task from './Task'
-//import ExcelDownload from './ExcelDownload'
+import ExcelDownload from './ExcelDownload'
 
 import 'moment/locale/es.js'
 import 'rc-datepicker/lib/style.css'
@@ -433,6 +433,7 @@ export default class Deliveries extends Component {
     }
     return (
       <div className="deliveries">
+        <ExcelDownload />
         <h1>Entregas</h1>
         <div className="filters">
           <div className="inputContainer">

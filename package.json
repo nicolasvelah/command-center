@@ -5,9 +5,7 @@
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "dependencies": {
     "axios": "^0.18.0",
-    "file-saver": "^2.0.1",
     "firebase": "^5.7.2",
-    "fs": "0.0.1-security",
     "gatsby": "^2.0.53",
     "gatsby-image": "^2.0.20",
     "gatsby-plugin-create-client-paths": "^2.0.3",
@@ -23,7 +21,6 @@
     "prop-types": "^15.6.2",
     "rc-datepicker": "^5.0.13",
     "react": "^16.6.3",
-    "react-data-export": "^0.5.0",
     "react-date": "^2.0.0",
     "react-dom": "^16.6.3",
     "react-google-autocomplete": "^1.0.18",
@@ -35,8 +32,7 @@
     "react-toastify": "^4.5.1",
     "scroll-into-view": "^1.9.3",
     "socket.io-client": "^2.2.0",
-    "styled-components": "^4.1.3",
-    "xlsx": "^0.14.1"
+    "styled-components": "^4.1.3"
   },
   "keywords": [
     "gatsby"
