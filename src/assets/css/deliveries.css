@@ -63,3 +63,39 @@ td {
   margin: 0px;
   background: #a3a3a3;
 }
+.activesFilters {
+  display: inline-flex;
+}
+.filterTrack h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.filterItem {
+  background: #9ad4e8;
+  font-size: 12px;
+  padding: 2px 5px 2px 15px;
+  border-radius: 10px;
+  margin-right: 10px;
+}
+.deleteFilter {
+  cursor: pointer;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  background: #d0edf7;
+  color: #333;
+  display: block;
+  float: right;
+  text-align: center;
+  line-height: 20px;
+  margin: 3px 0px 0px 10px;
+}
+.deliveries .input {
+  margin-bottom: 0px;
+  margin-right: 10px;
+}
+.keywordFilter {
+  border-radius: 5px;
+  border: 1px solid hsl(0, 0%, 80%);
+  padding: 6px;
+}
