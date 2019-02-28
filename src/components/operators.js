@@ -45,7 +45,7 @@ export default class Operators extends Component {
     operators = await operators.map(async item => {
       try {
         const data = await axios.post(
-          `${process.env.API_URL}/getOperatorsTasks/` + item.id,
+          `${process.env.API_URL}/getOperatorsOrdersCount/` + item.id,
           {},
           {
             headers: {

@@ -32,6 +32,7 @@ export default class Task extends Component {
   }
 
   componentDidMount() {
+    console.log('this.props.task', this.props.task)
     if (this.props.task[0].assignedTo_911 != null) {
       this.setState({
         have911: true,
@@ -143,6 +144,7 @@ export default class Task extends Component {
       console.log(err)
     }
   }
+
   setNote = e => {
     this.setState({
       note: e.target.value,

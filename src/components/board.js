@@ -300,6 +300,7 @@ export default class Board extends Component {
     })
   }
   onDrop = async (ev, cat) => {
+    ev.preventDefault()
     let id = ev.dataTransfer.getData('text')
     let idNumber = null
     let tasks = await this.state.tasks.filter(task => {

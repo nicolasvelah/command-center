@@ -1,5 +1,6 @@
 .deliveries {
   font-family: 'Yantramanav', sans-serif;
+  padding: 0px 40px 0px 0px;
 }
 .filters {
   display: inline-flex;
@@ -8,6 +9,7 @@
 .inputContainer {
   display: flex;
   margin-right: 20px;
+  padding-top: 10px;
 }
 .inputContainer span {
   margin-right: 5px;
@@ -15,4 +17,49 @@
 }
 .input {
   min-width: 200px;
+}
+.btmContainer {
+  display: inline-flex;
+}
+.btm {
+  background: #0047b3;
+  padding: 5px 10px;
+  color: #fff;
+  margin: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  border: 0px;
+}
+td {
+  font-size: 15px;
+}
+.loader {
+  text-align: center;
+  padding-bottom: 40px;
+}
+.deliveries .mensagessForm,
+.deliveries .asigne911,
+.deliveries .notes .addNote,
+.deliveries .notes h2,
+.deliveries .reasign,
+.deliveries .mapSearch {
+  display: none;
+}
+.columDetails {
+  font-size: 10px;
+  line-height: 12px;
+}
+.inputGroupContainer {
+  border: 1px solid #eee;
+  display: inline-flex;
+  margin-right: 20px;
+  padding: 10px;
+}
+.excel {
+  background: #5fbf21;
+  margin-top: 10px;
+}
+.addFilter {
+  margin: 0px;
+  background: #a3a3a3;
 }
