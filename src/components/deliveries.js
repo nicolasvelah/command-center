@@ -8,22 +8,24 @@ import { getUser, logoutLocal } from '../services/auth'
 import Modal from './modal'
 import Task from './Task'
 import ExcelDownload from './ExcelDownload'
+import { ToastContainer, toast } from 'react-toastify'
 
 import 'moment/locale/es.js'
 import 'rc-datepicker/lib/style.css'
 import '../assets/css/deliveries.css'
+import 'react-toastify/dist/ReactToastify.css'
 
 const columnsAll = [
-  { label: 'Id', value: 0, id: 0 },
-  { label: 'Fecha', value: 1, id: 1 },
-  { label: 'Categoria', value: 2, id: 2 },
-  { label: 'Servicio', value: 3, id: 3 },
-  { label: 'Cliente', value: 4, id: 4 },
-  { label: 'Proveedor', value: 5, id: 5 },
-  { label: 'Operador', value: 6, id: 6 },
-  { label: 'Pais', value: 7, id: 7 },
-  { label: 'Ciudad', value: 8, id: 8 },
-  { label: 'Direccion', value: 9, id: 9 },
+  { label: 'Id', value: 'Id', id: 0 },
+  { label: 'Fecha', value: 'Fecha', id: 1 },
+  { label: 'Categoria', value: 'Categoria', id: 2 },
+  { label: 'Servicio', value: 'Servicio', id: 3 },
+  { label: 'Cliente', value: 'Cliente', id: 4 },
+  { label: 'Proveedor', value: 'Proveedor', id: 5 },
+  { label: 'Operador', value: 'Operador', id: 6 },
+  { label: 'Pais', value: 'Pais', id: 7 },
+  { label: 'Ciudad', value: 'Ciudad', id: 8 },
+  { label: 'Direccion', value: 'Direccion', id: 9 },
 ]
 export default class Deliveries extends Component {
   constructor(props) {
@@ -46,6 +48,17 @@ export default class Deliveries extends Component {
       filterKeyword: '',
       filterColection: [],
       generatingExcel: false,
+      columnsSelect: [
+        { label: 'Id', value: 'Id' },
+        { label: 'Categoria', value: 'Categoria' },
+        { label: 'Servicio', value: 'Servicio' },
+        { label: 'Cliente', value: 'Cliente' },
+        { label: 'Proveedor', value: 'Proveedor' },
+        { label: 'Operador', value: 'Operador' },
+        { label: 'Pais', value: 'Pais' },
+        { label: 'Ciudad', value: 'Ciudad' },
+      ],
+      columnSelected: null,
     }
   }
 
@@ -111,7 +124,7 @@ export default class Deliveries extends Component {
         items = this.state.items.concat(data.data.tasks)
       }
 
-      console.log('hojas', data.data.pages)
+      console.log('hojas', data.data)
       let hasMoreItems = true
       if (data.data.pages === this.state.page || data.data.tasks.length === 0) {
         hasMoreItems = false
@@ -240,42 +253,70 @@ export default class Deliveries extends Component {
     console.log('addFilter')
     console.log(this.state.filterColumn)
     console.log(this.state.filterKeyword)
+    if (this.state.filterKeyword !== '' && this.state.filterColumn !== '') {
+      let { filterColection } = this.state
+      filterColection.push({
+        column: this.state.filterColumn,
+        keyword: this.state.filterKeyword,
+      })
+      console.log('filterColection', filterColection)
+      window.localStorage.setItem(
+        'filtercolection',
+        JSON.stringify(filterColection)
+      )
 
-    let { filterColection } = this.state
-    filterColection.push({
-      column: this.state.filterColumn,
-      keyword: this.state.filterKeyword,
-    })
-    console.log('filterColection', filterColection)
-    window.localStorage.setItem(
-      'filtercolection',
-      JSON.stringify(filterColection)
-    )
-    this.setState({
-      filterColection,
-    })
+      let { columnsSelect } = this.state
+      var index = columnsSelect
+        .map(x => {
+          return x.value
+        })
+        .indexOf(this.state.filterColumn)
+
+      columnsSelect.splice(index, 1)
+      console.log('---------------------columnsSelect', columnsSelect)
+
+      this.setState({
+        filterColection,
+        columnsSelect,
+        columnSelected: null,
+        filterColumn: '',
+        filterKeyword: '',
+      })
+
+      document.getElementById('keywordFilter').value = ''
+    } else {
+      this.MsmNewTask('Debe llenar los campos')
+    }
   }
   setFilter = (option, id) => {
     console.log('setFilter ID', id)
     console.log('setFilter', option)
-
-    if (id === 'filterColumn') {
-      let { filterColumn } = this.state
-      filterColumn = option.label
-      this.setState({
-        filterColumn,
-      })
-    } else {
-      let { filterKeyword } = this.state
-      filterKeyword = option
-      this.setState({
-        filterKeyword,
-      })
+    if (option) {
+      if (id === 'filterColumn') {
+        let { filterColumn, columnSelected } = this.state
+        filterColumn = option.label
+        columnSelected = [
+          {
+            label: option.label,
+            value: option.value,
+          },
+        ]
+        this.setState({
+          filterColumn,
+          columnSelected,
+        })
+      } else {
+        let { filterKeyword } = this.state
+        filterKeyword = option
+        this.setState({
+          filterKeyword,
+        })
+      }
+      console.log('filterColumn', this.state.filterColumn)
+      console.log('filterKeyword', this.state.filterKeyword)
     }
-    console.log('filterColumn', this.state.filterColumn)
-    console.log('filterKeyword', this.state.filterKeyword)
   }
-  deleteFilter = index => {
+  deleteFilter = (index, column) => {
     let { filterColection } = this.state
     filterColection.map(item => {
       if (index > -1) {
@@ -287,7 +328,10 @@ export default class Deliveries extends Component {
       'filtercolection',
       JSON.stringify(filterColection)
     )
-    this.setState({ filterColection })
+    let { columnsSelect } = this.state
+
+    columnsSelect.push({ label: column, value: column })
+    this.setState({ filterColection, columnsSelect })
   }
 
   loadAll = async () => {
@@ -357,6 +401,9 @@ export default class Deliveries extends Component {
 
     return response
   }
+
+  //ALERTS
+  MsmNewTask = title => toast(title)
 
   render() {
     const loader = (
@@ -439,7 +486,7 @@ export default class Deliveries extends Component {
     } else {
       items.push(
         <tr key="SinResultados">
-          <td colSpan="9">
+          <td colSpan="11">
             <div>Sin resultados</div>
           </td>
         </tr>
@@ -475,7 +522,8 @@ export default class Deliveries extends Component {
                 isSearchable={true}
                 name="column"
                 onChange={option => this.setFilter(option, 'filterColumn')}
-                options={columnsAll}
+                options={this.state.columnsSelect}
+                value={this.state.columnSelected}
               />
             </div>
             <div>
@@ -483,6 +531,7 @@ export default class Deliveries extends Component {
                 defaultValue={''}
                 placeholder="Ingresa una palabra clave"
                 className="input keywordFilter"
+                id="keywordFilter"
                 onChange={e => this.setFilter(e.target.value, 'filterKeyword')}
               />
             </div>
@@ -515,7 +564,7 @@ export default class Deliveries extends Component {
                   <b>Columna:</b> {item.column} <b>/ Keyword:</b> {item.keyword}{' '}
                   <span
                     className="deleteFilter"
-                    onClick={e => this.deleteFilter(i)}
+                    onClick={e => this.deleteFilter(i, item.column)}
                   >
                     X
                   </span>
@@ -570,6 +619,7 @@ export default class Deliveries extends Component {
         ) : (
           ''
         )}
+        <ToastContainer />
       </div>
     )
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { getUser } from '../services/auth'
-//import Chart from 'react-google-charts'
+import Chart from 'react-google-charts'
 import '../assets/css/operators.css'
 import flag from '../images/flag.svg'
 import star from '../images/star-full.svg'
@@ -11,6 +11,7 @@ export default class Operators extends Component {
     super(props)
     this.state = {
       operators: [],
+      totalTasks: [],
     }
   }
 
@@ -41,7 +42,8 @@ export default class Operators extends Component {
     }
   }
   getOperatorsTasks = async () => {
-    let { operators } = this.state
+    let { operators, totalTasks } = this.state
+    totalTasks = [{ asignet: 0, incourse: 0, resolve: 0, total: 0 }]
     operators = await operators.map(async item => {
       try {
         const data = await axios.post(
@@ -56,16 +58,23 @@ export default class Operators extends Component {
         )
         console.log('getOperatorsTasks: ', data.data)
         item.tasks = data.data.tasks
+
+        totalTasks[0].asignet = totalTasks[0].asignet + item.tasks.asignet
+        totalTasks[0].incourse = totalTasks[0].incourse + item.tasks.incourse
+        totalTasks[0].resolve = totalTasks[0].resolve + item.tasks.resolve
+        totalTasks[0].total = totalTasks[0].total + item.tasks.total
+
         return item
       } catch (err) {
         console.log(err.message)
         return 'error'
       }
     })
+    console.log('totalTasks', totalTasks)
     operators = await Promise.all(operators)
 
     console.log('data.data.users XXXXXX operators', operators)
-    this.setState({ operators })
+    this.setState({ operators, totalTasks })
 
     return operators
   }
@@ -129,35 +138,82 @@ export default class Operators extends Component {
                     </div>
                   </div>
                 </div>
+                <div className="operatorGraph">
+                  <Chart
+                    width={'280px'}
+                    height={'200px'}
+                    chartType="PieChart"
+                    loader={<div>Loading Chart</div>}
+                    data={[
+                      ['Tareas', 'Cantidad'],
+                      [
+                        'Asignados',
+                        operator.tasks ? operator.tasks.asignet : 0,
+                      ],
+                      [
+                        'En Curso',
+                        operator.tasks ? operator.tasks.incourse : 0,
+                      ],
+                      [
+                        'Resueltos',
+                        operator.tasks ? operator.tasks.resolve : 0,
+                      ],
+                    ]}
+                    options={{
+                      title: 'Tablero de Ordenes',
+                      pieHole: 0.2,
+                      colors: ['#af2d0e', '#ffc200', '#167711'],
+                    }}
+                    rootProps={{ 'data-testid': '1' }}
+                  />
+                </div>
               </div>
             </div>
           ))}
         </div>
-        {/* <div className="operatorsCharts">
+
+        <div className="operatorsCharts">
           <h2>Reportes de rendimiento</h2>
-          <Chart
-            width={'500px'}
-            height={'300px'}
-            chartType="Bar"
-            loader={<div>Loading Chart</div>}
-            data={[
-              ['Year', 'Sales', 'Expenses', 'Profit'],
-              ['2014', 1000, 400, 200],
-              ['2015', 1170, 460, 250],
-              ['2016', 660, 1120, 300],
-              ['2017', 1030, 540, 350],
-            ]}
-            options={{
-              // Material design options
-              chart: {
-                title: 'Company Performance',
-                subtitle: 'Sales, Expenses, and Profit: 2014-2017',
-              },
-            }}
-            // For tests
-            rootProps={{ 'data-testid': '2' }}
-          />
-          </div>*/}
+          <div className="totales">
+            Asignados:{' '}
+            {this.state.totalTasks.length > 0
+              ? this.state.totalTasks[0].asignet
+              : ''}{' '}
+            / En curso:{' '}
+            {this.state.totalTasks.length > 0
+              ? this.state.totalTasks[0].incourse
+              : ''}{' '}
+            / Resuelto:{' '}
+            {this.state.totalTasks.length > 0
+              ? this.state.totalTasks[0].resolve
+              : ''}{' '}
+            / Total:{' '}
+            {this.state.totalTasks.length > 0
+              ? this.state.totalTasks[0].total
+              : ' '}
+          </div>
+          {this.state.totalTasks.length > 0 ? (
+            <Chart
+              width={'500px'}
+              height={'300px'}
+              chartType="PieChart"
+              loader={<div>Loading Chart</div>}
+              data={[
+                ['Tareas', 'Cantidad'],
+                ['Asignados', this.state.totalTasks[0].asignet],
+                ['En Curso', this.state.totalTasks[0].incourse],
+                ['Resueltos', this.state.totalTasks[0].resolve],
+              ]}
+              options={{
+                title: 'Tablero de Ordenes',
+                is3D: true,
+              }}
+              rootProps={{ 'data-testid': '1' }}
+            />
+          ) : (
+            ''
+          )}
+        </div>
       </div>
     )
   }

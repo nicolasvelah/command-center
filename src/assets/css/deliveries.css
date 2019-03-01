@@ -132,3 +132,9 @@ td {
   font-size: 30px;
   padding-top: 200px;
 }
+.totales {
+  font-size: 20px;
+  width: 100%;
+  margin-top: 20px;
+  font-family: 'Yantramanav', sans-serif;
+}
