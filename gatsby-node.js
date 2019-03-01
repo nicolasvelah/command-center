@@ -25,6 +25,13 @@ exports.onCreateWebpackConfig = ({ actions, stage }) => {
     })
   }
 }
+exports.onCreateWebpackConfig = ({ actions }) => {
+  actions.setWebpackConfig({
+    node: {
+      fs: 'empty',
+    },
+  })
+}
 require('dotenv').config({
   path: `.env.${process.env.NODE_ENV}`,
 })

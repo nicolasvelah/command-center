@@ -45,6 +45,7 @@ export default class Deliveries extends Component {
       filterColumn: '',
       filterKeyword: '',
       filterColection: [],
+      generatingExcel: false,
     }
   }
 
@@ -82,7 +83,7 @@ export default class Deliveries extends Component {
   nextPage = async plus => {
     console.log('cargar mas', this.state.page)
     try {
-      let page = this.state.page
+      let { page } = this.state.page
       if (plus) {
         page = this.state.page + 1
       } else {
@@ -289,6 +290,74 @@ export default class Deliveries extends Component {
     this.setState({ filterColection })
   }
 
+  loadAll = async () => {
+    this.setState({ generatingExcel: true })
+    let page = this.state.page
+    while (page < this.state.pages + 1) {
+      await this.nextPage(true)
+      page++
+    }
+    this.setState({ generatingExcel: false })
+    return this.state.items
+  }
+
+  filterItems = item => {
+    const { filterColection } = this.state
+    let response = true
+    let responseArray = []
+    if (filterColection.length > 0) {
+      response = false
+      filterColection.map(filter => {
+        if (filter.column === 'Id') {
+          if (Number(item.id) === Number(filter.keyword)) {
+            responseArray.push(true)
+          }
+        } else if (filter.column === 'Categoria') {
+          if (item.service.categories.name === filter.keyword) {
+            responseArray.push(true)
+          }
+        } else if (filter.column === 'Servicio') {
+          if (item.service.name === filter.keyword) {
+            responseArray.push(true)
+          }
+        } else if (filter.column === 'Cliente') {
+          if (
+            item.client.name + ' ' + item.client.lastName ===
+            filter.keyword
+          ) {
+            responseArray.push(true)
+          }
+        } else if (filter.column === 'Proveedor') {
+          if (item.provider.busnessName === filter.keyword) {
+            responseArray.push(true)
+          }
+        } else if (filter.column === 'Operador') {
+          if (
+            item.operator.name + ' ' + item.operator.lastName ===
+            filter.keyword
+          ) {
+            responseArray.push(true)
+          }
+        }
+        console.log('responseArray: ', responseArray)
+        if (responseArray.length === filterColection.length) {
+          responseArray.map(resp => {
+            if (resp) {
+              response = true
+            }
+            return resp
+          })
+        } else {
+          response = false
+        }
+
+        return filter
+      })
+    }
+
+    return response
+  }
+
   render() {
     const loader = (
       <div key="loader" className="loader">
@@ -302,62 +371,7 @@ export default class Deliveries extends Component {
         .sort((a, b) => {
           return b.id - a.id
         })
-        .filter(item => {
-          const { filterColection } = this.state
-          let response = true
-          let responseArray = []
-          if (filterColection.length > 0) {
-            response = false
-            filterColection.map(filter => {
-              if (filter.column === 'Id') {
-                if (Number(item.id) === Number(filter.keyword)) {
-                  responseArray.push(true)
-                }
-              } else if (filter.column === 'Categoria') {
-                if (item.service.categories.name === filter.keyword) {
-                  responseArray.push(true)
-                }
-              } else if (filter.column === 'Servicio') {
-                if (item.service.name === filter.keyword) {
-                  responseArray.push(true)
-                }
-              } else if (filter.column === 'Cliente') {
-                if (
-                  item.client.name + ' ' + item.client.lastName ===
-                  filter.keyword
-                ) {
-                  responseArray.push(true)
-                }
-              } else if (filter.column === 'Proveedor') {
-                if (item.provider.busnessName === filter.keyword) {
-                  responseArray.push(true)
-                }
-              } else if (filter.column === 'Operador') {
-                if (
-                  item.operator.name + ' ' + item.operator.lastName ===
-                  filter.keyword
-                ) {
-                  responseArray.push(true)
-                }
-              }
-              console.log('responseArray: ', responseArray)
-              if (responseArray.length === filterColection.length) {
-                responseArray.map(resp => {
-                  if (resp) {
-                    response = true
-                  }
-                  return resp
-                })
-              } else {
-                response = false
-              }
-
-              return filter
-            })
-          }
-
-          return response
-        })
+        .filter(item => this.filterItems(item))
         .map((item, i) => {
           items.push(
             <tr key={i}>
@@ -433,7 +447,6 @@ export default class Deliveries extends Component {
     }
     return (
       <div className="deliveries">
-        <ExcelDownload />
         <h1>Entregas</h1>
         <div className="filters">
           <div className="inputContainer">
@@ -477,6 +490,20 @@ export default class Deliveries extends Component {
               Añadir Filtro
             </button>
           </div>
+          {this.state.page >= this.state.pages ? (
+            <ExcelDownload
+              items={this.state.items}
+              filterItems={this.filterItems}
+            />
+          ) : !this.state.generatingExcel ? (
+            <button onClick={this.loadAll} className="generateExcel">
+              Generar Excel
+            </button>
+          ) : (
+            <div className="generatingExcel">
+              Trayendo todas las ordenes un momento porfavor...
+            </div>
+          )}
           <div />
         </div>
         {this.state.filterColection.length > 0 ? (
