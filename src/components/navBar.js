@@ -88,7 +88,7 @@ export default class navBar extends Component {
                           }}
                           className="menuItem"
                         >
-                          Reportes <img src={report} alt="" className="icon" />
+                          Gráficas <img src={report} alt="" className="icon" />
                         </div>
                         <div
                           onClick={event => {

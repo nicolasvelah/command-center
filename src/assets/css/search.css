@@ -1,0 +1,34 @@
+.searchResults {
+  display: inline-flex;
+  width: 100%;
+  text-align: left;
+}
+.resultColumn {
+  width: 25%;
+  border-right: 1px solid hsl(0, 0%, 80%);
+  padding: 10px 20px;
+  min-height: 70vh;
+  font-size: 15px;
+  line-height: 18px;
+  color: #666;
+}
+.resultColumn:last-of-type {
+  border: none;
+}
+.resultItem {
+  border: 1px solid rgb(209, 209, 209);
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+.resultItem b {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+.loadingSearch {
+  text-align: left;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0px;
+  padding: 0px 0px 20px;
+  color: #0047b3;
+}

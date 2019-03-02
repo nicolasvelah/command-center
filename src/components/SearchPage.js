@@ -2,57 +2,15 @@ import React, { Component } from 'react'
 import styled from 'styled-components'
 import axios from 'axios'
 import { getUser } from '../services/auth'
-import { Async } from 'react-select'
 
-const StyledAutocomplete = styled(Async)`
-  .Select-control {
-    border: solid 1px ${props => props.theme.gray};
-    border-radius: 0 !important;
-    box-shadow: none;
-    color: ${props => props.theme.black};
-    height: 41px;
+import '../assets/css/search.css'
 
-    .Select-multi-value-wrapper {
-      .Select-placeholder {
-        line-height: 40px;
-      }
-
-      .Select-value {
-        line-height: 40px;
-        .Select-value-label {
-          color: ${props => props.theme.black} !important;
-        }
-      }
-
-      .Select-input {
-        height: 38px;
-        width: 100%;
-
-        input {
-          line-height: 18px;
-          padding: 10px 0 12px;
-        }
-      }
-    }
-
-    .Select-clear-zone {
-      .Select-clear {
-        font-size: 30px;
-        margin-right: 5px;
-      }
-    }
-
-    .Select-arrow-zone {
-      display: none;
-    }
-  }
-`
-const Error = styled.div`
-  color: red;
-  font-size: 12px;
-  position: absolute;
-  top: 34px;
-  left: 0;
+const StyledAutocomplete = styled.input`
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid hsl(0, 0%, 80%);
+  margin-bottom: 30px;
 `
 const InputContainer = styled.div`
   position: relative;
@@ -63,22 +21,25 @@ export default class SearchPage extends Component {
     super(props)
     this.state = {
       isLoading: false,
-      keySearch: {
-        value: '',
-        error: '',
-      },
+      keyWord: '',
+      error: false,
+      items: [],
+      clienteArray: [],
+      providerArray: [],
+      operatorArray: [],
     }
   }
 
-  getKeySearch = (inputValue, callback) => {
-    if (!this.state.isLoading && inputValue) {
-      let options = []
-      if (this.state.keyWord !== '') {
-        axios
+  getKeySearch = async () => {
+    console.log('Entra a API')
+    if (this.state.isLoading && this.state.keyWord !== '') {
+      console.log('cumple requisitos inicia consulta')
+      try {
+        await axios
           .post(
-            `${process.env.API_URL}/clients/searchClients`,
+            `${process.env.API_URL}/gs/${this.state.keyWord}`,
             {
-              searchText: this.state.keyWord,
+              limit: 100,
             },
             {
               headers: {
@@ -88,55 +49,104 @@ export default class SearchPage extends Component {
             }
           )
           .then(async result => {
-            options = await result.data.clients.map(client => {
-              return {
-                id: client.id,
-                label:
-                  client.name +
-                  ' ' +
-                  client.lastName +
-                  ' / Telf: ' +
-                  client.phone,
-                value: client.id,
-              }
-            })
-
-            setTimeout(() => {
-              callback(options)
-              this.setState({ isLoading: false })
-            }, 500)
+            console.log(
+              'this.state.keyWord en result/---------',
+              this.state.keyWord
+            )
+            if (this.state.keyWord !== '') {
+              console.log('Result', result.data.results)
+              await this.setState({
+                items: result.data.results,
+                isLoading: false,
+                error: false,
+                clienteArray: [],
+                providerArray: [],
+                operatorArray: [],
+              })
+              console.log('estado items', this.state.items)
+            } else {
+              console.log('vacio pero consulto/---------')
+              this.setState({
+                isLoading: false,
+                error: false,
+                items: [],
+                clienteArray: [],
+                providerArray: [],
+                operatorArray: [],
+              })
+            }
           })
-      } else {
-        setTimeout(() => {
-          callback(options)
-          this.setState({ isLoading: false })
-        }, 500)
+      } catch (er) {
+        console.error(er)
+        this.setState({
+          items: [],
+          isLoading: false,
+          error: true,
+          clienteArray: [],
+          providerArray: [],
+          operatorArray: [],
+        })
       }
+    } else {
+      console.log('vacio else/---------')
+      this.setState({
+        items: [],
+        isLoading: false,
+        error: false,
+        clienteArray: [],
+        providerArray: [],
+        operatorArray: [],
+      })
     }
     return
   }
 
-  handleKeySearchTypeInputSearch = inputValue => {
-    if (this.state.firstTyping) {
-      this.setState({ firstTyping: false })
-    }
-    if (inputValue) {
-      this.setState({ keyWord: inputValue })
-    }
-  }
-  handleKeySearchAutoCompleteChange = async option => {
-    if (option) {
-      await this.setState({
-        keyWord: option.label,
-        mapShow: true,
-        clientId: option.value,
-        client: { value: option.value },
+  handleKeySearchAutoCompleteChange = e => {
+    if (e.target.value) {
+      this.setState({
+        keyWord: e.target.value,
       })
     } else {
-      await this.setState({ keyWord: '' })
+      this.setState({ keyWord: '' })
     }
+    console.log('keyword: ', e.target.value)
 
-    return option.label
+    if (!this.state.isLoading) {
+      this.setState({ isLoading: true })
+      setTimeout(() => {
+        console.log('llama api ahora')
+        this.getKeySearch()
+      }, 3000)
+    }
+    return
+  }
+
+  setArrays = (id, type) => {
+    let { clienteArray, providerArray, operatorArray } = this.state
+    let response = false
+    switch (type) {
+      case 'client':
+        if (clienteArray.indexOf(id) === -1) {
+          clienteArray.push(id)
+          response = true
+        }
+        break
+      case 'provider':
+        if (providerArray.indexOf(id) === -1) {
+          providerArray.push(id)
+          response = true
+        }
+        break
+      case 'operator':
+        if (operatorArray.indexOf(id) === -1) {
+          operatorArray.push(id)
+          response = true
+        }
+        break
+      default:
+    }
+    console.log('clienteArray', clienteArray)
+    return response
   }
   render() {
     return (
@@ -144,26 +154,180 @@ export default class SearchPage extends Component {
         <InputContainer>
           <StyledAutocomplete
             name="keySearch"
-            autosize={true}
-            noResultsText="No se han encontrado resultados"
             placeholder="Buscar"
-            clearValueText="Limpiar Campo"
             onChange={this.handleKeySearchAutoCompleteChange}
-            onInputChange={this.handleKeySearchTypeInputSearch}
-            onSelectResetsInput={false}
-            onBlurResetsInput={false}
-            onCloseResetsInput={false}
-            inputProps={{ autoComplete: 'on' }}
-            isLoading={this.state.isLoading}
-            cache={false}
-            loadOptions={this.getKeySearch}
-            loadingPlaceholder="Buscando..."
-            searchPromptText="Escriba una frase o palabra para realizar una búsqueda"
-            ignoreAccents={false}
-            className="input"
           />
-          <Error>{this.state.keySearch.error}</Error>
+          {this.state.isLoading ? (
+            <div className="loadingSearch">Cargando...</div>
+          ) : (
+            ''
+          )}
+          {this.state.error ? <div>Upps... hubo un Error...</div> : ''}
         </InputContainer>
+        <div className="searchResults">
+          <div className="resultColumn">
+            <h2>Ordenes</h2>
+            <div className="resultColumnItems">
+              {this.state.items.length > 0
+                ? this.state.items.map(item => (
+                    <div className="resultItem" key={item.id}>
+                      <div>
+                        <b>id:</b> {item.id}
+                      </div>
+                      <div>
+                        <b>Categoria:</b> {item.service.categories.name}
+                      </div>
+                      <div>
+                        <b>Servicio:</b> {item.service.name}
+                      </div>
+                      <div>
+                        <b>Creada el:</b> {item.createdAt}
+                      </div>
+                      <div>
+                        <b>Estado:</b> {item.status.name}
+                      </div>
+                      <div>
+                        <b>Cliente:</b>{' '}
+                        {item.client.name + ' ' + item.client.lastName}
+                      </div>
+                      <div>
+                        <b>Proveedor:</b> {item.provider.busnessName}
+                      </div>
+                      <div>
+                        <b>Operador:</b>{' '}
+                        {item.operator.name + ' ' + item.operator.lastName}
+                      </div>
+                      <div>
+                        <b>Pais:</b>{' '}
+                      </div>
+                      <div>
+                        <b>Ciudad:</b>{' '}
+                      </div>
+                      <div>
+                        <b>Direccion:</b>{' '}
+                      </div>
+                    </div>
+                  ))
+                : 'No hay resultados'}
+            </div>
+          </div>
+          <div className="resultColumn">
+            <h2>Clientes</h2>
+            <div className="resultColumnItems">
+              {this.state.items.length > 0
+                ? this.state.items
+                    .filter(item => {
+                      return this.setArrays(item.client.id, 'client')
+                    })
+                    .map(item => (
+                      <div className="resultItem" key={item.id}>
+                        <div>
+                          <b>id:</b> {item.client.id}
+                        </div>
+                        <div>
+                          <b>Nombre:</b>{' '}
+                          {item.client.name + ' ' + item.client.lastName}
+                        </div>
+                        <div>
+                          <b>CI:</b> {item.client.idCard}
+                        </div>
+                        <div>
+                          <b>Fecha de nacimiento:</b> {item.client.birthday}
+                        </div>
+                        <div>
+                          <b>Email:</b> {item.client.email}
+                        </div>
+                        <div>
+                          <b>Telefono:</b> {item.client.phone}
+                        </div>
+                        <div>
+                          <b>Pais:</b> {item.client.country}
+                        </div>
+                        <div>
+                          <b>Ciudad:</b> {item.client.city}
+                        </div>
+                      </div>
+                    ))
+                : 'No hay resultados'}
+            </div>
+          </div>
+          <div className="resultColumn">
+            <h2>Proveedores</h2>
+            <div className="resultColumnItems">
+              {this.state.items.length > 0
+                ? this.state.items
+                    .filter(item => {
+                      return this.setArrays(item.provider.user.id, 'provider')
+                    })
+                    .map(item => (
+                      <div className="resultItem" key={item.id}>
+                        <div>
+                          <b>Id:</b> {item.provider.user.id}
+                        </div>
+                        <div>
+                          <b>Proveedor:</b> {item.provider.busnessName}
+                        </div>
+                        <div>
+                          <b>Nombre:</b>
+                          {item.provider.user.name +
+                            ' ' +
+                            item.provider.user.lastName}
+                        </div>
+                        <div>
+                          <b>Estado:</b> {item.provider.user.appState}
+                        </div>
+                        <div>
+                          <b>Email:</b> {item.provider.user.email}
+                        </div>
+                        <div>
+                          <b>Telefono:</b> {item.provider.user.phone}
+                        </div>
+                        <div>
+                          <b>Pais:</b> {item.provider.user.country}
+                        </div>
+                        <div>
+                          <b>Ciudad:</b> {item.provider.user.city}
+                        </div>
+                      </div>
+                    ))
+                : 'No hay resultados'}
+            </div>
+          </div>
+          <div className="resultColumn">
+            <h2>Operadores</h2>
+            <div className="resultColumnItems">
+              {this.state.items.length > 0
+                ? this.state.items
+                    .filter(item => {
+                      return this.setArrays(item.operator.id, 'operator')
+                    })
+                    .map(item => (
+                      <div className="resultItem" key={item.id}>
+                        <div>
+                          <b>Id:</b> {item.operator.id}
+                        </div>
+                        <div>
+                          <b>Nombre:</b>
+                          {item.operator.name + ' ' + item.operator.lastName}
+                        </div>
+                        <div>
+                          <b>Email:</b> {item.operator.email}
+                        </div>
+                        <div>
+                          <b>Telefono:</b> {item.operator.phone}
+                        </div>
+                        <div>
+                          <b>Pais:</b> {item.operator.country}
+                        </div>
+                        <div>
+                          <b>Ciudad:</b> {item.operator.city}
+                        </div>
+                      </div>
+                    ))
+                : 'No hay resultados'}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

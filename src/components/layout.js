@@ -76,7 +76,7 @@ export default class Layout extends React.Component {
                 ''
               )}
               <link
-                href="https://fonts.googleapis.com/css?family=Teko:500|Yantramanav:300"
+                href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700|Yantramanav:300"
                 rel="stylesheet"
               />
             </Helmet>

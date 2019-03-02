@@ -207,6 +207,7 @@ export default class Operators extends Component {
               options={{
                 title: 'Tablero de Ordenes',
                 is3D: true,
+                colors: ['#af2d0e', '#ffc200', '#167711'],
               }}
               rootProps={{ 'data-testid': '1' }}
             />
