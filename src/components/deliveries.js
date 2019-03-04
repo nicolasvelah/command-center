@@ -35,10 +35,10 @@ export default class Deliveries extends Component {
       page: 1,
       pages: 0,
       count: 0,
-      date: moment().format('YYYY-MM-DDT00:00:20.719Z'),
+      date: moment().format('YYYY-MM-DDT23:59:59.719Z'),
       firstDate: moment()
         .startOf('month')
-        .format('YYYY-MM-DDT00:00:20.719Z'),
+        .format('YYYY-MM-DDT00:00:00.719Z'),
       hasMoreItems: true,
       showModal: false,
       curTask: [],
@@ -84,7 +84,7 @@ export default class Deliveries extends Component {
       })
     } else {
       await this.setState({
-        date: moment(jsDate).format('YYYY-MM-DDT00:00:20.719Z'),
+        date: moment(jsDate).format('YYYY-MM-DDT23:59:59.719Z'),
       })
     }
 
@@ -382,6 +382,14 @@ export default class Deliveries extends Component {
           ) {
             responseArray.push(true)
           }
+        } else if (filter.column === 'Pais') {
+          if (item.country === filter.keyword) {
+            responseArray.push(true)
+          }
+        } else if (filter.column === 'Ciudad') {
+          if (item.city === filter.keyword) {
+            responseArray.push(true)
+          }
         }
         console.log('responseArray: ', responseArray)
         if (responseArray.length === filterColection.length) {
@@ -466,9 +474,9 @@ export default class Deliveries extends Component {
                     : 'Sin datos'}
                 </div>
               </td>
-              <td>Pais</td>
-              <td>Ciudad</td>
-              <td>Direccion</td>
+              <td>{item.country !== null ? item.country : 'Sin datos'}</td>
+              <td>{item.city !== null ? item.city : 'Sin datos'}</td>
+              <td>{item.address !== null ? item.address : 'Sin datos'}</td>
               <td>
                 <div className="btmContainer">
                   <div onClick={() => this.setModal(item.id)} className="btm">

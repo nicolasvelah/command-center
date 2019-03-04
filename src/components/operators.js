@@ -132,7 +132,7 @@ export default class Operators extends Component {
                     </div>
                   </div>
                   <div className="taskCounter totalCounter">
-                    <div className="taskCounterHead">Total / mes</div>{' '}
+                    <div className="taskCounterHead">Total</div>{' '}
                     <div className="taskCounterNumber">
                       {operator.tasks ? operator.tasks.total : '0'}
                     </div>

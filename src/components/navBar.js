@@ -10,7 +10,7 @@ import rocket from '../images/rocket.svg'
 import radar from '../images/radar.svg'
 import board from '../images/board.svg'
 import plus from '../images/plus.svg'
-import report from '../images/report.svg'
+//import report from '../images/report.svg'
 import users from '../images/users.svg'
 import exit from '../images/exit.svg'
 import circleRight from '../images/circle-right.svg'
@@ -84,21 +84,21 @@ export default class navBar extends Component {
                         <div
                           onClick={event => {
                             event.preventDefault()
-                            navigate(`/app/reports`)
-                          }}
-                          className="menuItem"
-                        >
-                          Gráficas <img src={report} alt="" className="icon" />
-                        </div>
-                        <div
-                          onClick={event => {
-                            event.preventDefault()
                             navigate(`/app/deliveries`)
                           }}
                           className="menuItem"
                         >
                           Entregas <img src={rocket} alt="" className="icon" />
                         </div>
+                        {/*<div
+                          onClick={event => {
+                            event.preventDefault()
+                            navigate(`/app/reports`)
+                          }}
+                          className="menuItem"
+                        >
+                          Monitoreo <img src={report} alt="" className="icon" />
+                        </div>*/}
                         <div
                           onClick={event => {
                             event.preventDefault()
