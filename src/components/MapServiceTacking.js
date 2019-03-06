@@ -49,7 +49,7 @@ class MapServiceTacking extends Component {
     this.activeDraggable = this.activeDraggable.bind(this)
   }
   getLocationByIP = async () => {
-    try {
+    /*try {
       const publicIp = require('public-ip')
       const ip = await publicIp.v4()
       const response = await axios({
@@ -65,7 +65,7 @@ class MapServiceTacking extends Component {
     } catch (error) {
       console.log('no se pudo desde el backend')
       //alert(error.message);
-    }
+    }*/
   }
   async componentDidMount() {
     token = await getUser().token
