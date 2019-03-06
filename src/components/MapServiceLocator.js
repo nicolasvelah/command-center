@@ -53,14 +53,35 @@ class MapServiceLocator extends Component {
     this.onCircleInteraction = this.onCircleInteraction.bind(this)
     this.activeDraggable = this.activeDraggable.bind(this)
   }
+
+  getLocationByIP = async () => {
+    try {
+      const publicIp = require('public-ip')
+      const ip = await publicIp.v4()
+      const response = await axios({
+        url: `${process.env.WS_URL}/api/v1/geo-ip/${ip}`,
+        method: 'get',
+        headers: {
+          jwt: token,
+        },
+      })
+      const { country } = response.data
+      console.log('geoapi', response.data)
+      return country
+    } catch (error) {
+      console.log('no se pudo desde el backend')
+      //alert(error.message);
+    }
+  }
   async componentDidMount() {
     token = await getUser().token
     //Geolocalizacion
     const { userId } = this.state
     this.google = window.google = window.google ? window.google : {}
+    const country = await this.getLocationByIP()
 
-    await this.getClients() //get a client list with the last know location
-    await this.getProviders() //get a provider list with the last know location
+    await this.getClients(country) //get a client list with the last know location
+    await this.getProviders(country) //get a provider list with the last know location
 
     //connect with the websocket
     this.socket = io(process.env.WS_URL, {
@@ -68,14 +89,20 @@ class MapServiceLocator extends Component {
         user: JSON.stringify({
           id: userId,
           token,
+          country,
         }),
       },
     })
     this.socket.on(`user-${userId}-socketId`, this.onSockedId)
-    this.socket.on('onClientLocation', this.onClientLocation)
-    this.socket.on('onProviderLocation', this.onProviderLocation) //to check gps providers updates
-    this.socket.on('onProviderInService', this.onProviderInService) //to check if a provider is in service
-    this.socket.on('onProviderDisconnected', this.onProviderInService) //to check if a provider has disconnected
+    this.socket.on(`onClientLocation-${country}`, this.onClientLocation)
+    this.socket.on(`onProviderLocation-${country}`, this.onProviderLocation) //to check gps providers updates
+    this.socket.on(`onProviderInService-${country}`, this.onProviderInService) //to check if a provider is in service
+    this.socket.on(
+      `onProviderDisconnected-${country}`,
+      this.onProviderDisconnected
+    ) //to check if a provider has disconnected
+    //the event onClientDisconnected works just like onProviderDisconnected, please  implement the method onClientDisconnected by yourself
+    this.socket.on(`onClientDisconnected-${country}`, this.onClientDisconnected) //to check if a provider has disconnected
   }
   async shouldComponentUpdate() {
     await this.updateMap()
@@ -119,13 +146,16 @@ class MapServiceLocator extends Component {
     }
   }
   //GEOLOCALIZATION
-  async getClients() {
+  async getClients(country) {
     try {
       const res = await axios({
         method: 'POST',
         url: `${process.env.WS_URL}/api/v1/clients`,
         headers: {
           jwt: token,
+        },
+        data: {
+          country,
         },
       })
 
@@ -156,6 +186,7 @@ class MapServiceLocator extends Component {
       lng: null,
       user: null,
     }
+
     await users.map(user => {
       if (user.id === userId) {
         response = {
@@ -168,7 +199,7 @@ class MapServiceLocator extends Component {
     })
     return response
   }
-  async getProviders() {
+  async getProviders(country) {
     console.log('this.props.providerId', this.props.providerId)
     try {
       const res = await axios({
@@ -176,6 +207,9 @@ class MapServiceLocator extends Component {
         url: `${process.env.WS_URL}/api/v1/providers`,
         headers: {
           jwt: token,
+        },
+        data: {
+          country,
         },
       })
       console.log(res.data)
