@@ -49,7 +49,7 @@ class MapServiceTacking extends Component {
     this.activeDraggable = this.activeDraggable.bind(this)
   }
   getLocationByIP = async () => {
-    /*try {
+    try {
       const publicIp = require('public-ip')
       const ip = await publicIp.v4()
       const response = await axios({
@@ -65,7 +65,7 @@ class MapServiceTacking extends Component {
     } catch (error) {
       console.log('no se pudo desde el backend')
       //alert(error.message);
-    }*/
+    }
   }
   async componentDidMount() {
     token = await getUser().token
@@ -281,8 +281,14 @@ class MapServiceTacking extends Component {
     //update the state
     this.setState({ providers: [tmp] })
   }
-  centerClients = e => {
+  centerClients = async e => {
     e.preventDefault()
+    await this.setState({
+      center: {
+        lat: null,
+        lng: null,
+      },
+    })
     let bounds = new this.google.maps.LatLngBounds()
     if (this.state.clients.length === 0) {
       alert('No hay marcadores para centrar')
@@ -295,6 +301,7 @@ class MapServiceTacking extends Component {
           lng: client.lng,
         },
       })
+      console.log('this.state.center: ', this.state.center)
       return
     }
     this.state.clients.forEach(p => {
@@ -359,7 +366,7 @@ class MapServiceTacking extends Component {
 
   render() {
     const { clients, providers, center, zoom } = this.state
-    console.log('providers to print', providers)
+    //console.log('providers to print', providers)
     return (
       <div className="map-container-traking">
         <Autocomplete
@@ -386,29 +393,37 @@ class MapServiceTacking extends Component {
             id={'solicitud_' + this.props.userId}
             address={this.state.address}
           />
-          {clients.map((client, index) => (
-            <CMarker
-              key={index}
-              lat={client.lat}
-              lng={client.lng}
-              id={client.id}
-              isProvider={false}
-              info={client.info}
-              donde={'tacker cliente'}
-            />
-          ))}
+          {clients.map((client, index) =>
+            client.lat !== null ? (
+              <CMarker
+                key={index}
+                lat={client.lat}
+                lng={client.lng}
+                id={client.id}
+                isProvider={false}
+                info={client.info}
+                donde={'tacker cliente'}
+              />
+            ) : (
+              ''
+            )
+          )}
           {this.props.providerId !== 0 && providers.length > 0
-            ? providers.map((provider, index) => (
-                <CMarker
-                  key={index}
-                  lat={provider.lat}
-                  lng={provider.lng}
-                  isProvider={true}
-                  id={provider.id}
-                  info={provider.info}
-                  donde={'tacker poroviders'}
-                />
-              ))
+            ? providers.map((provider, index) =>
+                provider.lat !== null ? (
+                  <CMarker
+                    key={index}
+                    lat={provider.lat}
+                    lng={provider.lng}
+                    isProvider={true}
+                    id={provider.id}
+                    info={provider.info}
+                    donde={'tacker poroviders'}
+                  />
+                ) : (
+                  ''
+                )
+              )
             : ''}
         </GoogleMapReact>
 

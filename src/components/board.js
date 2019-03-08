@@ -41,6 +41,7 @@ export default class Board extends Component {
     this.getMyTasks = this.getMyTasks.bind(this)
     this.getOperators = this.getOperators.bind(this)
     this.update911state = this.update911state.bind(this)
+    this.updateLocalTask = this.updateLocalTask.bind(this)
   }
 
   async componentDidMount() {
@@ -299,9 +300,9 @@ export default class Board extends Component {
       dragStard: true,
     })
   }
-  onDrop = async (ev, cat) => {
-    ev.preventDefault()
-    let id = ev.dataTransfer.getData('text')
+  updateLocalTask = async (id, cat) => {
+    console.log('local update cat -----------', cat)
+    console.log('local update id -----------', id)
     let idNumber = null
     let tasks = await this.state.tasks.filter(task => {
       if ('id_' + task.id === id) {
@@ -315,6 +316,14 @@ export default class Board extends Component {
       tasks,
       dragStard: false,
     })
+
+    return idNumber
+  }
+  onDrop = async (ev, cat) => {
+    ev.preventDefault()
+    let id = ev.dataTransfer.getData('text')
+
+    const idNumber = await this.updateLocalTask(id, cat)
 
     await axios.post(
       `${process.env.API_URL}/orders/updateStatus`,
@@ -616,6 +625,7 @@ export default class Board extends Component {
               chageProvider={this.chageProvider}
               chageProviderVal={this.state.chageProviderVal}
               update911state={this.update911state}
+              updateLocalTask={this.updateLocalTask}
             />
           </Modal>
         ) : (

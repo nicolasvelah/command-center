@@ -4,6 +4,7 @@ import Chat from './Chat'
 import phone from '../images/phone.svg'
 import axios from 'axios'
 import { getUser } from '../services/auth'
+import scrollIntoView from 'scroll-into-view'
 
 import '../assets/css/task.css'
 
@@ -19,6 +20,7 @@ export default class Task extends Component {
       note: '',
       update: false,
     }
+    this.scrollToBottom = this.scrollToBottom.bind(this)
   }
 
   componentDidMount() {}
@@ -74,7 +76,7 @@ export default class Task extends Component {
       return
     }
   }
-  setMenssage = (e, isClientTo, userId) => {
+  setMenssage = (e, isClientTo, userId, id) => {
     if (typeof e.target !== 'undefined') {
       this.setState({
         Menssage: e.target.value,
@@ -83,6 +85,11 @@ export default class Task extends Component {
         isClientTo: isClientTo,
       })
     }
+    this.scrollToBottom(id)
+  }
+  scrollToBottom = id => {
+    scrollIntoView(document.getElementById(id))
+    return
   }
 
   render() {
@@ -152,6 +159,7 @@ export default class Task extends Component {
                       messagesTask={this.props.messagesTask['911']}
                       id="chat-911"
                       idInput="input"
+                      scrollToBottom={this.scrollToBottom}
                     />
                   </div>
                   <div className="mapContainer">

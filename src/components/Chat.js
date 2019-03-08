@@ -2,21 +2,39 @@ import React from 'react'
 import { getUser } from '../services/auth'
 import send from '../images/send.svg'
 import '../assets/css/chat.css'
-import scrollIntoView from 'scroll-into-view'
 
 export default class Chat extends React.Component {
-  scrollToBottom = id => {
-    scrollIntoView(document.getElementById(id))
-    return
+  constructor(props) {
+    super(props)
+    this.state = {
+      messagesTaskTemp: [],
+    }
   }
-
   componentDidMount() {
-    this.scrollToBottom(this.props.id)
+    this.props.scrollToBottom(this.props.id)
+    this.setState({
+      messagesTaskTemp: this.props.messagesTask,
+    })
+  }
+  componentDidUpdate() {
+    console.log('this.props.messagesTask', this.props.messagesTask)
+    console.log('this.state.messagesTaskTemp', this.state.messagesTaskTemp)
+    if (!this.isEqual(this.props.messagesTask, this.state.messagesTaskTemp)) {
+      this.props.scrollToBottom(this.props.id)
+      this.setState({
+        messagesTaskTemp: this.props.messagesTask,
+      })
+    }
+  }
+  isEqual = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) return false
+    for (var i = arr1.length; i--; ) {
+      if (arr1[i] !== arr2[i]) return false
+    }
+
+    return true
   }
 
-  componentDidUpdate() {
-    this.scrollToBottom(this.props.id)
-  }
   render() {
     console.log('mesajers para esta tarea', this.props.messagesTask)
     return (
@@ -29,7 +47,7 @@ export default class Chat extends React.Component {
                     <div
                       key={item.id}
                       className={
-                        getUser().type === item.type
+                        getUser().name + ' ' + getUser().lastName === item.name
                           ? 'message itsMeAlign'
                           : 'message'
                       }
@@ -37,9 +55,10 @@ export default class Chat extends React.Component {
                       <div
                         key={item.id}
                         className={
-                          getUser().type === item.type
-                            ? 'msm itsMe'
-                            : 'msm notMe'
+                          getUser().name + ' ' + getUser().lastName ===
+                          item.name
+                            ? 'msm itsMe '
+                            : 'msm notMe '
                         }
                       >
                         <div className="userData">
@@ -81,7 +100,8 @@ export default class Chat extends React.Component {
                   e,
                   this.props.isClientTo,
                   this.props.userId,
-                  this.props.is911
+                  this.props.is911,
+                  this.props.id
                 )
               }
               onKeyPress={this.props.sendMenssageByEnter}

@@ -7,6 +7,8 @@ import phone from '../images/phone.svg'
 import circleDown from '../images/circle-down.svg'
 import axios from 'axios'
 import { getUser } from '../services/auth'
+import scrollIntoView from 'scroll-into-view'
+import Select from 'react-select'
 
 import '../assets/css/task.css'
 
@@ -26,9 +28,18 @@ export default class Task extends Component {
       showCD: false,
       showPD: false,
       is911: false,
+      states: [
+        { value: 'backlog', label: 'BACKLOG' },
+        { value: 'asigned', label: 'ASIGNADOS' },
+        { value: 'live', label: 'EN VIVO' },
+        { value: 'standby', label: 'WORK IN PROGRESS' },
+        { value: 'notresponse', label: 'SIN RESPUESTA' },
+        { value: 'complete', label: 'RESUELTOS' },
+      ],
     }
     this.setNote = this.setNote.bind(this)
     this.sendNote = this.sendNote.bind(this)
+    this.scrollToBottom = this.scrollToBottom.bind(this)
   }
 
   componentDidMount() {
@@ -83,7 +94,7 @@ export default class Task extends Component {
           dd + '/' + mm + '/' + yyyy + ' ' + hour + ':' + minute + ':' + second,
         id: 100,
         message: this.state.Menssage,
-        name: getUser().name + getUser().lastName,
+        name: getUser().name + ' ' + getUser().lastName,
         type: getUser().type,
       }
       let userType = '911'
@@ -105,7 +116,7 @@ export default class Task extends Component {
       return
     }
   }
-  setMenssage = (e, isClientTo, userId, is911) => {
+  setMenssage = (e, isClientTo, userId, is911, id) => {
     if (typeof e.target !== 'undefined') {
       this.setState({
         Menssage: e.target.value,
@@ -115,6 +126,7 @@ export default class Task extends Component {
         is911: is911,
       })
     }
+    this.scrollToBottom(id)
   }
 
   sendNote = async e => {
@@ -193,6 +205,34 @@ export default class Task extends Component {
       console.log(err)
     }
   }
+  scrollToBottom = id => {
+    scrollIntoView(document.getElementById(id))
+    return
+  }
+
+  updateState = async option => {
+    console.log('opcion', option.value)
+    console.log('orderId', this.props.task[0].id)
+    console.log('x-access-token', getUser().token)
+    try {
+      await axios.post(
+        `${process.env.API_URL}/orders/updateStatus`,
+        {
+          statusName: option.value,
+          orderId: this.props.task[0].id,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      this.props.updateLocalTask('id_' + this.props.task[0].id, option.value)
+    } catch (err) {
+      console.log('error', err)
+    }
+  }
 
   render() {
     console.log(this.props.task)
@@ -204,7 +244,20 @@ export default class Task extends Component {
           <div>
             <h1 className="popUpTitle">{this.props.task[0].service.name}</h1>
             <div className="taskState">
-              <b>Estado:</b> {this.props.task[0].status.name}
+              <b>Estado:</b>
+              <Select
+                className="input"
+                classNamePrefix="state"
+                placeholder="Estado"
+                isClearable={false}
+                isSearchable={true}
+                name="state"
+                defaultValue={this.state.states.filter(
+                  option => option.value === this.props.task[0].status.name
+                )}
+                options={this.state.states}
+                onChange={this.updateState}
+              />
             </div>
             <div>
               {!this.state.have911 ? (
@@ -282,6 +335,7 @@ export default class Task extends Component {
                       id="chatClient"
                       idInput="client"
                       is911={false}
+                      scrollToBottom={this.scrollToBottom}
                     />
                   </div>
                 </div>
@@ -364,6 +418,7 @@ export default class Task extends Component {
                               id="chatProvider"
                               idInput="provider"
                               is911={false}
+                              scrollToBottom={this.scrollToBottom}
                             />
                           </div>
                         ) : (
@@ -420,6 +475,7 @@ export default class Task extends Component {
                         id="chatsos"
                         idInput="911"
                         is911={true}
+                        scrollToBottom={this.scrollToBottom}
                       />
                     </div>
                   </div>

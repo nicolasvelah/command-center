@@ -134,12 +134,17 @@ class MapServiceLocator extends Component {
         })
       }
     }
+    console.log(
+      'ejecuta buscar proveedor---------------',
+      this.state.provider[0]
+    )
     if (typeof this.state.provider[0] !== 'undefined') {
       if (this.props.providerId !== this.state.provider[0].id) {
         const prov = await this.filterProviders(
           this.state.providers,
           this.props.providerId
         )
+        console.log('Proveedro a ver en mapa', prov)
         //update the state
         this.setState({ provider: [prov] })
       }
@@ -275,7 +280,7 @@ class MapServiceLocator extends Component {
       }
       return user
     })
-    console.log(response)
+    console.log('Proveedor filtrado:', response)
     return response
   }
   // catch when the inService status of a one provider has changed
@@ -330,8 +335,14 @@ class MapServiceLocator extends Component {
       })
     }
   }
-  centerClients = e => {
+  centerClients = async e => {
     e.preventDefault()
+    await this.setState({
+      center: {
+        lat: null,
+        lng: null,
+      },
+    })
     let bounds = new this.google.maps.LatLngBounds()
     if (this.state.client.length === 0) {
       alert('No hay marcadores para centrar')
@@ -428,27 +439,35 @@ class MapServiceLocator extends Component {
           onChildMouseUp={this.activeDraggable}
           onChildMouseMove={this.onCircleInteraction}
         >
-          {client.map((client, index) => (
-            <CMarker
-              key={index}
-              lat={client.lat}
-              lng={client.lng}
-              id={client.id}
-              info={client.info}
-            />
-          ))}
+          {client.map((client, index) =>
+            client.lat !== null ? (
+              <CMarker
+                key={index}
+                lat={client.lat}
+                lng={client.lng}
+                id={client.id}
+                info={client.info}
+              />
+            ) : (
+              ''
+            )
+          )}
           {this.props.providerId !== 0
-            ? provider.map((item, index) => (
-                <CMarker
-                  key={index}
-                  lat={item.lat}
-                  lng={item.lng}
-                  isProvider={true}
-                  id={item.id}
-                  info={item.info}
-                  donde={'tacker poroviders'}
-                />
-              ))
+            ? provider.map((item, index) =>
+                provider.lat !== null ? (
+                  <CMarker
+                    key={index}
+                    lat={item.lat}
+                    lng={item.lng}
+                    isProvider={true}
+                    id={item.id}
+                    info={item.info}
+                    donde={'tacker poroviders'}
+                  />
+                ) : (
+                  ''
+                )
+              )
             : ''}
           <CMarkerSelector
             key={20}
