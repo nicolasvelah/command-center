@@ -116,25 +116,35 @@ export default class Deliveries extends Component {
           },
         }
       )
+      var CryptoJS = require('crypto-js')
+      let decryptedData = CryptoJS.AES.decrypt(
+        data.data,
+        process.env.CRYPTO_SECRET
+      ).toString(CryptoJS.enc.Utf8)
 
-      let items = data.data.tasks
+      decryptedData = JSON.parse(decryptedData)
+      console.log(decryptedData)
+      let items = decryptedData.tasks
 
-      console.log('data.data.tasks', data.data.tasks)
+      console.log('items.tasks', items)
       if (plus) {
-        items = this.state.items.concat(data.data.tasks)
+        items = this.state.items.concat(decryptedData.tasks)
       }
 
-      console.log('hojas', data.data)
+      console.log('hojas', decryptedData)
       let hasMoreItems = true
-      if (data.data.pages === this.state.page || data.data.tasks.length === 0) {
+      if (
+        decryptedData.pages === this.state.page ||
+        decryptedData.tasks.length === 0
+      ) {
         hasMoreItems = false
-        console.log('esta fue la ultima hoja', data.data.pages)
+        console.log('esta fue la ultima hoja', decryptedData.pages)
       }
       this.setState({
         items: items,
         page: page,
-        pages: data.data.pages,
-        count: data.data.count,
+        pages: decryptedData.pages,
+        count: decryptedData.count,
         hasMoreItems: hasMoreItems,
       })
 

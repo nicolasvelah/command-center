@@ -147,9 +147,15 @@ export default class Board extends Component {
           },
         }
       )
-      console.log('tasks', tasks.data.tasks)
+      var CryptoJS = require('crypto-js')
+      let decryptedData = CryptoJS.AES.decrypt(
+        tasks.data,
+        process.env.CRYPTO_SECRET
+      ).toString(CryptoJS.enc.Utf8)
+      decryptedData = JSON.parse(decryptedData)
+      console.log('tasks ', decryptedData.tasks)
       this.setState({
-        tasks: tasks.data.tasks,
+        tasks: decryptedData.tasks,
       })
     } catch (err) {
       console.log(err)

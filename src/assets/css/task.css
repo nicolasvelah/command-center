@@ -110,8 +110,13 @@ button:focus {
 .delete {
   cursor: pointer;
 }
+.combineChats {
+  cursor: pointer;
+  float: left;
+}
 .asigne911 {
   cursor: pointer;
+  background: #d14;
 }
 .chat911Container {
   width: 100%;
@@ -152,6 +157,7 @@ button:focus {
 }
 .openDD {
   max-height: auto;
+  overflow: visible;
 }
 .closeDD {
   max-height: 0;
@@ -164,4 +170,45 @@ button:focus {
 }
 .upIcon {
   transform: rotate(0deg);
+}
+.taskLocation {
+  font-family: 'Yantramanav', sans-serif;
+}
+.inputContainerCD {
+  padding-right: 10px;
+}
+.inputContainerCD input {
+  border-color: hsl(0, 0%, 80%);
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  padding: 10px;
+  margin: 0px;
+}
+.inputContainerCD .input {
+  margin: 0px;
+  min-width: auto;
+  width: 100%;
+}
+.inputMasterContainerCD {
+  width: 33%;
+  height: 50px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+.title-tool .actorNameC {
+  margin-left: 5px;
+}
+.actorPhoneC {
+  margin-left: 5px;
+  font-size: 17px;
+}
+.stars {
+  display: inline-flex;
+  margin-left: 5px;
+}
+.stars img {
+  margin: 0px 3px 0px 0px;
+  width: 13px;
+  height: 13px;
 }

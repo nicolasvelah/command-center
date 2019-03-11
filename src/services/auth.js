@@ -20,11 +20,22 @@ const setUser = user => {
 
 export const handleLogin = async ({ username, password }) => {
   try {
-    const response = await axios.post(`${process.env.API_URL}/login`, {
+    const dataToSend = {
       email: username,
       password: password,
       isClient: false,
-    })
+    }
+    var CryptoJS = require('crypto-js')
+
+    const loginEncryptedData = CryptoJS.AES.encrypt(
+      JSON.stringify(dataToSend),
+      process.env.CRYPTO_SECRET
+    ).toString()
+
+    const response = await axios.post(
+      `${process.env.API_URL}/login`,
+      loginEncryptedData
+    )
     if (response.data.token != null && response.data.auth === true) {
       getUserData(response.data.token)
       return true

@@ -278,10 +278,16 @@ export default class Board extends Component {
           },
         }
       )
-      console.log('tasks ', tasks.data.tasks)
+      var CryptoJS = require('crypto-js')
+      let decryptedData = CryptoJS.AES.decrypt(
+        tasks.data,
+        process.env.CRYPTO_SECRET
+      ).toString(CryptoJS.enc.Utf8)
+      decryptedData = JSON.parse(decryptedData)
+      console.log('tasks ', decryptedData)
       if (this._ismounted) {
         this.setState({
-          tasks: tasks.data.tasks,
+          tasks: decryptedData.tasks,
         })
       }
     } catch (err) {
@@ -498,6 +504,7 @@ export default class Board extends Component {
               <b>Cliente:</b> {t.client.name + ' ' + t.client.lastName} <br />
               <b>Proveedor:</b> {t.provider.busnessName} <br />
               <b>Creada el:</b> {t.createdAt} <br />
+              <b>Locación: </b> {t.country} / {t.city}
             </p>
             <div className="task-footer">
               <img

@@ -7,6 +7,8 @@ import phone from '../images/phone.svg'
 import circleDown from '../images/circle-down.svg'
 import axios from 'axios'
 import { getUser } from '../services/auth'
+import TaskClientData from './TaskClientData'
+import TaskProviderData from './TaskProviderData'
 import scrollIntoView from 'scroll-into-view'
 import Select from 'react-select'
 
@@ -35,6 +37,16 @@ export default class Task extends Component {
         { value: 'standby', label: 'WORK IN PROGRESS' },
         { value: 'notresponse', label: 'SIN RESPUESTA' },
         { value: 'complete', label: 'RESUELTOS' },
+      ],
+      bloodTypes: [
+        { value: 'o+', label: 'o+' },
+        { value: 'o-', label: 'o-' },
+        { value: 'a+', label: 'a+' },
+        { value: 'a-', label: 'o-' },
+        { value: 'b+', label: 'b+' },
+        { value: 'b-', label: 'b-' },
+        { value: 'ab-', label: 'ab-' },
+        { value: 'ab+', label: 'ab+' },
       ],
     }
     this.setNote = this.setNote.bind(this)
@@ -243,6 +255,9 @@ export default class Task extends Component {
         this.props.task.length > 0 ? (
           <div>
             <h1 className="popUpTitle">{this.props.task[0].service.name}</h1>
+            <div className="taskLocation">
+              {this.props.task[0].country} / {this.props.task[0].city}
+            </div>
             <div className="taskState">
               <b>Estado:</b>
               <Select
@@ -261,8 +276,10 @@ export default class Task extends Component {
             </div>
             <div>
               {!this.state.have911 ? (
-                <div className="asigne911 btn" onClick={this.asigne911}>
-                  Asignar al 911
+                <div className="Tools">
+                  <div className="asigne911 btn" onClick={this.asigne911}>
+                    Asignar al 911
+                  </div>
                 </div>
               ) : (
                 ''
@@ -288,6 +305,9 @@ export default class Task extends Component {
                               ' ' +
                               this.props.task[0].client.lastName}
                           </span>
+                          <span className="actorPhoneC">
+                            / {this.props.task[0].client.phone}
+                          </span>
                         </h2>
                         <img
                           src={circleDown}
@@ -306,23 +326,10 @@ export default class Task extends Component {
                             : 'dropDownData closeDD'
                         }
                       >
-                        <div>
-                          <b>Cédula:</b> {this.props.task[0].client.idCard}
-                        </div>
-                        <div>
-                          <b>Tipo de sangre:</b>{' '}
-                          {this.props.task[0].client.bloodType}
-                        </div>
-                        <div>
-                          <b>Email:</b> {this.props.task[0].client.email}
-                        </div>
-                        <div>
-                          <b>Cumpleaños:</b>{' '}
-                          {this.props.task[0].client.birthday}
-                        </div>
-                        <div>
-                          <b>Phone:</b> {this.props.task[0].client.phone}
-                        </div>
+                        <TaskClientData
+                          task={this.props.task[0]}
+                          bloodTypes={this.state.bloodTypes}
+                        />
                       </div>
                     </div>
                     <Chat
@@ -386,26 +393,7 @@ export default class Task extends Component {
                                     : 'dropDownData closeDD'
                                 }
                               >
-                                <div>
-                                  <b>Nombre del negocio:</b>{' '}
-                                  {this.props.task[0].provider.busnessName}
-                                </div>
-                                <div>
-                                  <b>Description:</b>{' '}
-                                  {this.props.task[0].provider.descriptio}
-                                </div>
-                                <div>
-                                  <b>Rate:</b>{' '}
-                                  {this.props.task[0].provider.rate}
-                                </div>
-                                <div>
-                                  <b>Email:</b>{' '}
-                                  {this.props.task[0].provider.user.email}
-                                </div>
-                                <div>
-                                  <b>Phone:</b>{' '}
-                                  {this.props.task[0].provider.user.phone}
-                                </div>
+                                <TaskProviderData task={this.props.task} />
                               </div>
                             </div>
                             <Chat

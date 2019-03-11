@@ -2,13 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { StaticQuery, graphql } from 'gatsby'
-import axios from 'axios'
 
 import Header from './header'
 import NavBar from './navBar'
 import '../assets/css/layout.css'
 import { isLoggedIn } from '../services/auth'
-import { getUser } from '../services/auth'
 import { initializeFirebase } from '../services/push-notification'
 
 const initFirebase = async () => {
@@ -30,21 +28,6 @@ export default class Layout extends React.Component {
         firebaseSW: true,
       })
     }
-  }
-
-  getMyTasks = async () => {
-    const tasks = await axios.post(
-      `${process.env.API_URL}/orders/getOrders`,
-      {},
-      {
-        headers: {
-          'x-access-token': getUser().token,
-        },
-      }
-    )
-    this.setState({
-      tasks: tasks.data.tasks,
-    })
   }
 
   render() {
