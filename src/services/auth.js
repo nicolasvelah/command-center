@@ -32,10 +32,11 @@ export const handleLogin = async ({ username, password }) => {
       process.env.CRYPTO_SECRET
     ).toString()
 
-    const response = await axios.post(
-      `${process.env.API_URL}/login`,
-      loginEncryptedData
-    )
+    console.log('loginEncryptedData:', loginEncryptedData)
+
+    const response = await axios.post(`${process.env.API_URL}/login`, {
+      data: loginEncryptedData,
+    })
     if (response.data.token != null && response.data.auth === true) {
       getUserData(response.data.token)
       return true
