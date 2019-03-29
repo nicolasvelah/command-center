@@ -86,7 +86,7 @@ export default class Board extends Component {
     const context = this
     messaging.onMessage(function(payload) {
       console.log('Frond Message received.', payload)
-      const notification = JSON.parse(payload.notification.body)
+      const notification = JSON.parse(payload.data.content)
       if (notification.type === 'chat') {
         context.chatNotifications(notification.orderId)
       } else if (
@@ -97,7 +97,7 @@ export default class Board extends Component {
       } else {
         context.getMyTasks()
         if (notification.type !== 'updateOrder') {
-          context.MsmNewTask(payload.notification.title)
+          context.MsmNewTask(payload.data.title)
         }
       }
     })
@@ -184,7 +184,7 @@ export default class Board extends Component {
       }
     )
     console.log('messages ------------- ', messages)
-    this.setState({
+    await this.setState({
       messagesTask: messages.data,
     })
     return messages
@@ -236,12 +236,31 @@ export default class Board extends Component {
 
     await this.getMessages(task[0].id)
     await this.getNotes(task[0].id)
+    await this.updateChatState(task[0].id)
     this.notificationOff(task[0].id, 'provider')
     this.setState({
       curTask: task,
       showModal: true,
       chageProviderVal: false,
     })
+  }
+  updateChatState = async orderId => {
+    try {
+      await axios.post(
+        `${process.env.API_URL}/updateChatState/false/` + orderId,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      console.log('Exito en updateChatState')
+    } catch (error) {
+      console.log('Error en updateChatState', error.message)
+    }
+    return
   }
   update911state = async id => {
     console.log('id del 911 user:', id)
@@ -458,7 +477,8 @@ export default class Board extends Component {
                 ? 'wip'
                 : '') +
               ' ' +
-              (t.appStatus === 'GOING' ? 'going' : '')
+              (t.appStatus === 'GOING' ? 'going' : '') +
+              (t.message.length > 0 ? 'haveNotification not_provider' : '')
             }
             onClick={e => this.setModal(t.id)}
             id={'taskid_' + t.id}
@@ -510,7 +530,7 @@ export default class Board extends Component {
               <img
                 src={notifications}
                 alt="notifications"
-                className="notificationIcon notProvider"
+                className={'notificationIcon notProvider '}
               />
               <img
                 src={notifications}
