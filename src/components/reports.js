@@ -105,11 +105,7 @@ export default class Reports extends Component {
                 width={'400px'}
                 height={'247px'}
                 chartType="GeoChart"
-                data={[
-                  ['Country', 'Orders'],
-                  ['Mexico', 300],
-                  ['Ecuador', 500],
-                ]}
+                data={[['Country', 'Orders'], ['Mexico', 50], ['Ecuador', 500]]}
                 options={{
                   region: 'MX',
                   colorAxis: { colors: ['#ccefb6', '#368900'] },
