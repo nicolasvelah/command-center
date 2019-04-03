@@ -247,7 +247,7 @@ export default class Board extends Component {
   updateChatState = async orderId => {
     try {
       await axios.post(
-        `${process.env.API_URL}/updateChatState/false/` + orderId,
+        `${process.env.API_URL}/updateChatState/` + orderId,
         {},
         {
           headers: {

@@ -29,6 +29,7 @@ const Button = styled.button`
 `
 
 let token = getUser().token
+const APP_ID = 1
 
 class MapServiceTacking extends Component {
   constructor(props) {
@@ -82,22 +83,36 @@ class MapServiceTacking extends Component {
     this.socket = io(process.env.WS_URL, {
       query: {
         user: JSON.stringify({
+          appId: APP_ID,
           id: userId,
           token,
           country,
         }),
       },
     })
-    this.socket.on(`user-${userId}-socketId`, this.onSockedId)
-    this.socket.on(`onClientLocation-${country}`, this.onClientLocation)
-    this.socket.on(`onProviderLocation-${country}`, this.onProviderLocation) //to check gps providers updates
-    this.socket.on(`onProviderInService-${country}`, this.onProviderInService) //to check if a provider is in service
+
+    this.socket.on(`user-app-${APP_ID}-${userId}-socketId`, this.onSockedId)
     this.socket.on(
-      `onProviderDisconnected-${country}`,
+      `onClientLocation-app-${APP_ID}-${country}`,
+      this.onClientLocation
+    )
+    this.socket.on(
+      `onProviderLocation-app-${APP_ID}-${country}`,
+      this.onProviderLocation
+    ) //to check gps providers updates
+    this.socket.on(
+      `onProviderInService-app-${APP_ID}-${country}`,
+      this.onProviderInService
+    ) //to check if a provider is in service
+    this.socket.on(
+      `onProviderDisconnected-app-${APP_ID}-${country}`,
       this.onProviderDisconnected
     ) //to check if a provider has disconnected
     //the event onClientDisconnected works just like onProviderDisconnected, please  implement the method onClientDisconnected by yourself
-    this.socket.on(`onClientDisconnected-${country}`, this.onClientDisconnected) //to check if a provider has disconnected
+    this.socket.on(
+      `onClientDisconnected-app-${APP_ID}-${country}`,
+      this.onClientDisconnected
+    ) //to check if a provider has disconnected
   }
   //GEOLOCALIZATION
   async getClients(country) {
@@ -111,30 +126,32 @@ class MapServiceTacking extends Component {
         },
         data: {
           country,
+          appId: APP_ID,
         },
       })
 
       const filterC = await this.filterClient(res.data, this.props.userId)
-      let users = filterC.user
-      let lat = filterC.lat
-      let lng = filterC.lng
-
+      console.log('res-------------------', res)
+      const users = filterC.user
+      //let lat = filterC.lat
+      //let lng = filterC.lng
       console.log('Clientes [users]', users)
       await this.setState({
         clients: [users],
         center: {
-          lat: lat,
-          lng: lng,
+          lat: Number(this.props.lat),
+          lng: Number(this.props.len),
         },
       })
+      console.log('llego aca carajillo')
     } catch (error) {
       console.error(error)
     }
   }
   filterClient = async (users, userId) => {
     let response = {
-      lat: null,
-      lng: null,
+      lat: 0,
+      lng: 0,
       user: null,
     }
     await users.map(user => {
@@ -147,7 +164,6 @@ class MapServiceTacking extends Component {
       }
       return user
     })
-    console.log('Response filter', response)
     return response
   }
   onSockedId = id => {
@@ -165,6 +181,7 @@ class MapServiceTacking extends Component {
           },
           data: {
             country,
+            appId: APP_ID,
           },
         })
 
@@ -367,6 +384,7 @@ class MapServiceTacking extends Component {
   render() {
     const { clients, providers, center, zoom } = this.state
     //console.log('providers to print', providers)
+    console.log('center---------------', center)
     return (
       <div className="map-container-traking">
         <Autocomplete
@@ -394,7 +412,7 @@ class MapServiceTacking extends Component {
             address={this.state.address}
           />
           {clients.map((client, index) =>
-            client.lat !== null ? (
+            client !== null ? (
               <CMarker
                 key={index}
                 lat={client.lat}

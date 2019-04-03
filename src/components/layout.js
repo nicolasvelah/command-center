@@ -2,15 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { StaticQuery, graphql } from 'gatsby'
-
 import Header from './header'
 import NavBar from './navBar'
-import '../assets/css/layout.css'
 import { isLoggedIn } from '../services/auth'
 import { initializeFirebase } from '../services/push-notification'
 
-import favicon16 from '../images/favicon-16x16.png'
-import favicon32 from '../images/favicon-32x32.png'
+import '../assets/css/layout.css'
 
 const initFirebase = async () => {
   await initializeFirebase()
@@ -48,20 +45,6 @@ export default class Layout extends React.Component {
         render={data => (
           <>
             <Helmet title="Command Center - PAS-HQ">
-              <link
-                rel="icon"
-                type="image/png"
-                sizes="32x32"
-                href={favicon32}
-              />
-              <link
-                rel="icon"
-                type="image/png"
-                sizes="16x16"
-                href={favicon16}
-              />
-              <meta name="msapplication-TileColor" content="#da532c" />
-              <meta name="theme-color" content="#000" />
               {typeof window !== 'undefined' ? (
                 !window.google ? (
                   <script
