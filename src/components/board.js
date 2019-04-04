@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { getUser, logout, isLoggedIn, logoutLocal } from '../services/auth'
 import { Link, navigate } from 'gatsby'
 
+
 import axios from 'axios'
 
 import arrowDownIcon from '../images/arrow-down.svg'
@@ -15,6 +16,11 @@ import Filter from './Filter'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../assets/css/board.css'
+
+
+
+
+
 
 export default class Board extends Component {
   constructor(props) {
@@ -477,7 +483,7 @@ export default class Board extends Component {
                 ? 'wip'
                 : '') +
               ' ' +
-              (t.appStatus === 'GOING' ? 'going' : '') +
+              (t.appStatus === 'GOING' ? 'going ' : '') +
               (t.message.length > 0 ? 'haveNotification not_provider' : '')
             }
             onClick={e => this.setModal(t.id)}
@@ -525,18 +531,28 @@ export default class Board extends Component {
               <b>Proveedor:</b> {t.provider.busnessName} <br />
               <b>Creada el:</b> {t.createdAt} <br />
               <b>Locación: </b> {t.country} / {t.city}
+              
             </p>
             <div className="task-footer">
+              
               <img
                 src={notifications}
                 alt="notifications"
                 className={'notificationIcon notProvider '}
               />
+              {t.message.length>0 ? ( 
+                  <div className="notification-number">
+                  {t.message.length}
+                </div>
+              ): ''
+              }
               <img
                 src={notifications}
                 alt="notifications"
                 className="notificationIcon notClient"
               />
+              
+              
             </div>
           </div>
         )
