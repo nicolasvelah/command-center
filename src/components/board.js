@@ -236,7 +236,7 @@ export default class Board extends Component {
 
     await this.getMessages(task[0].id)
     await this.getNotes(task[0].id)
-    await this.updateChatState(task[0].id)
+
     this.notificationOff(task[0].id, 'provider')
     this.setState({
       curTask: task,
@@ -277,7 +277,8 @@ export default class Board extends Component {
       curTask,
     })
   }
-  closeModal = () => {
+  closeModal = async () => {
+    await this.updateChatState(this.state.curTask[0].id)
     this.setState({
       curTask: [],
       showModal: false,
