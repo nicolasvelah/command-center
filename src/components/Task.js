@@ -286,6 +286,32 @@ export default class Task extends Component {
               )}
             </div>
 
+            <div className="mapContainer">
+              <div onClick={this.showHideMap} className="hideShowMap">
+                Mapa de actores{' '}
+                <img
+                  src={circleDown}
+                  alt="Mapa"
+                  className={this.state.showHideMap ? 'trakingMapIcon' : ''}
+                />
+              </div>
+              <div
+                className={
+                  this.state.showHideMap ? 'trakingMap mapActive' : 'trakingMap'
+                }
+              >
+                <MapServiceTacking
+                  userId={this.props.task[0].clientId}
+                  lat={this.props.task[0].lat}
+                  len={this.props.task[0].len}
+                  providerId={this.props.task[0].providerId}
+                  latProvider={this.props.task[0].latProvider}
+                  lenProvider={this.props.task[0].lenProvider}
+                  setLocation={this.setLocation}
+                />
+              </div>
+            </div>
+
             <div className="row">
               <div className="chatRow">
                 <div className="client column">
@@ -319,6 +345,7 @@ export default class Task extends Component {
                           }
                         />
                       </div>
+                      
                       <div
                         className={
                           this.state.showCD
@@ -345,6 +372,14 @@ export default class Task extends Component {
                       scrollToBottom={this.scrollToBottom}
                     />
                   </div>
+                  {console.log("Mensaje: ",this.props.task[0].comment)}
+                    {this.props.task[0].comment === '' ? (
+                      ''
+                    ) : (
+                      <div className="message-client">
+                        Mensaje Inicial: "<i>{this.props.task[0].comment}</i>"
+                      </div>
+                    )}
                 </div>
                 {this.props.task[0].provider.user.name !== '911' ? (
                   <div className="provider column">
@@ -474,31 +509,7 @@ export default class Task extends Component {
             </div>
             <br />
             <br />
-            <div className="mapContainer">
-              <div onClick={this.showHideMap} className="hideShowMap">
-                Mapa de actores{' '}
-                <img
-                  src={circleDown}
-                  alt="Mapa"
-                  className={this.state.showHideMap ? 'trakingMapIcon' : ''}
-                />
-              </div>
-              <div
-                className={
-                  this.state.showHideMap ? 'trakingMap mapActive' : 'trakingMap'
-                }
-              >
-                <MapServiceTacking
-                  userId={this.props.task[0].clientId}
-                  lat={this.props.task[0].lat}
-                  len={this.props.task[0].len}
-                  providerId={this.props.task[0].providerId}
-                  latProvider={this.props.task[0].latProvider}
-                  lenProvider={this.props.task[0].lenProvider}
-                  setLocation={this.setLocation}
-                />
-              </div>
-            </div>
+            
             <br />
             <br />
             <div>
