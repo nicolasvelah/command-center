@@ -40,14 +40,34 @@
   opacity: 0;
 }
 .modalClose {
-  background: none;
+  background: #d14;
   border: none;
   cursor: pointer;
-  float: right;
+  float: left;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   font-size: 30px;
-  color: #333;
+  color: white;
   position: relative;
   margin: -30px -30px 0px 0px;
+
+  -webkit-border-radius: 20px 20px 20px 20px;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  transition: 0.3s;
+  
+}
+
+.modalClose:hover { 
+  background-color: #4e86d8;
+}
+
+.mapContainer{
+  margin-top: 70px;
+}
+
+.message-client i{
+  font-style: oblique;
+  font-weight: bold;
 }

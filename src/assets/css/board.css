@@ -164,7 +164,7 @@
   position: relative;
 }
 .notificationIcon {
-  max-width: 20px;
+  max-width: 25px;
   margin-bottom: 0px;
   float: right;
   position: relative;
@@ -199,4 +199,21 @@
 .wf #ProviderState {
   background: rgba(185, 30, 30, 0.616);
   display: block;
+}
+
+.notification-number{
+  background: #d14;
+  color: white;
+  text-align: center;
+  line-height: 15px;
+  font-size: 10px;
+  width: 15px;
+  height: 15px;
+  margin-right: -27px;
+  float: right;
+  position: relative;
+  bottom: 29px;
+
+  -webkit-border-radius: 20px 20px 20px 20px;
+  
 }
