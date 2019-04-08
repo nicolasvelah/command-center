@@ -545,7 +545,7 @@ export default class Board extends Component {
               />
               {t.message.length > 0 ? (
                 <div className={'notificationNumber notProvider '}>
-                  {t.message.length > 0 ? t.message.length: 0}
+                  {t.message.length > 0 ? t.message.length : 0}
                 </div>
               ) : (
                 ''
