@@ -6,7 +6,7 @@ const Modal = ({ closeModal, showModal, children }) => {
     <div className={showModal ? 'modal display-block' : 'modal display-none'}>
       <section className="modal-main">
         <button onClick={closeModal} className="modalClose">
-          X
+          Cerrar | X
         </button>
         {children}
       </section>

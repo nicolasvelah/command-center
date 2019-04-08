@@ -18,6 +18,12 @@ export default class Task extends Component {
   constructor(props) {
     super(props)
     this.state = {
+
+      EmailC: '',
+      IdCardC: '',
+      BloodTypeC:'',
+      BirthdayC:'',
+
       showHideMap: true,
       Menssage: '',
       to: null,
@@ -52,6 +58,9 @@ export default class Task extends Component {
     this.setNote = this.setNote.bind(this)
     this.sendNote = this.sendNote.bind(this)
     this.scrollToBottom = this.scrollToBottom.bind(this)
+    this.setEmail = this.setEmail.bind(this)
+    this.setIdCard = this.setIdCard.bind(this)
+    this.sendDataClient = this.sendDataClient.bind(this)
   }
 
   componentDidMount() {
@@ -245,7 +254,80 @@ export default class Task extends Component {
       console.log('error', err)
     }
   }
+  setEmail = e => {
+    console.log('SetEmail....',e.target.value)
+    this.setState({
+      EmailC: e.target.value
+    })
+  }
+  setIdCard = e => {
+    console.log('SetIdCard....',e.target.value)
+    console.log(e.target)
+    this.setState({
+      IdCardC: e.target.value
+    })
+  }
+  setBloodType= e => {
+    console.log('SetBloodType....',e.value)
+    this.setState({
+      BloodTypeC: e.value
+    })
+  }
+  setBirthday= e => {
+    console.log('SetBirthday....',e)
+    this.setState({
+      BirthdayC: e
+    })
+  }
+  sendDataClient = async e =>{
+    
+      console.log('Email Cambiado: ',this.state.EmailC)
+      console.log('IdCard Cambiado: ',this.state.IdCardC)
+      console.log('BloodType Cambiado: ',this.state.BloodTypeC)
+      console.log('Birthday Cambiado: ',this.state.BirthdayC)
 
+      console.log('Task: ',this.props.task[0].client.name)
+      const dataClientJson = {
+        name: this.props.task[0].client.name,
+        lastName: this.props.task[0].client.lastName,
+        email: this.state.EmailC,
+        idCard: this.state.IdCardC,
+        birthday: this.state.BirthdayC,
+        country: 'ECUADOR',
+        province: this.props.task[0].client.province,
+        city: this.props.task[0].client.city,
+        bloodType: this.state.BloodTypeC,
+      }
+      console.log(dataClientJson)
+      try {
+        await axios.post(
+        `${process.env.API_URL}/clients/updateInfo`,
+        {
+          dataClientJson
+          /*
+          name: this.props.task[0].client.name,
+          lastName: this.props.task[0].client.lastName,
+          email: this.state.EmailC,
+          idCard: this.state.IdCardC,
+          birthday: this.state.BirthdayC,
+          country: 'ECUADOR',
+          province: this.props.task[0].client.province,
+          city: this.props.task.client[0].city,
+          bloodType: this.state.BloodTypeC,
+          */
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': getUser().token,
+          },
+        }
+      )
+      console.log('Enviado sin problema')
+    } catch (err) {
+      console.log(err)
+    }
+  }
   render() {
     console.log(this.props.task)
     return (
@@ -354,6 +436,11 @@ export default class Task extends Component {
                         }
                       >
                         <TaskClientData
+                          setEmail={this.setEmail}
+                          setIdCard={this.setIdCard}
+                          setBloodType={this.setBloodType}
+                          setBirthday={this.setBirthday}
+                          sendDataClient={this.sendDataClient}
                           task={this.props.task[0]}
                           bloodTypes={this.state.bloodTypes}
                         />
@@ -372,7 +459,7 @@ export default class Task extends Component {
                       scrollToBottom={this.scrollToBottom}
                     />
                   </div>
-                  {console.log("Mensaje: ",this.props.task[0].comment)}
+                  {console.log("Usuario: ",this.props.task[0])}
                     {this.props.task[0].comment === '' ? (
                       ''
                     ) : (

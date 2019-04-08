@@ -201,7 +201,7 @@
   display: block;
 }
 
-.notification-number{
+.notificationNumber{
   background: #d14;
   color: white;
   text-align: center;
@@ -215,5 +215,6 @@
   bottom: 29px;
 
   -webkit-border-radius: 20px 20px 20px 20px;
+  display: none;
   
 }
