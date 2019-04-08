@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { getUser, logout, isLoggedIn, logoutLocal } from '../services/auth'
 import { Link, navigate } from 'gatsby'
 
-
 import axios from 'axios'
 
 import arrowDownIcon from '../images/arrow-down.svg'
@@ -16,11 +15,6 @@ import Filter from './Filter'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../assets/css/board.css'
-
-
-
-
-
 
 export default class Board extends Component {
   constructor(props) {
@@ -167,11 +161,21 @@ export default class Board extends Component {
   notificationMessages = (id, type) => {
     document.getElementById('taskid_' + id).classList.add('haveNotification')
     document.getElementById('taskid_' + id).classList.add('not_' + type)
+
+    const nodeValue = document
+      .getElementById('taskid_' + id)
+      .getElementsByClassName('notificationNumber')
+    const numberMsm = Number(nodeValue[0].innerHTML) + 1
+    nodeValue[0].innerHTML = numberMsm
     return ''
   }
   notificationOff = (id, type) => {
     document.getElementById('taskid_' + id).classList.remove('haveNotification')
     document.getElementById('taskid_' + id).classList.remove('not_' + type)
+    const nodeValue = document
+      .getElementById('taskid_' + id)
+      .getElementsByClassName('notificationNumber')
+    nodeValue[0].innerHTML = 0
     return ''
   }
 
@@ -532,28 +536,25 @@ export default class Board extends Component {
               <b>Proveedor:</b> {t.provider.busnessName} <br />
               <b>Creada el:</b> {t.createdAt} <br />
               <b>Locación: </b> {t.country} / {t.city}
-              
             </p>
             <div className="task-footer">
-              
               <img
                 src={notifications}
                 alt="notifications"
                 className={'notificationIcon notProvider '}
               />
-              {t.message.length>0 ? ( 
-                  <div className={'notificationNumber notProvider '}>
-                  {t.message.length}
+              {t.message.length > 0 ? (
+                <div className={'notificationNumber notProvider '}>
+                  {t.message.length > 0 ? t.message.length: 0}
                 </div>
-              ): ''
-              }
+              ) : (
+                ''
+              )}
               <img
                 src={notifications}
                 alt="notifications"
                 className="notificationIcon notClient"
               />
-              
-              
             </div>
           </div>
         )

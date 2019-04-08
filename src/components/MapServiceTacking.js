@@ -68,6 +68,29 @@ class MapServiceTacking extends Component {
       //alert(error.message);
     }
   }
+  getWsAccessToken = async country => {
+    const { userId } = this.state
+    const data = {
+      appId: APP_ID,
+      isClient: false,
+      user: {
+        id: userId,
+      },
+      country,
+    }
+
+    const response = await axios({
+      method: 'POST',
+      url: `${process.env.WS_URL}/api/v1/ws/get-access-token`,
+      headers: {
+        jwt: token,
+      },
+      data,
+    })
+
+    //return a token from ws api
+    return response.data
+  }
   async componentDidMount() {
     token = await getUser().token
     //Geolocalizacion
@@ -75,23 +98,18 @@ class MapServiceTacking extends Component {
     this.google = window.google = window.google ? window.google : {}
     this.geocodeLatLng(this.props.lat, this.props.len)
     const country = await this.getLocationByIP()
-
+    const wsToken = await this.getWsAccessToken(country)
     await this.getClients(country) //get a client list with the last know location
     await this.getProviders(country) //get a provider list with the last know location
 
     //connect with the websocket
     this.socket = io(process.env.WS_URL, {
       query: {
-        user: JSON.stringify({
-          appId: APP_ID,
-          id: userId,
-          token,
-          country,
-        }),
+        wsToken,
       },
     })
 
-    this.socket.on(`user-app-${APP_ID}-${userId}-socketId`, this.onSockedId)
+    this.socket.on(`user--${userId}`, this.onSockedId)
     this.socket.on(
       `onClientLocation-app-${APP_ID}-${country}`,
       this.onClientLocation
@@ -143,7 +161,6 @@ class MapServiceTacking extends Component {
           lng: Number(this.props.len),
         },
       })
-      console.log('llego aca carajillo')
     } catch (error) {
       console.error(error)
     }
@@ -167,7 +184,7 @@ class MapServiceTacking extends Component {
     return response
   }
   onSockedId = id => {
-    //console.log('connected with socketID', id)
+    console.log('connected with socketID', id)
   }
   async getProviders(country) {
     console.log('token :', token)
@@ -265,7 +282,7 @@ class MapServiceTacking extends Component {
   onProviderDisconnected = async data => {
     // id : provider id
     const { id } = data
-
+    console.log('client disconnected', id)
     //update the providers arrays
     var tmp = this.state.providers
     const index = tmp.findIndex(o => o.id === id)
@@ -428,7 +445,7 @@ class MapServiceTacking extends Component {
           )}
           {this.props.providerId !== 0 && providers.length > 0
             ? providers.map((provider, index) =>
-                provider.lat !== null ? (
+                provider !== null ? (
                   <CMarker
                     key={index}
                     lat={provider.lat}
