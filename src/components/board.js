@@ -542,7 +542,7 @@ export default class Board extends Component {
                 className={'notificationIcon notProvider '}
               />
               {t.message.length>0 ? ( 
-                  <div className="notification-number">
+                  <div className={'notificationNumber notProvider '}>
                   {t.message.length}
                 </div>
               ): ''

@@ -12,16 +12,7 @@ export default class TaskClientData extends React.Component {
       idCard: this.props.task.client.idCard,
     }
   }
-  saveClientData = e => {
-    const data = [this.state]
-    console.log('Emviar esta data', data)
-    var CryptoJS = require('crypto-js')
-    var cipherData = CryptoJS.AES.encrypt(
-      JSON.stringify(data),
-      process.env.CRYPTO_SECRET
-    )
-    console.log('Data encriptada', cipherData)
-  }
+  
   render() {
     return (
       <div className="TaskClientData">
@@ -29,9 +20,10 @@ export default class TaskClientData extends React.Component {
           <b>Email:</b>
           <div className="inputContainerCD">
             <input
-              name="cedula"
+              name="email"
               className="input"
               defaultValue={this.state.email}
+              onChange={e => this.props.setEmail(e)}
               type="email"
             />
           </div>
@@ -51,7 +43,7 @@ export default class TaskClientData extends React.Component {
                 option => option.value === this.state.bloodType
               )}
               options={this.props.bloodTypes}
-              onChange={() => {}}
+              onChange={e =>this.props.setBloodType(e)}
             />
           </div>
         </div>
@@ -60,11 +52,9 @@ export default class TaskClientData extends React.Component {
           <b>Cumpleaños:</b>
           <div className="inputContainerCD">
             <DatePickerInput
-              onChange={jsDate => {
-                console.log(jsDate)
-              }}
               value={this.state.birthday}
               className="my-custom-datepicker-component"
+              onChange={e =>this.props.setBirthday(e)}
             />
           </div>
         </div>
@@ -76,11 +66,12 @@ export default class TaskClientData extends React.Component {
               name="cedula"
               className="input"
               defaultValue={this.state.idCard}
+              onChange={e => this.props.setIdCard(e)}
             />
           </div>
         </div>
         <div className="inputMasterContainerCD">
-          <button className="btn" onClick={this.saveClientData}>
+          <button className="btn" onClick={e => this.props.sendDataClient(e)}>
             Guardar
           </button>
         </div>
