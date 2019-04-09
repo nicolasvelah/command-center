@@ -280,41 +280,35 @@ export default class Task extends Component {
     })
   }
   sendDataClient = async e =>{
-    
-      console.log('Email Cambiado: ',this.state.EmailC)
-      console.log('IdCard Cambiado: ',this.state.IdCardC)
-      console.log('BloodType Cambiado: ',this.state.BloodTypeC)
-      console.log('Birthday Cambiado: ',this.state.BirthdayC)
-
-      console.log('Task: ',this.props.task[0].client.name)
-      const dataClientJson = {
-        name: this.props.task[0].client.name,
-        lastName: this.props.task[0].client.lastName,
-        email: this.state.EmailC,
-        idCard: this.state.IdCardC,
-        birthday: this.state.BirthdayC,
-        country: 'ECUADOR',
-        province: this.props.task[0].client.province,
-        city: this.props.task[0].client.city,
-        bloodType: this.state.BloodTypeC,
+      if(this.state.BirthdayC===''){
+        this.state.BirthdayC= this.props.task[0].client.birthday
       }
-      console.log(dataClientJson)
+      if(this.state.EmailC===''){
+        this.state.EmailC= this.props.task[0].client.email
+      }
+      if(this.state.IdCardC===''){
+        this.state.IdCardC= this.props.task[0].client.idCard
+      }
+
+      const birthdayCoverter = new Date(this.state.BirthdayC)
+      const dd = birthdayCoverter.getDate()
+      const mm = birthdayCoverter.getMonth() + 1
+      const yyyy = birthdayCoverter.getFullYear()
+      const birthdayCoverterTxt = yyyy+'-'+mm+'-'+dd
+
       try {
         await axios.post(
         `${process.env.API_URL}/clients/updateInfo`,
         {
-          dataClientJson
-          /*
           name: this.props.task[0].client.name,
           lastName: this.props.task[0].client.lastName,
           email: this.state.EmailC,
           idCard: this.state.IdCardC,
-          birthday: this.state.BirthdayC,
+          birthday: birthdayCoverterTxt,
           country: 'ECUADOR',
           province: this.props.task[0].client.province,
-          city: this.props.task.client[0].city,
+          city: this.props.task[0].client.city,
           bloodType: this.state.BloodTypeC,
-          */
         },
         {
           headers: {
