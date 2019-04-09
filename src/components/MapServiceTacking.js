@@ -233,7 +233,7 @@ class MapServiceTacking extends Component {
         lng: data.lng,
       }
       var tmpClients = this.state.clients
-      const index = tmpClients.findIndex(o => o.userId === data.userId)
+      const index = tmpClients.findIndex(o => o.id === client.id)
       if (index !== -1) {
         //if the user is already on the list
         //just only udate the user by index
@@ -400,8 +400,9 @@ class MapServiceTacking extends Component {
 
   render() {
     const { clients, providers, center, zoom } = this.state
-    //console.log('providers to print', providers)
+    console.log('providers to print', providers)
     console.log('center---------------', center)
+    console.log('clientes---------------', clients)
     return (
       <div className="map-container-traking">
         <Autocomplete

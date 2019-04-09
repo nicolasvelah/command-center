@@ -165,8 +165,10 @@ export default class Board extends Component {
     const nodeValue = document
       .getElementById('taskid_' + id)
       .getElementsByClassName('notificationNumber')
-    const numberMsm = Number(nodeValue[0].innerHTML) + 1
-    nodeValue[0].innerHTML = numberMsm
+    if (nodeValue.length > 0) {
+      const numberMsm = Number(nodeValue[0].innerHTML) + 1
+      nodeValue[0].innerHTML = numberMsm
+    }
     return ''
   }
   notificationOff = (id, type) => {
@@ -175,7 +177,9 @@ export default class Board extends Component {
     const nodeValue = document
       .getElementById('taskid_' + id)
       .getElementsByClassName('notificationNumber')
-    nodeValue[0].innerHTML = 0
+    if (nodeValue.length > 0) {
+      nodeValue[0].innerHTML = 0
+    }
     return ''
   }
 
@@ -543,13 +547,11 @@ export default class Board extends Component {
                 alt="notifications"
                 className={'notificationIcon notProvider '}
               />
-              {t.message.length > 0 ? (
-                <div className={'notificationNumber notProvider '}>
-                  {t.message.length > 0 ? t.message.length : 0}
-                </div>
-              ) : (
-                ''
-              )}
+
+              <div className={'notificationNumber notProvider '}>
+                {t.message.length > 0 ? t.message.length : 0}
+              </div>
+
               <img
                 src={notifications}
                 alt="notifications"

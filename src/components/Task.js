@@ -18,11 +18,10 @@ export default class Task extends Component {
   constructor(props) {
     super(props)
     this.state = {
-
       EmailC: '',
       IdCardC: '',
-      BloodTypeC:'',
-      BirthdayC:'',
+      BloodTypeC: '',
+      BirthdayC: '',
 
       showHideMap: true,
       Menssage: '',
@@ -255,49 +254,49 @@ export default class Task extends Component {
     }
   }
   setEmail = e => {
-    console.log('SetEmail....',e.target.value)
+    console.log('SetEmail....', e.target.value)
     this.setState({
-      EmailC: e.target.value
+      EmailC: e.target.value,
     })
   }
   setIdCard = e => {
-    console.log('SetIdCard....',e.target.value)
+    console.log('SetIdCard....', e.target.value)
     console.log(e.target)
     this.setState({
-      IdCardC: e.target.value
+      IdCardC: e.target.value,
     })
   }
-  setBloodType= e => {
-    console.log('SetBloodType....',e.value)
+  setBloodType = e => {
+    console.log('SetBloodType....', e.value)
     this.setState({
-      BloodTypeC: e.value
+      BloodTypeC: e.value,
     })
   }
-  setBirthday= e => {
-    console.log('SetBirthday....',e)
+  setBirthday = e => {
+    console.log('SetBirthday....', e)
     this.setState({
-      BirthdayC: e
+      BirthdayC: e,
     })
   }
-  sendDataClient = async e =>{
-      if(this.state.BirthdayC===''){
-        this.state.BirthdayC= this.props.task[0].client.birthday
-      }
-      if(this.state.EmailC===''){
-        this.state.EmailC= this.props.task[0].client.email
-      }
-      if(this.state.IdCardC===''){
-        this.state.IdCardC= this.props.task[0].client.idCard
-      }
+  sendDataClient = async e => {
+    if (this.state.BirthdayC === '') {
+      this.state.BirthdayC = this.props.task[0].client.birthday
+    }
+    if (this.state.EmailC === '') {
+      this.state.EmailC = this.props.task[0].client.email
+    }
+    if (this.state.IdCardC === '') {
+      this.state.IdCardC = this.props.task[0].client.idCard
+    }
 
-      const birthdayCoverter = new Date(this.state.BirthdayC)
-      const dd = birthdayCoverter.getDate()
-      const mm = birthdayCoverter.getMonth() + 1
-      const yyyy = birthdayCoverter.getFullYear()
-      const birthdayCoverterTxt = yyyy+'-'+mm+'-'+dd
+    const birthdayCoverter = new Date(this.state.BirthdayC)
+    const dd = birthdayCoverter.getDate()
+    const mm = birthdayCoverter.getMonth() + 1
+    const yyyy = birthdayCoverter.getFullYear()
+    const birthdayCoverterTxt = yyyy + '-' + mm + '-' + dd
 
-      try {
-        await axios.post(
+    try {
+      const res = await axios.post(
         `${process.env.API_URL}/clients/updateInfo`,
         {
           name: this.props.task[0].client.name,
@@ -309,6 +308,7 @@ export default class Task extends Component {
           province: this.props.task[0].client.province,
           city: this.props.task[0].client.city,
           bloodType: this.state.BloodTypeC,
+          userId: this.props.task[0].client.id,
         },
         {
           headers: {
@@ -317,7 +317,7 @@ export default class Task extends Component {
           },
         }
       )
-      console.log('Enviado sin problema')
+      console.log('Enviado sin problema', res)
     } catch (err) {
       console.log(err)
     }
@@ -421,7 +421,7 @@ export default class Task extends Component {
                           }
                         />
                       </div>
-                      
+
                       <div
                         className={
                           this.state.showCD
@@ -453,14 +453,14 @@ export default class Task extends Component {
                       scrollToBottom={this.scrollToBottom}
                     />
                   </div>
-                  {console.log("Usuario: ",this.props.task[0])}
-                    {this.props.task[0].comment === '' ? (
-                      ''
-                    ) : (
-                      <div className="message-client">
-                        Mensaje Inicial: "<i>{this.props.task[0].comment}</i>"
-                      </div>
-                    )}
+                  {console.log('Usuario: ', this.props.task[0])}
+                  {this.props.task[0].comment === '' ? (
+                    ''
+                  ) : (
+                    <div className="message-client">
+                      Mensaje Inicial: "<i>{this.props.task[0].comment}</i>"
+                    </div>
+                  )}
                 </div>
                 {this.props.task[0].provider.user.name !== '911' ? (
                   <div className="provider column">
@@ -590,7 +590,7 @@ export default class Task extends Component {
             </div>
             <br />
             <br />
-            
+
             <br />
             <br />
             <div>
