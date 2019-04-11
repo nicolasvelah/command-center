@@ -32,6 +32,7 @@ export default class Board extends Component {
       operators: [],
       providerState: '',
       messaging: null,
+      idClick: null
     }
     this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)
@@ -415,10 +416,14 @@ export default class Board extends Component {
     }
   }
   handleFilterOperatorChange = option => {
+    console.log('Dio click: ',option)
+    
     if (option) {
       this.setState({ filterByoperator: option })
+      this.setState({ idClick: option })
     } else {
       this.setState({ filterByoperator: null })
+      this.setState({ idClick: null })
     }
   }
   //OPERATORS
@@ -574,6 +579,7 @@ export default class Board extends Component {
             onFilterChange={this.handleFilterChange}
             handleFilterOperatorChange={this.handleFilterOperatorChange}
             operators={this.state.operators}
+            idClick={this.state.idClick}
           />
         ) : (
           ''

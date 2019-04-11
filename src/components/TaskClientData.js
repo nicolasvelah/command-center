@@ -10,10 +10,13 @@ export default class TaskClientData extends React.Component {
       bloodType: this.props.task.client.bloodType,
       birthday: this.props.task.client.birthday,
       idCard: this.props.task.client.idCard,
+      isLoadingForm: this.props.isLoadingForm
     }
   }
   
+
   render() {
+    console.log('isLoadingForm TCD',this.props.isLoadingForm)
     return (
       <div className="TaskClientData">
         <div className="inputMasterContainerCD">
@@ -71,9 +74,15 @@ export default class TaskClientData extends React.Component {
           </div>
         </div>
         <div className="inputMasterContainerCD">
-          <button className="btn" onClick={e => this.props.sendDataClient(e)}>
-            Guardar
-          </button>
+        {
+            this.props.isLoadingForm ?(
+              <div className="loaderGif"></div>
+            ):(
+              <button className="btn" onClick={e => this.props.sendDataClient(e)}>
+                  Guardar
+              </button>
+            )
+          } 
         </div>
       </div>
     )

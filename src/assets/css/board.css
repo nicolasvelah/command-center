@@ -150,6 +150,8 @@
 }
 .column-footer button {
   border: none;
+  border-radius: 5px;
+  margin: 7px;
   padding: 5px 20px;
   background: #0047b3;
   color: #fff;

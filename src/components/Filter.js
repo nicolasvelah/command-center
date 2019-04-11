@@ -36,12 +36,22 @@ const OperatorsContainer = styled.div`
     margin-right: -5px;
     cursor: pointer;
   }
+  .btnActive{
+    background: rgb(2,106,167,0.3);
+  }
+
+  .btnAll{
+    width: 75px;
+    height: 43px;
+    border-radius: 20px;
+  }
 `
 const Filter = ({
   filterOption,
   onFilterChange,
   handleFilterOperatorChange,
   operators,
+  idClick,
 }) => {
   console.log('operators', operators)
   return (
@@ -60,8 +70,10 @@ const Filter = ({
       {operators.map(operator => (
         <OperatorsContainer key={operator.id}>
           <button
-            onClick={() => handleFilterOperatorChange(operator.id)}
-            className="operatorFilter"
+            onClick={() => 
+              handleFilterOperatorChange(operator.id)
+            }
+            className={"operatorFilter"+(idClick=== operator.id ? ' btnActive':'')}
           >
             {operator.name.charAt(0) + operator.lastName.charAt(0)}
             <div className="dropdownOperatorDataFilter">
@@ -77,9 +89,9 @@ const Filter = ({
       <OperatorsContainer>
         <button
           onClick={() => handleFilterOperatorChange(null)}
-          className="FilterReset"
+          className={"FilterReset"+(idClick=== null ? ' btnActive':'')+" btnAll"}
         >
-          X
+          TODOS
         </button>
       </OperatorsContainer>
     </Container>

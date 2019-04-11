@@ -13,6 +13,8 @@ import scrollIntoView from 'scroll-into-view'
 import Select from 'react-select'
 
 import '../assets/css/task.css'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default class Task extends Component {
   constructor(props) {
@@ -20,9 +22,8 @@ export default class Task extends Component {
     this.state = {
       EmailC: '',
       IdCardC: '',
-      BloodTypeC: '',
-      BirthdayC: '',
-
+      BloodTypeC:'',
+      BirthdayC:'',
       showHideMap: true,
       Menssage: '',
       to: null,
@@ -35,6 +36,7 @@ export default class Task extends Component {
       showCD: false,
       showPD: false,
       is911: false,
+      isLoadingForm: false,
       states: [
         { value: 'backlog', label: 'BACKLOG' },
         { value: 'asigned', label: 'ASIGNADOS' },
@@ -278,7 +280,13 @@ export default class Task extends Component {
       BirthdayC: e,
     })
   }
+
+  toastSendDataClient = (mensaggeToastSendDataClient) => toast(mensaggeToastSendDataClient)
+
   sendDataClient = async e => {
+    this.setState({
+      isLoadingForm: true
+    })
     if (this.state.BirthdayC === '') {
       this.state.BirthdayC = this.props.task[0].client.birthday
     }
@@ -296,7 +304,8 @@ export default class Task extends Component {
     const birthdayCoverterTxt = yyyy + '-' + mm + '-' + dd
 
     try {
-      const res = await axios.post(
+
+      await axios.post(
         `${process.env.API_URL}/clients/updateInfo`,
         {
           name: this.props.task[0].client.name,
@@ -317,13 +326,23 @@ export default class Task extends Component {
           },
         }
       )
-      console.log('Enviado sin problema', res)
+      this.setState({
+        isLoadingForm: false
+      })
+      this.toastSendDataClient('Datos guardados')
+      return true
     } catch (err) {
+      this.toastSendDataClient('Error al guardar datos')
       console.log(err)
+      this.setState({
+        isLoadingForm: false
+      })
+      return false
     }
   }
   render() {
     console.log(this.props.task)
+    console.log('isLoadingForm: ',this.state.isLoadingForm)
     return (
       <div className="taskContent">
         {typeof this.props.task !== 'undefined' &&
@@ -437,6 +456,7 @@ export default class Task extends Component {
                           sendDataClient={this.sendDataClient}
                           task={this.props.task[0]}
                           bloodTypes={this.state.bloodTypes}
+                          isLoadingForm={this.state.isLoadingForm}
                         />
                       </div>
                     </div>
@@ -604,6 +624,7 @@ export default class Task extends Component {
         ) : (
           ''
         )}
+         <ToastContainer />
       </div>
     )
   }
