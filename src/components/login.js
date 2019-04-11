@@ -8,6 +8,7 @@ class Login extends React.Component {
   state = {
     username: ``,
     password: ``,
+    isLoadingLogin: false,
   }
 
   handleUpdate = event => {
@@ -18,10 +19,19 @@ class Login extends React.Component {
 
   handleSubmit = async event => {
     event.preventDefault()
+    this.setState({
+      isLoadingLogin: true
+    })
     if (!(await handleLogin(this.state))) {
       this.invalidUser()
+      this.setState({
+        isLoadingLogin: false
+      })
     } else {
       navigate(`/`)
+      this.setState({
+        isLoadingLogin: false
+      })
     }
   }
   invalidUser = () => toast('Password o usuario invalido.')
@@ -54,7 +64,15 @@ class Login extends React.Component {
             />
           </label>
           <br />
-          <input type="submit" value="Log In" className="btn" />
+          {
+            this.state.isLoadingLogin ?(
+              <div className="loaderGif"></div>
+            ):(
+              <input type="submit" value="Log In" className="btn" />
+            )
+          } 
+          <div className=""></div>
+          
         </form>
         <ToastContainer />
       </>
