@@ -34,6 +34,7 @@ export default class navBar extends Component {
     this.setState({ showModal: !this.state.showModal, content })
   }
   activeMenu = () => {
+    this.props.setContentPaddingLeft()
     this.setState({ menuActive: !this.state.menuActive })
   }
   render() {

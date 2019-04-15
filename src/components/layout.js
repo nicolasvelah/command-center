@@ -18,7 +18,10 @@ export default class Layout extends React.Component {
     this.state = {
       tasks: [],
       firebaseSW: false,
+      paddingLeftContent: 70,
+      menuActive: false,
     }
+    this.setContentPaddingLeft = this.setContentPaddingLeft.bind(this)
   }
 
   componentDidMount() {
@@ -28,6 +31,19 @@ export default class Layout extends React.Component {
         firebaseSW: true,
       })
     }
+  }
+
+  setContentPaddingLeft = async () => {
+    let { paddingLeftContent, menuActive } = this.state
+    if (menuActive) {
+      paddingLeftContent = 70
+    } else {
+      paddingLeftContent = 200
+    }
+    this.setState({
+      paddingLeftContent,
+      menuActive: !menuActive,
+    })
   }
 
   render() {
@@ -62,11 +78,17 @@ export default class Layout extends React.Component {
                 href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700|Yantramanav:300"
                 rel="stylesheet"
               />
+              <meta name="theme-color" content="#0047b3" />
             </Helmet>
             <Header siteTitle={data.site.siteMetadata.title} />
             <div className="container">
-              <NavBar />
-              <div className="content">{this.props.children}</div>
+              <NavBar setContentPaddingLeft={this.setContentPaddingLeft} />
+              <div
+                className="content"
+                style={{ paddingLeft: this.state.paddingLeftContent }}
+              >
+                {this.props.children}
+              </div>
             </div>
           </>
         )}

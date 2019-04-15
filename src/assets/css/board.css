@@ -137,9 +137,6 @@
 .operator a {
   float: left;
 }
-.FilterReset {
-  background: red;
-}
 
 .column-footer {
   margin-top: 20px;
@@ -203,7 +200,7 @@
   display: block;
 }
 
-.notificationNumber{
+.notificationNumber {
   background: #d14;
   color: white;
   text-align: center;
@@ -218,5 +215,12 @@
 
   -webkit-border-radius: 20px 20px 20px 20px;
   display: none;
-  
+}
+@media (max-width: 767px) {
+  .board {
+    display: block;
+  }
+  .b-column {
+    width: 100%;
+  }
 }

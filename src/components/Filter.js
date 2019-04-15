@@ -36,11 +36,16 @@ const OperatorsContainer = styled.div`
     margin-right: -5px;
     cursor: pointer;
   }
-  .btnActive{
-    background: rgb(2,106,167,0.3);
+  .FilterReset {
+    background: rgba(185, 30, 30, 0.616);
+    color: #fff;
+  }
+  .btnActive {
+    background: rgba(0, 204, 255, 0.767);
+    color: #fff;
   }
 
-  .btnAll{
+  .btnAll {
     width: 75px;
     height: 43px;
     border-radius: 20px;
@@ -70,10 +75,10 @@ const Filter = ({
       {operators.map(operator => (
         <OperatorsContainer key={operator.id}>
           <button
-            onClick={() => 
-              handleFilterOperatorChange(operator.id)
+            onClick={() => handleFilterOperatorChange(operator.id)}
+            className={
+              'operatorFilter' + (idClick === operator.id ? ' btnActive' : '')
             }
-            className={"operatorFilter"+(idClick=== operator.id ? ' btnActive':'')}
           >
             {operator.name.charAt(0) + operator.lastName.charAt(0)}
             <div className="dropdownOperatorDataFilter">
@@ -87,12 +92,18 @@ const Filter = ({
         </OperatorsContainer>
       ))}
       <OperatorsContainer>
-        <button
-          onClick={() => handleFilterOperatorChange(null)}
-          className={"FilterReset"+(idClick=== null ? ' btnActive':'')+" btnAll"}
-        >
-          TODOS
-        </button>
+        {idClick !== null ? (
+          <button
+            onClick={() => handleFilterOperatorChange(null)}
+            className={
+              'FilterReset' + (idClick === null ? ' btnActive' : '') + ' '
+            }
+          >
+            X
+          </button>
+        ) : (
+          ''
+        )}
       </OperatorsContainer>
     </Container>
   )
