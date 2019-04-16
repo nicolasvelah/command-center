@@ -46,6 +46,7 @@
 .data {
   font-size: 14px;
   line-height: 15px;
+  width: 100%;
 }
 .data b {
   font-weight: bolder;

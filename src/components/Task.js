@@ -22,8 +22,8 @@ export default class Task extends Component {
     this.state = {
       EmailC: '',
       IdCardC: '',
-      BloodTypeC:'',
-      BirthdayC:'',
+      BloodTypeC: '',
+      BirthdayC: '',
       showHideMap: true,
       Menssage: '',
       to: null,
@@ -281,11 +281,12 @@ export default class Task extends Component {
     })
   }
 
-  toastSendDataClient = (mensaggeToastSendDataClient) => toast(mensaggeToastSendDataClient)
+  toastSendDataClient = mensaggeToastSendDataClient =>
+    toast(mensaggeToastSendDataClient)
 
   sendDataClient = async e => {
     this.setState({
-      isLoadingForm: true
+      isLoadingForm: true,
     })
     if (this.state.BirthdayC === '') {
       this.state.BirthdayC = this.props.task[0].client.birthday
@@ -304,7 +305,6 @@ export default class Task extends Component {
     const birthdayCoverterTxt = yyyy + '-' + mm + '-' + dd
 
     try {
-
       await axios.post(
         `${process.env.API_URL}/clients/updateInfo`,
         {
@@ -327,7 +327,7 @@ export default class Task extends Component {
         }
       )
       this.setState({
-        isLoadingForm: false
+        isLoadingForm: false,
       })
       this.toastSendDataClient('Datos guardados')
       return true
@@ -335,14 +335,14 @@ export default class Task extends Component {
       this.toastSendDataClient('Error al guardar datos')
       console.log(err)
       this.setState({
-        isLoadingForm: false
+        isLoadingForm: false,
       })
       return false
     }
   }
   render() {
     console.log(this.props.task)
-    console.log('isLoadingForm: ',this.state.isLoadingForm)
+    console.log('isLoadingForm: ', this.state.isLoadingForm)
     return (
       <div className="taskContent">
         {typeof this.props.task !== 'undefined' &&
@@ -486,7 +486,8 @@ export default class Task extends Component {
                   <div className="provider column">
                     <div>
                       {this.props.chageProviderVal === false ? (
-                        this.props.task[0].provider.user.name !== 'N/A' ? (
+                        this.props.task[0].provider.user.name !==
+                        'SIN PROVEEDOR' ? (
                           <div className="">
                             <div className="data">
                               <button
@@ -624,7 +625,7 @@ export default class Task extends Component {
         ) : (
           ''
         )}
-         <ToastContainer />
+        <ToastContainer />
       </div>
     )
   }

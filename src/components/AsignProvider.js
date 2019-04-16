@@ -11,9 +11,21 @@ const Error = styled.div`
   top: 34px;
   left: 0;
 `
-const InputContainer = styled.div`
-  position: relative;
+
+const ProviderItemSearch = styled.div`
+  .providerItemSearch {
+    width: 32%;
+    display: inline-block;
+    border: 12px solid #eee;
+    padding: 10px;
+    margin-left: 1%;
+    font-size: 12px;
+    h3 {
+      font-size: 12px;
+    }
+  }
 `
+const InputContainer = styled.div``
 export default class AsignProvider extends Component {
   validations = {
     category: { required: true },
@@ -43,6 +55,7 @@ export default class AsignProvider extends Component {
         value: '',
         error: '',
       },
+      providers: [],
     }
   }
 
@@ -113,15 +126,9 @@ export default class AsignProvider extends Component {
         }
       )
       .then(async result => {
-        const options = await result.data.providers.map(provider => {
-          return {
-            id: provider.providerId,
-            label: provider.Provider.busnessName,
-            value: provider.providerId,
-          }
-        })
+        console.log('result.data.providers', result.data.providers)
 
-        this.setState({ providers: options })
+        await this.setState({ providers: result.data.providers })
       })
       .catch(er => {
         console.log(er)
@@ -271,28 +278,30 @@ export default class AsignProvider extends Component {
           ''
         )}
         {this.state.providerShow ? (
-          <InputContainer>
-            <Select
-              className="input"
-              classNamePrefix="provider"
-              placeholder="Proveedor"
-              isClearable={true}
-              isSearchable={true}
-              name="provider"
-              onChange={this.handleProviderChange}
-              options={this.state.providers}
-            />
-            <Error>{this.state.provider.error}</Error>
-          </InputContainer>
+          <ProviderItemSearch>
+            {typeof this.state.providers !== undefined &&
+            this.state.providers.length > 0
+              ? this.state.providers.map((provider, key) => (
+                  <div key={key} className={'providerItemSearch'}>
+                    <h3>{provider.Provider.busnessName}</h3>
+                    <div>Rate: {provider.Provider.rate}</div>
+                    <div>Telefono: </div>
+                    <div>Estado: </div>
+                    <div>País: </div>
+                    <div>Ciudad: </div>
+                    <div>Ver en el mapa</div>
+                    <div className="text-right">
+                      <button onClick={this.sendTask} className="btn">
+                        Asignar
+                      </button>
+                    </div>
+                  </div>
+                ))
+              : ''}
+          </ProviderItemSearch>
         ) : (
           ''
         )}
-
-        <div className="text-right">
-          <button onClick={this.sendTask} className="btn">
-            Asignar
-          </button>
-        </div>
       </form>
     )
   }
