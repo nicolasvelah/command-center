@@ -3,6 +3,12 @@
   font-family: 'Yantramanav', sans-serif;
   width: 100%;
 }
+.newTaskTitle {
+  margin-left: 55px;
+}
+.taskContent h1.popUpTitle {
+  margin: 0px 0px 0px 55px;
+}
 .column {
   padding: 20px;
   width: 33%;
@@ -20,6 +26,8 @@
   margin: 30px 0px 10px;
   padding-top: 10px;
   font-size: 38px;
+  line-height: 40px;
+  position: relative;
 }
 .title-tool {
   display: flex;
@@ -57,7 +65,7 @@
 .taskState {
   float: right;
   font-family: 'Yantramanav', sans-serif;
-  margin-top: -20px;
+  margin-top: -37px;
 }
 .notes {
   font-family: 'Yantramanav', sans-serif;
@@ -174,6 +182,7 @@ button:focus {
 }
 .taskLocation {
   font-family: 'Yantramanav', sans-serif;
+  margin-left: 55px;
 }
 .inputContainerCD {
   padding-right: 10px;
@@ -213,3 +222,24 @@ button:focus {
   width: 13px;
   height: 13px;
 }
+
+.appStatusModal {
+  background: #333;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  line-height: 25px;
+  display: inline-block;
+}
+.GOING {
+  background: rgba(0, 204, 255, 0.767);
+}
+.FINISHED {
+  background: rgba(185, 30, 30, 0.616);
+}
+.STARTED {
+  background: #28b954c9;
+}
+

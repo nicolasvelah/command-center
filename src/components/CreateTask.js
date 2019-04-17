@@ -430,7 +430,7 @@ export default class CreateTask extends Component {
         <div className={this.state.isSending ? 'sending' : 'nosending'}>
           Creando la tarea....
         </div>
-        <h1>Nueva Taréa</h1>
+        <h1 className="newTaskTitle">Nueva Taréa</h1>
         <InputContainer>
           <Select
             className="input"

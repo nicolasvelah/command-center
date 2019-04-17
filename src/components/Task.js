@@ -55,6 +55,8 @@ export default class Task extends Component {
         { value: 'ab-', label: 'ab-' },
         { value: 'ab+', label: 'ab+' },
       ],
+      haveProvider: true,
+      providersIdVisibles: [],
     }
     this.setNote = this.setNote.bind(this)
     this.sendNote = this.sendNote.bind(this)
@@ -64,14 +66,27 @@ export default class Task extends Component {
     this.sendDataClient = this.sendDataClient.bind(this)
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     console.log('this.props.task', this.props.task)
+
+    let { haveProvider, have911, id911 } = this.state
     if (this.props.task[0].assignedTo_911 != null) {
-      this.setState({
-        have911: true,
-        id911: this.props.task[0].assignedTo_911,
-      })
+      have911 = true
+      id911 = this.props.task[0].assignedTo_911
     }
+    if (
+      this.props.task[0].provider.user.name === 'SIN PROVEEDOR' ||
+      this.props.task[0].provider.user.name === 'N/A'
+    ) {
+      haveProvider = false
+    }
+
+    console.log('haveProvider', haveProvider)
+    await this.setState({
+      have911,
+      id911,
+      haveProvider,
+    })
   }
 
   showHideMap = () => {
@@ -340,6 +355,10 @@ export default class Task extends Component {
       return false
     }
   }
+  activateProviderTools = () => {
+    console.log('activateProviderTools', true)
+    this.setState({ haveProvider: true })
+  }
   render() {
     console.log(this.props.task)
     console.log('isLoadingForm: ', this.state.isLoadingForm)
@@ -349,12 +368,21 @@ export default class Task extends Component {
         this.props.task !== null &&
         this.props.task.length > 0 ? (
           <div>
-            <h1 className="popUpTitle">{this.props.task[0].service.name}</h1>
+            <h1 className="popUpTitle">
+              {this.props.task[0].service.name}{' '}
+              <span
+                className={this.props.task[0].appStatus + ' appStatusModal'}
+              >
+                {this.props.task[0].appStatus !== null
+                  ? this.props.task[0].appStatus
+                  : 'SIN PROVEEDOR'}
+              </span>
+            </h1>
             <div className="taskLocation">
               {this.props.task[0].country} / {this.props.task[0].city}
             </div>
             <div className="taskState">
-              <b>Estado:</b>
+              <b>Columna:</b>
               <Select
                 className="input"
                 classNamePrefix="state"
@@ -370,7 +398,7 @@ export default class Task extends Component {
               />
             </div>
             <div>
-              {!this.state.have911 ? (
+              {/*!this.state.have911 ? (
                 <div className="Tools">
                   <div className="asigne911 btn" onClick={this.asigne911}>
                     Asignar al 911
@@ -378,7 +406,7 @@ export default class Task extends Component {
                 </div>
               ) : (
                 ''
-              )}
+              )*/}
             </div>
 
             <div className="mapContainer">
@@ -486,8 +514,7 @@ export default class Task extends Component {
                   <div className="provider column">
                     <div>
                       {this.props.chageProviderVal === false ? (
-                        this.props.task[0].provider.user.name !==
-                        'SIN PROVEEDOR' ? (
+                        this.state.haveProvider ? (
                           <div className="">
                             <div className="data">
                               <button
@@ -567,6 +594,7 @@ export default class Task extends Component {
                               orderId={this.props.task[0].id}
                               getMyTasks={this.props.getMyTasks}
                               setModal={this.props.setModal}
+                              activateProviderTools={this.activateProviderTools}
                             />
                           </div>
                         </div>
@@ -609,10 +637,6 @@ export default class Task extends Component {
                 )}
               </div>
             </div>
-            <br />
-            <br />
-
-            <br />
             <br />
             <div>
               <Notes

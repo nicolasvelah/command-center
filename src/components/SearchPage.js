@@ -14,6 +14,8 @@ const StyledAutocomplete = styled.input`
 `
 const InputContainer = styled.div`
   position: relative;
+  margin-left: 50px;
+  margin-top: 13px;
 `
 
 export default class SearchPage extends Component {

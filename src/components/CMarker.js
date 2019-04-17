@@ -60,14 +60,14 @@ export default class CMarker extends React.Component {
     return (
       <Wrapper
         className={`${active ? 'active' : ''}`}
-        style={{ backgroundColor: isProvider ? '#ff0000' : '#2962ff' }}
+        style={{ backgroundColor: isProvider ? '#ffa97a' : '#2abbdd' }}
         onClick={() => this.setState({ active: !active })}
       >
         {`${info.name.charAt(0)}${info.lastName.charAt(0)}`}
 
         <div
           className="info"
-          style={{ backgroundColor: isProvider ? '#ff0000' : '#2962ff' }}
+          style={{ backgroundColor: isProvider ? '#ffa97a' : '#6bcbef' }}
         >
           <p style={{ margin: 0, padding: 0 }}>
             <b>ID: {id}</b>

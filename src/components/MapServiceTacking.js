@@ -99,8 +99,8 @@ class MapServiceTacking extends Component {
     this.geocodeLatLng(this.props.lat, this.props.len)
     const country = await this.getLocationByIP()
     const wsToken = await this.getWsAccessToken(country)
-    await this.getClients(country) //get a client list with the last know location
-    await this.getProviders(country) //get a provider list with the last know location
+    await this.getClients() //get a client list with the last know location
+    await this.getProviders() //get a provider list with the last know location
 
     //connect with the websocket
     this.socket = io(process.env.WS_URL, {
@@ -133,29 +133,32 @@ class MapServiceTacking extends Component {
     ) //to check if a provider has disconnected
   }
   //GEOLOCALIZATION
-  async getClients(country) {
-    console.log('token :', token)
+  async findUser(userId, isClient) {
+    console.log('find userId-------------------', userId)
     try {
-      const res = await axios({
+      const user = await axios({
         method: 'POST',
-        url: `${process.env.WS_URL}/api/v1/clients`,
+        url: `${process.env.WS_URL}/api/v1/find-user`,
         headers: {
           jwt: token,
         },
         data: {
-          country,
-          appId: APP_ID,
+          userId,
+          isClient,
         },
       })
-
-      const filterC = await this.filterClient(res.data, this.props.userId)
-      console.log('res-------------------', res)
-      const users = filterC.user
-      //let lat = filterC.lat
-      //let lng = filterC.lng
-      console.log('Clientes [users]', users)
+      console.log('find user-------------------', user)
+      return user
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  async getClients() {
+    try {
+      const user = await this.findUser(this.props.userId, true)
+      console.log('Cliente-------------------', user.data)
       await this.setState({
-        clients: [users],
+        clients: [user.data],
         center: {
           lat: Number(this.props.lat),
           lng: Number(this.props.len),
@@ -165,62 +168,24 @@ class MapServiceTacking extends Component {
       console.error(error)
     }
   }
-  filterClient = async (users, userId) => {
-    let response = {
-      lat: 0,
-      lng: 0,
-      user: null,
-    }
-    await users.map(user => {
-      if (user.id === userId) {
-        response = {
-          lat: user.lat,
-          lng: user.lng,
-          user: user,
-        }
-      }
-      return user
-    })
-    return response
-  }
+
   onSockedId = id => {
     console.log('connected with socketID', id)
   }
-  async getProviders(country) {
-    console.log('token :', token)
+  async getProviders() {
     if (this.props.providerId !== 0) {
       try {
-        const res = await axios({
-          method: 'POST',
-          url: `${process.env.WS_URL}/api/v1/providers`,
-          headers: {
-            jwt: token,
-          },
-          data: {
-            country,
-            appId: APP_ID,
-          },
-        })
-
-        let users = await this.filterProviders(res.data, this.props.providerId)
-        if (users !== null) {
-          await this.setState({ providers: [users] })
+        const user = await this.findUser(this.props.providerId, false)
+        console.log('Provider-------------------', user.data)
+        if (user.data !== null) {
+          await this.setState({ providers: [user.data] })
         }
       } catch (error) {
         console.error(error)
       }
     }
   }
-  filterProviders = async (users, providerId) => {
-    let response = null
-    await users.map(user => {
-      if (user.id === providerId) {
-        response = user
-      }
-      return user
-    })
-    return response
-  }
+
   onSockedId = id => {
     //console.log('connected with socketID', id)
   }

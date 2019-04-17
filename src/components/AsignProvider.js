@@ -3,6 +3,7 @@ import axios from 'axios'
 import { getUser } from '../services/auth'
 import Select from 'react-select'
 import styled from 'styled-components'
+import star from '../images/star-full.svg'
 
 const Error = styled.div`
   color: red;
@@ -20,8 +21,10 @@ const ProviderItemSearch = styled.div`
     padding: 10px;
     margin-left: 1%;
     font-size: 12px;
+    height: 270px;
     h3 {
-      font-size: 12px;
+      font-size: 15px;
+      min-height: 45px;
     }
   }
 `
@@ -30,7 +33,6 @@ export default class AsignProvider extends Component {
   validations = {
     category: { required: true },
     service: { required: true },
-    provider: { required: true },
   }
   constructor(props) {
     super(props)
@@ -163,7 +165,7 @@ export default class AsignProvider extends Component {
     })
   }
 
-  sendTask = async e => {
+  sendTask = async (e, providerId) => {
     e.preventDefault()
     this.clearFormErrors()
     const newState = this.state
@@ -191,12 +193,12 @@ export default class AsignProvider extends Component {
     }
     try {
       console.log('this.props.orderId', this.props.orderId)
-      console.log('this.state.provider.value', this.state.provider.value)
+      console.log('providerId', providerId)
       await axios.post(
         `${process.env.API_URL}/orders/changeOrderProvider`,
         {
           orderId: this.props.orderId,
-          providerId: this.state.provider.value,
+          providerId: providerId,
         },
         {
           headers: {
@@ -213,6 +215,7 @@ export default class AsignProvider extends Component {
       })
       await this.props.getMyTasks()
       this.props.setModal(this.props.orderId)
+      this.props.activateProviderTools()
     } catch (err) {
       console.log(err)
       this.setState({ isSending: false, errorSending: true })
@@ -284,14 +287,42 @@ export default class AsignProvider extends Component {
               ? this.state.providers.map((provider, key) => (
                   <div key={key} className={'providerItemSearch'}>
                     <h3>{provider.Provider.busnessName}</h3>
-                    <div>Rate: {provider.Provider.rate}</div>
-                    <div>Telefono: </div>
-                    <div>Estado: </div>
-                    <div>País: </div>
-                    <div>Ciudad: </div>
-                    <div>Ver en el mapa</div>
-                    <div className="text-right">
-                      <button onClick={this.sendTask} className="btn">
+                    <div>
+                      Representante:{' '}
+                      {provider.Provider.user.name +
+                        ' ' +
+                        provider.Provider.user.lastName}
+                    </div>
+                    <div>
+                      Rate:{' '}
+                      {((rows, i) => {
+                        const context = provider
+                        while (++i <= context.Provider.rate - 1) {
+                          rows.push(
+                            <div className="stars" key={i}>
+                              <img src={star} alt="rate" />
+                            </div>
+                          )
+                        }
+                        return rows
+                      })([], 0, 10)}
+                    </div>
+                    <div>Telefono: {provider.Provider.user.phone}</div>
+                    <div>Estado: {provider.Provider.user.appState}</div>
+                    <div>País: {provider.Provider.user.country}</div>
+                    <div>
+                      Ciudad:{' '}
+                      {provider.Provider.user.city !== null
+                        ? provider.Provider.user.city
+                        : 'Sin definir'}
+                    </div>
+                    <div className="text-left">
+                      <button className="btn ma-right-5">Mapa</button>
+                      <button className="btn ma-right-5">Contactar</button>
+                      <button
+                        onClick={e => this.sendTask(e, provider.providerId)}
+                        className="btn b-verde"
+                      >
                         Asignar
                       </button>
                     </div>

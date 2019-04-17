@@ -620,6 +620,9 @@ pre tt:after {
 .text-right {
   text-align: right;
 }
+.text-left {
+  text-align: left;
+}
 .container {
   width: 100%;
 }
@@ -677,7 +680,15 @@ label {
   animation: spin 2s linear infinite;
   position: absolute;
 }
-
+.b-verde {
+  background: #28b954c9;
+}
+.ma-left-5 {
+  margin-left: 5px;
+}
+.ma-right-5 {
+  margin-right: 5px;
+}
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(0deg);
