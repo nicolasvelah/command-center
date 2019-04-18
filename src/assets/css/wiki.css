@@ -1,0 +1,107 @@
+.container {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-decoration: none;
+  border: none;
+  outline: none;
+  font-family: 'Yantramanav', sans-serif;
+  font-size: 20px;
+}
+p {
+  margin: 10px 0px 10px 0px;
+}
+.title {
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+img {
+  margin: 0px;
+  padding-left: 5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 30px;
+  font-weight: bold;
+}
+h2 {
+  text-align: center;
+  font-size: 35px;
+}
+#portada {
+  margin-top: 200px;
+  margin-bottom: 200px;
+}
+
+#indice {
+  background-color: beige;
+  width: 300px;
+  border: 1px solir border;
+  padding: 20px;
+}
+
+.div-center {
+  text-align: center;
+}
+
+td {
+  border: 1px solid grey;
+}
+
+.jerarquia-uno {
+  padding-left: 2em;
+}
+.jerarquia-dos {
+  padding-left: 2em;
+}
+.jerarquia-tres {
+  padding-left: 2em;
+}
+.jerarquia-cuatro {
+  padding-left: 2em;
+}
+.jerarquia-cinco {
+  padding-left: 2em;
+}
+.jerarquia-seis {
+  padding-left: 2em;
+}
+ul {
+  list-style: none;
+}
+li {
+  margin-bottom: 0px;
+}
+a {
+  text-decoration: none;
+}
+
+.normal-img {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.contenedor-componentes {
+  margin-left: 25%;
+  margin-right: 25%;
+  border: 1px solid grey;
+  display: flex;
+}
+
+.izquierda,
+.derecha {
+  margin: 5px;
+  display: inline-block;
+}
+.derecha p {
+  margin-left: 25px;
+  margin-bottom: 40px;
+}
