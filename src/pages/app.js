@@ -8,6 +8,7 @@ import Reports from '../components/reports'
 import Deliveries from '../components/deliveries'
 import Operators from '../components/operators'
 import Login from '../components/login'
+import Wiki from '../components/wiki'
 
 const App = () => (
   <Layout>
@@ -17,6 +18,7 @@ const App = () => (
       <PrivateRoute path="/app/reports" component={Reports} />
       <PrivateRoute path="/app/deliveries" component={Deliveries} />
       <PrivateRoute path="/app/operators" component={Operators} />
+      <PrivateRoute path="/app/wiki" component={Wiki} />
       <Login path="/app/login" />
     </Router>
   </Layout>
