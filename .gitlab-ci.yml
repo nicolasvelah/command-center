@@ -3,7 +3,19 @@ stages:
   - install
   - test
 
+variables:
+  npm_config_cache: '$CI_PROJECT_DIR/.npm'
+  CYPRESS_CACHE_FOLDER: '$CI_PROJECT_DIR/cache/Cypress'
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm
+    - cache/Cypress
+    - node_modules
+
 install-dependencies:
+  image: cypress/base:10
   stage: install
   script:
     - npm install
@@ -11,6 +23,9 @@ install-dependencies:
     expire_in: 1hr
     paths:
       - node_modules/
+      - npm ci
+      - $(npm bin)/print-env CI
+      - npm run cy:verify
   cache:
     paths:
       - node_modules/
