@@ -1,0 +1,30 @@
+image: node:10.14.2
+stages:
+  - install
+  - test
+
+install-dependencies:
+  stage: install
+  script:
+    - npm install
+  artifacts:
+    expire_in: 1hr
+    paths:
+      - node_modules/
+  cache:
+    paths:
+      - node_modules/
+
+test-apps:
+  stage: test
+  variables:
+    CHROME_BIN: google-chrome
+  dependencies:
+    - install-dependencies
+  before_script:
+    - apt-get update && apt-get install -y apt-transport-https
+    - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - sh -c 'echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    - apt-get update && apt-get install -y google-chrome-stable
+  script:
+    - npm run test:e2e:ci
