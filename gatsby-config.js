@@ -1,5 +1,5 @@
 let activeEnv =
-  process.env.GATSBY_ACTIVE_ENV || process.env.NODE_ENV || 'development'
+  process.env.GATSBY_ACTIVE_ENV || process.env.NODE_ENV || 'production'
 
 console.log(`Using environment config: '${activeEnv}'`)
 
