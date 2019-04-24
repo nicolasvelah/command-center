@@ -48,6 +48,7 @@ test-apps:
     - npm run test:e2e:ci
 
 build-app:
+  image: node:10.14.2
   stage: build
   variables:
     BUILD_CONFIGURATION: 'production'
@@ -61,6 +62,7 @@ build-app:
       - public/
 
 pages:
+  image: node:10.14.2
   stage: deploy
   dependencies:
     - build-app
