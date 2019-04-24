@@ -31,7 +31,7 @@ install-dependencies:
     paths:
       - node_modules/
   only:
-    - 8-end-to-end-testing
+    - branches
 
 test-apps:
   image: cypress/browsers:chrome67
@@ -46,7 +46,7 @@ test-apps:
       - cypress/screenshots
       - cypress/videos
   only:
-    - 8-end-to-end-testing
+    - branches
 
 build-app:
   image: node:10.14.2
@@ -62,19 +62,16 @@ build-app:
     paths:
       - public/
   only:
-    - 8-end-to-end-testing
+    - staging
+    - master
 
-pages:
+deploy-staging:
   image: node:10.14.2
   stage: deploy
   dependencies:
     - build-app
-  script:
-    - mv ./public/* ./public/
-  artifacts:
-    paths:
-      - public
+  script: git push staging HEAD:master
   environment:
     name: staging
   only:
-    - 8-end-to-end-testing
+    - staging
