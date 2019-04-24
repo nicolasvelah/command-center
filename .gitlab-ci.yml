@@ -78,6 +78,6 @@ pages:
     paths:
       - public
   environment:
-    name: production
+    name: staging
   only:
     - 8-end-to-end-testing
