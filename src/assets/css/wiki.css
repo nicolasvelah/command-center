@@ -1,6 +1,5 @@
-.container {
-  margin: 0;
-  padding: 0;
+#wiki-container {
+  padding: 20px;
   list-style: none;
   text-decoration: none;
   border: none;
@@ -8,50 +7,44 @@
   font-family: 'Yantramanav', sans-serif;
   font-size: 20px;
 }
-p {
+#indice {
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 1px solir border;
+  padding: 20px;
+  float: left;
+  overflow-y: scroll;
+  position: fixed;
+}
+
+#wiki-text {
+  max-width: 1024px;
+  padding: 10px;
+  float: right;
+}
+#wiki-container p {
   margin: 10px 0px 10px 0px;
 }
-.title {
+.wiki-title {
   font-size: 30px;
   font-weight: bold;
   margin-top: 30px;
   margin-bottom: 30px;
 }
-img {
+#wiki-container img {
   margin: 0px;
   padding-left: 5px;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+#wiki-container h1 {
   font-size: 30px;
   font-weight: bold;
 }
-h2 {
+#wiki-container h2 {
   text-align: center;
   font-size: 35px;
 }
-#portada {
-  margin-top: 200px;
-  margin-bottom: 200px;
-}
 
-#indice {
-  background-color: beige;
-  width: 300px;
-  border: 1px solir border;
-  padding: 20px;
-}
-
-.div-center {
-  text-align: center;
-}
-
-td {
+#wiki-container td {
   border: 1px solid grey;
 }
 
@@ -73,35 +66,35 @@ td {
 .jerarquia-seis {
   padding-left: 2em;
 }
-ul {
+#wiki-container ul {
   list-style: none;
 }
-li {
+#wiki-container li {
   margin-bottom: 0px;
 }
-a {
+#wiki-container a {
   text-decoration: none;
 }
 
-.normal-img {
+.wiki-normal-img {
   margin-left: auto;
   margin-right: auto;
   display: block;
 }
 
-.contenedor-componentes {
+.wiki-contenedor-componentes {
   margin-left: 25%;
   margin-right: 25%;
   border: 1px solid grey;
   display: flex;
 }
 
-.izquierda,
-.derecha {
+.wiki-izquierda,
+.wiki-derecha {
   margin: 5px;
   display: inline-block;
 }
-.derecha p {
+.wiki-derecha p {
   margin-left: 25px;
   margin-bottom: 40px;
 }

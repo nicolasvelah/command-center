@@ -317,7 +317,16 @@ export default class Task extends Component {
     const dd = birthdayCoverter.getDate()
     const mm = birthdayCoverter.getMonth() + 1
     const yyyy = birthdayCoverter.getFullYear()
-    const birthdayCoverterTxt = yyyy + '-' + mm + '-' + dd
+
+    var mmm = ''
+
+    if (mm < 10) {
+      mmm = '0' + mm
+    } else {
+      mmm = mm
+    }
+
+    const birthdayCoverterTxt = yyyy + '-' + mmm + '-' + dd
 
     try {
       await axios.post(
@@ -345,9 +354,11 @@ export default class Task extends Component {
         isLoadingForm: false,
       })
       this.toastSendDataClient('Datos guardados')
+      console.log('***********MES******', mmm)
       return true
     } catch (err) {
       this.toastSendDataClient('Error al guardar datos')
+      console.log('***********MES******', mmm)
       console.log(err)
       this.setState({
         isLoadingForm: false,
