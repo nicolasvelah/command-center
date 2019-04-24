@@ -30,6 +30,8 @@ install-dependencies:
   cache:
     paths:
       - node_modules/
+  only:
+    - 8-end-to-end-testing
 
 test-apps:
   image: cypress/base:10
@@ -46,6 +48,8 @@ test-apps:
   script:
     - npm ci
     - npm run test:e2e:ci
+  only:
+    - 8-end-to-end-testing
 
 build-app:
   image: node:10.14.2
@@ -60,6 +64,8 @@ build-app:
     expire_in: 1hr
     paths:
       - public/
+  only:
+    - 8-end-to-end-testing
 
 pages:
   image: node:10.14.2
@@ -67,7 +73,6 @@ pages:
   dependencies:
     - build-app
   script:
-    - mkdir public
     - mv ./public/* ./public/
   artifacts:
     paths:
