@@ -1,6 +1,8 @@
 stages:
   - install
   - test
+  - build
+  - deploy
 
 variables:
   npm_config_cache: '$CI_PROJECT_DIR/.npm'
@@ -44,3 +46,31 @@ test-apps:
   script:
     - npm ci
     - npm run test:e2e:ci
+
+build-app:
+  stage: build
+  variables:
+    BUILD_CONFIGURATION: 'production'
+  dependencies:
+    - install-dependencies
+  script:
+    - npm run build
+  artifacts:
+    expire_in: 1hr
+    paths:
+      - public/
+
+pages:
+  stage: deploy
+  dependencies:
+    - build-app
+  script:
+    - mkdir public
+    - mv ./public/* ./public/
+  artifacts:
+    paths:
+      - public
+  environment:
+    name: production
+  only:
+    - 8-end-to-end-testing
