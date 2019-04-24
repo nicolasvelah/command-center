@@ -8,7 +8,7 @@ import Reports from '../components/reports'
 import Deliveries from '../components/deliveries'
 import Operators from '../components/operators'
 import Login from '../components/login'
-import Wiki from '../components/wiki'
+import Wiki from '../components/Wiki'
 
 const App = () => (
   <Layout>
