@@ -96,7 +96,7 @@ stop_review:
 
 deploy-staging:
   image: node:10.14.2
-  stage: deploy
+  stage: staging
   dependencies:
     - build-app
   script:
@@ -109,7 +109,7 @@ deploy-staging:
 
 deploy-production:
   image: node:10.14.2
-  stage: deploy
+  stage: production
   dependencies:
     - build-app
   script:
