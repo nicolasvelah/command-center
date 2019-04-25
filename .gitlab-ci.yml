@@ -49,6 +49,9 @@ test-apps:
       - cypress/videos
   only:
     - branches
+  except:
+    - master
+    - staging
 
 build-app:
   image: node:10.14.2
@@ -81,6 +84,9 @@ code_quality:
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
+  except:
+    - master
+    - staging
 
 review:
   stage: review
@@ -135,7 +141,7 @@ deploy-staging:
     ## without extra base64 encoding.
     ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
     ##
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - echo $TEST | tr -d '\r' | ssh-add - > /dev/null
 
     ##
     ## Create the SSH directory and give it the right permissions
