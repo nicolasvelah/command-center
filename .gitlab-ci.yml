@@ -153,7 +153,7 @@ deploy-staging:
     - ssh-keyscan 167.99.173.145 >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - ssh gitlab-runner@167.99.173.145
+    - ssh 167.99.173.145
   environment:
     name: staging
     url: https://cc.it-zam.com
