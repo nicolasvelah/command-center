@@ -1,8 +1,10 @@
 stages:
-  - install
+  - buildForTest
   - test
   - build
-  - deploy
+  - review
+  - staging
+  - production
 
 variables:
   npm_config_cache: '$CI_PROJECT_DIR/.npm'
@@ -17,7 +19,7 @@ cache:
 
 install-dependencies:
   image: cypress/base:10
-  stage: install
+  stage: buildForTest
   script:
     - npm install
   artifacts:
@@ -61,17 +63,59 @@ build-app:
     expire_in: 1hr
     paths:
       - public/
+
+review:
+  stage: review
+  script:
+    - command deploy
+  environment:
+    name: review/$CI_BUILD_REF_NAME
+    url: https://$CI_ENVIRONMENT_SLUG.$KUBE_DOMAIN
+    on_stop: stop_review
   only:
-    - staging
+    - branches
+  except:
     - master
+    - staging
+
+stop_review:
+  stage: review
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - command destroy
+  environment:
+    name: review/$CI_BUILD_REF_NAME
+    action: stop
+  when: manual
+  only:
+    - branches
+  except:
+    - master
+    - staging
 
 deploy-staging:
   image: node:10.14.2
   stage: deploy
   dependencies:
     - build-app
-  script: git push staging HEAD:master
+  script:
+    - rsync -avuz -e 'ssh -i ~/.ssh/id_rsa' $CI_PROJECT_DIR/public/ dev@167.99.173.145:/var/www/cc
   environment:
     name: staging
+    url: https://cc.it-zam.com
   only:
     - staging
+
+deploy-production:
+  image: node:10.14.2
+  stage: deploy
+  dependencies:
+    - build-app
+  script:
+    - rsync -avuz -e 'ssh -i ~/.ssh/id_rsa' $CI_PROJECT_DIR/public/ dev@167.99.173.145:/var/www/cc
+  environment:
+    name: production
+    url: https://cc.itzam.ec
+  only:
+    - master
