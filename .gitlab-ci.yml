@@ -137,7 +137,7 @@ deploy-staging:
     ## without extra base64 encoding.
     ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
     ##
-    - echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzocwnskzl0CIpoXvzYDg+ASSkpLaKJoI3O5tI5MNxV/s9pLcvP0tBbvrQPC1sHdQJmCx00fOfDlZN1gC1EFWv1M2HxwgnelhkZt53oygzQvzkTDo5HM34Wbueo4dS79i21eahbMLVJWP3ckHJC3TtQVov8oWOMlbK+h/PS8QKf0yPk4t6Y27If3D/V1bvvA9O0kUXFzBDoIvPj6pRPkTS3waNYtoybrE+B3QBvxQs53HRxmQ3++NQTGlxUj9YR4qerofotVj2m7nybRzRW7TYlLxBPWhEVi37AmCNYp+jcL7ywCSZZipTisG6Hds4S8D2f/+GdMmFrXLxn0eNjfDF nicolasvela@MacBook-Pro-de-Nicolas.local" | tr -d '\r' | ssh-add - > /dev/null
+    - echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDVKk2qaO3CfXAeze1CcQ44lzvJ+7pLMkN1g2Gld0Lo5gyGrZEJjjJtVSUx3sWyIONKEABtPdQUVxr8xhfAfg4R9RNtPQuTErjH4pnCNn/G4oa7AUtwAlNVQaBAle7GH0zoztnzD+TPPRB7T6n2MqWvM0cyzoO3y/anxXD5hOvKZYSSXYaHq8zh5Kywp7FlvBU5Bggms2/5Q4ud1hjmivk4nr1gD8se94fCkKC2tMU2WNVGnyoWHzOgygsXhyGQDYzwQIXoYHpDu2d4bLDxSZYEpuL02TAI4tcgwOgzpyhJ1CD3nd4fM6q2PmJcJi9vha8LzLCxiEKjL+pU+kVwtyIKXCwSUQDte9EgdPEgTlMazPd+sVl9IIt/TjAS+cYXAMuf8ha455NoaT+YKqJIxjSSQvu3xMI4F/Mx3JfpquH0VT1S3oe0IxHgQevxv+cuURSFVwUXltYp7PwHFm8VLEFM2Xm850X42LnDxhuUFKhVa8Y2p2E2YbBs4ELbM8rMC6aPlFS7y9Fj/Hvb4oE7S37yi8/MhKAVJh5DQLbXRwgsif+xe249N2nnzjUdzfAl2ZEJ8dA+tmzeziWlQOzYF5KUkDREEJatouiqclRdSguZKp5VcozzCZS1a9+CtVnz4LkA6/zHK6dbDbSWjSkZJlWJZ4tLY3nA5sqDGaMAo7OSsw== gitlab@pas-hq.com" | tr -d '\r' | ssh-add - > /dev/null
 
     ##
     ## Create the SSH directory and give it the right permissions
