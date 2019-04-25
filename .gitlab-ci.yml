@@ -34,6 +34,9 @@ install-dependencies:
       - node_modules/
   only:
     - branches
+  except:
+    - master
+    - staging
 
 test-apps:
   image: cypress/browsers:chrome67
