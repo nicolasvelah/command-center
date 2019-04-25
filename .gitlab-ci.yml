@@ -125,18 +125,10 @@ stop_review:
     - staging
 
 deploy-staging:
-  image: node:10.14.2
+  image: ubuntu:16.04
   stage: staging
   before_script:
-    ##
-    ## Install ssh-agent if not already installed, it is required by Docker.
-    ## (change apt-get to yum if you use an RPM-based image)
-    ##
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
-
-    ##
-    ## Run ssh-agent (inside the build environment)
-    ##
     - eval $(ssh-agent -s)
 
     ##
