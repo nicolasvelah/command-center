@@ -126,7 +126,7 @@ stop_review:
 
 deploy-staging:
   image: ubuntu
-  stage: deploy
+  stage: staging
   environment: Staging
   script:
     - sshpass -V
