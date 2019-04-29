@@ -125,7 +125,7 @@ stop_review:
     - staging
 
 deploy-staging:
-  image: ubuntu:16.04
+  image: ubuntu
   stage: staging
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
@@ -137,7 +137,7 @@ deploy-staging:
     ## without extra base64 encoding.
     ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
     ##
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - echo "$SSH_PRIVATE_KEY" | ssh-add - > /dev/null
 
     ##
     ## Create the SSH directory and give it the right permissions
@@ -153,7 +153,7 @@ deploy-staging:
     - ssh-keyscan 167.99.173.145 >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - ssh dev@167.99.173.145
+    - ssh gitlab-runner@167.99.173.145
   environment:
     name: staging
     url: https://cc.it-zam.com
