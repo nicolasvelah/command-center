@@ -1,5 +1,5 @@
 import React from 'react'
-import '../assets/css/wiki.css'
+import '../../assets/css/wiki.css'
 import ScrollIntoView from 'react-scroll-into-view'
 
 const clienteStyle = {
@@ -277,7 +277,7 @@ export default class Wiki extends React.Component {
                 pagina <a href="https://cc.itzam.ec">https://cc.itzam.ec</a>
               </p>
               <img
-                src={require('../images/wiki/url.png')}
+                src={require('../../images/wiki/url.png')}
                 className="wiki-normal-img"
                 alt=""
               />
@@ -290,7 +290,7 @@ export default class Wiki extends React.Component {
                 el botón Log In
               </p>
               <img
-                src={require('../images/wiki/acceder.png')}
+                src={require('../../images/wiki/acceder.png')}
                 className="wiki-normal-img"
                 alt=""
               />
@@ -306,7 +306,7 @@ export default class Wiki extends React.Component {
                 <li>CONTENIDO</li>
               </ol>
               <img
-                src={require('../images/wiki/plantilla.png')}
+                src={require('../../images/wiki/plantilla.png')}
                 className="wiki-normal-img"
                 alt=""
               />
@@ -319,7 +319,7 @@ export default class Wiki extends React.Component {
               <div className="wiki-contenedor-componentes">
                 <div className="wiki-izquierda">
                   <img
-                    src={require('../images/wiki/navegacion.png')}
+                    src={require('../../images/wiki/navegacion.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -346,7 +346,10 @@ export default class Wiki extends React.Component {
             <div id="tablero">
               <h3>
                 5. Tablero
-                <img src={require('../images/wiki/tableroicon.png')} alt="" />
+                <img
+                  src={require('../../images/wiki/tableroicon.png')}
+                  alt=""
+                />
               </h3>
               <p>
                 El tablero es la primera pantalla que verás al ingresar en la
@@ -362,7 +365,7 @@ export default class Wiki extends React.Component {
                   Kanban dividido en 3 columnas.
                 </p>
                 <img
-                  src={require('../images/wiki/columnasuno.png')}
+                  src={require('../../images/wiki/columnasuno.png')}
                   className="wiki-normal-img"
                   alt=""
                 />
@@ -371,7 +374,7 @@ export default class Wiki extends React.Component {
                   la columna que desees.
                 </p>
                 <img
-                  src={require('../images/wiki/columnasdos.png')}
+                  src={require('../../images/wiki/columnasdos.png')}
                   className="wiki-normal-img"
                   alt=""
                 />
@@ -384,7 +387,7 @@ export default class Wiki extends React.Component {
                     asignadas a tu usuario en color blanco.
                   </p>
                   <img
-                    src={require('../images/wiki/asignados.png')}
+                    src={require('../../images/wiki/asignados.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -396,7 +399,7 @@ export default class Wiki extends React.Component {
                     gestionando. Esta cuenta con 3 subestados:
                   </p>
                   <img
-                    src={require('../images/wiki/encurso.png')}
+                    src={require('../../images/wiki/encurso.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -411,7 +414,7 @@ export default class Wiki extends React.Component {
                       estarán en color verde.
                     </p>
                     <img
-                      src={require('../images/wiki/envivo.png')}
+                      src={require('../../images/wiki/envivo.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -425,7 +428,7 @@ export default class Wiki extends React.Component {
                       mostrará un estado del servicio.
                     </p>
                     <img
-                      src={require('../images/wiki/trabajoenprogreso.png')}
+                      src={require('../../images/wiki/trabajoenprogreso.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -435,7 +438,10 @@ export default class Wiki extends React.Component {
                       </div>
                       <p>
                         El estado inicial es{' '}
-                        <img src={require('../images/wiki/going.png')} alt="" />{' '}
+                        <img
+                          src={require('../../images/wiki/going.png')}
+                          alt=""
+                        />{' '}
                         referente a que el proveedor está en camino.
                       </p>
                       <div id="started" className="wiki-title">
@@ -450,7 +456,7 @@ export default class Wiki extends React.Component {
                         </b>
                         WORK IN PROGRESS y el estado del proveedor cambiará a
                         <img
-                          src={require('../images/wiki/started.png')}
+                          src={require('../../images/wiki/started.png')}
                           alt=""
                         />
                         .
@@ -463,7 +469,7 @@ export default class Wiki extends React.Component {
                         informará a través de una acción en la aplicación que el
                         servicio concluyó y la orden cambiará su estado a{' '}
                         <img
-                          src={require('../images/wiki/finished.png')}
+                          src={require('../../images/wiki/finished.png')}
                           alt=""
                         />
                         .
@@ -482,7 +488,7 @@ export default class Wiki extends React.Component {
                       esperar un poco para atenderlas por cualquier motivo.
                     </p>
                     <img
-                      src={require('../images/wiki/sinrespuesta.png')}
+                      src={require('../../images/wiki/sinrespuesta.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -531,7 +537,7 @@ export default class Wiki extends React.Component {
                 </p>
                 <p>El contenido de la orden es:</p>
                 <img
-                  src={require('../images/wiki/ordenuno.png')}
+                  src={require('../../images/wiki/ordenuno.png')}
                   className="wiki-normal-img"
                   alt=""
                 />
@@ -547,7 +553,7 @@ export default class Wiki extends React.Component {
                     Estado del servicio solicitado.
                     <div>
                       <img
-                        src={require('../images/wiki/ordendos.png')}
+                        src={require('../../images/wiki/ordendos.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
@@ -555,7 +561,10 @@ export default class Wiki extends React.Component {
                   </li>
                   <li>
                     Notificaciones de mensajes no leídos.{' '}
-                    <img src={require('../images/wiki/ordenicon.png')} alt="" />
+                    <img
+                      src={require('../../images/wiki/ordenicon.png')}
+                      alt=""
+                    />
                   </li>
                 </ol>
                 <p>
@@ -575,21 +584,21 @@ export default class Wiki extends React.Component {
                     gestión:
                   </p>
                   <img
-                    src={require('../images/wiki/template.png')}
+                    src={require('../../images/wiki/template.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
                   <div id="cabecera" className="wiki-title">
                     5.3.2. Cabecera
                   </div>
-                  <img src={require('../images/wiki/cabecera.png')} alt="" />
+                  <img src={require('../../images/wiki/cabecera.png')} alt="" />
                   <div className="wiki-title">Detalle</div>
                   <table>
                     <tbody>
                       <tr>
                         <td>
                           <img
-                            src={require('../images/wiki/cerraricon.png')}
+                            src={require('../../images/wiki/cerraricon.png')}
                             alt=""
                           />
                         </td>
@@ -600,7 +609,7 @@ export default class Wiki extends React.Component {
                       <tr>
                         <td>
                           <img
-                            src={require('../images/wiki/911icon.png')}
+                            src={require('../../images/wiki/911icon.png')}
                             alt=""
                           />
                         </td>
@@ -612,7 +621,7 @@ export default class Wiki extends React.Component {
                       <tr>
                         <td>
                           <img
-                            src={require('../images/wiki/pasodecorrienteicon.png')}
+                            src={require('../../images/wiki/pasodecorrienteicon.png')}
                             alt=""
                           />
                         </td>
@@ -624,7 +633,7 @@ export default class Wiki extends React.Component {
                       <tr>
                         <td>
                           <img
-                            src={require('../images/wiki/estadoicon.png')}
+                            src={require('../../images/wiki/estadoicon.png')}
                             alt=""
                           />
                         </td>
@@ -639,7 +648,7 @@ export default class Wiki extends React.Component {
                     5.3.3. Mapa
                   </div>
                   <img
-                    src={require('../images/wiki/mapauno.png')}
+                    src={require('../../images/wiki/mapauno.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -649,26 +658,35 @@ export default class Wiki extends React.Component {
                   </p>
                   <div className="jerarquia-tres">
                     <p>1. La ubicación de la solicitud de la orden.</p>
-                    <img src={require('../images/wiki/mapados.png')} alt="" />
+                    <img
+                      src={require('../../images/wiki/mapados.png')}
+                      alt=""
+                    />
                     <p>
                       2. La ubicación del cliente en vivo (El cliente debe tener
                       su aplicación activa para poder hacer seguimiento de su
                       movimiento).
                     </p>
-                    <img src={require('../images/wiki/mapatres.png')} alt="" />
+                    <img
+                      src={require('../../images/wiki/mapatres.png')}
+                      alt=""
+                    />
                     <p>
                       3. La ubicación del proveedor en vivo (El proveedor debe
                       tener su aplicación activa para poder hacer seguimiento de
                       su movimiento).
                     </p>
                     <img
-                      src={require('../images/wiki/mapacuatro.png')}
+                      src={require('../../images/wiki/mapacuatro.png')}
                       alt=""
                     />
                   </div>
                   <p>
                     Colapsa el mapa con el botón{' '}
-                    <img src={require('../images/wiki/chat2icon.png')} alt="" />{' '}
+                    <img
+                      src={require('../../images/wiki/chat2icon.png')}
+                      alt=""
+                    />{' '}
                     si no lo necesitas.
                   </p>
                   <div id="chats" className="wiki-title">
@@ -680,7 +698,7 @@ export default class Wiki extends React.Component {
                     aplicación o ejecutar una llamada a los mismos.
                   </p>
                   <img
-                    src={require('../images/wiki/chat1.png')}
+                    src={require('../../images/wiki/chat1.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -696,7 +714,7 @@ export default class Wiki extends React.Component {
                     <span style={soStyle}>Supervisor - Operador</span>
                     <br />
                     <img
-                      src={require('../images/wiki/chat2.png')}
+                      src={require('../../images/wiki/chat2.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -709,7 +727,7 @@ export default class Wiki extends React.Component {
                       <span style={clienteStyle}>Celeste</span>.
                     </p>
                     <img
-                      src={require('../images/wiki/chat3.png')}
+                      src={require('../../images/wiki/chat3.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -718,13 +736,13 @@ export default class Wiki extends React.Component {
                         1. Envía un mensaje al cliente ingresando texto y
                         presionando ENTER o dando click sobre el icono{' '}
                         <img
-                          src={require('../images/wiki/chat1icon.png')}
+                          src={require('../../images/wiki/chat1icon.png')}
                           alt=""
                         />
                         .
                       </p>
                       <img
-                        src={require('../images/wiki/chat4.png')}
+                        src={require('../../images/wiki/chat4.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
@@ -732,19 +750,19 @@ export default class Wiki extends React.Component {
                         2. Despliega la sección de información y edición de
                         datos del cliente dando click sobre el ícono{' '}
                         <img
-                          src={require('../images/wiki/chat2icon.png')}
+                          src={require('../../images/wiki/chat2icon.png')}
                           alt=""
                         />{' '}
                         si hace falta puedes editarla y guardarla.
                       </p>
                       <img
-                        src={require('../images/wiki/chat5.png')}
+                        src={require('../../images/wiki/chat5.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
                       <p>3. Ejecuta la llamada dando click sobre el ícono.</p>
                       <img
-                        src={require('../images/wiki/chat6.png')}
+                        src={require('../../images/wiki/chat6.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
@@ -758,7 +776,7 @@ export default class Wiki extends React.Component {
                       <span style={proveedorStyle}>Naranja</span>.
                     </p>
                     <img
-                      src={require('../images/wiki/chatp1.png')}
+                      src={require('../../images/wiki/chatp1.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -767,13 +785,13 @@ export default class Wiki extends React.Component {
                         4. Envía un mensaje al proveedor ingresando texto y
                         presionando ENTER o dando click sobre el icono{' '}
                         <img
-                          src={require('../images/wiki/chat1icon.png')}
+                          src={require('../../images/wiki/chat1icon.png')}
                           alt=""
                         />
                         .
                       </p>
                       <img
-                        src={require('../images/wiki/chatp2.png')}
+                        src={require('../../images/wiki/chatp2.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
@@ -781,19 +799,19 @@ export default class Wiki extends React.Component {
                         5. Despliega la sección de información de datos del
                         proveedor dando click sobre el ícono{' '}
                         <img
-                          src={require('../images/wiki/chat2icon.png')}
+                          src={require('../../images/wiki/chat2icon.png')}
                           alt=""
                         />
                         .
                       </p>
                       <img
-                        src={require('../images/wiki/chatp3.png')}
+                        src={require('../../images/wiki/chatp3.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
                       <p>6. Ejecuta la llamada dando click sobre el ícono.</p>
                       <img
-                        src={require('../images/wiki/chat6.png')}
+                        src={require('../../images/wiki/chat6.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
@@ -801,12 +819,12 @@ export default class Wiki extends React.Component {
                         7. Reasigna la orden a otro Proveedor dando click sobre
                       </p>
                       <img
-                        src={require('../images/wiki/chatp1icon.png')}
+                        src={require('../../images/wiki/chatp1icon.png')}
                         alt=""
                       />
                       <p>y llenando el formulario de reasignación.</p>
                       <img
-                        src={require('../images/wiki/chatp4.png')}
+                        src={require('../../images/wiki/chatp4.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
@@ -821,7 +839,7 @@ export default class Wiki extends React.Component {
                     operador que añadió la nota y su supervisor.
                   </p>
                   <img
-                    src={require('../images/wiki/nota.png')}
+                    src={require('../../images/wiki/nota.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -831,7 +849,7 @@ export default class Wiki extends React.Component {
             <div id="buscar">
               <h3>
                 6. Buscar
-                <img src={require('../images/wiki/buscaricon.png')} alt="" />
+                <img src={require('../../images/wiki/buscaricon.png')} alt="" />
               </h3>
               <p>
                 Al dar click en el botón buscar nos abrirá una nueva ventana
@@ -839,7 +857,7 @@ export default class Wiki extends React.Component {
                 operadores.
               </p>
               <img
-                src={require('../images/wiki/buscar.png')}
+                src={require('../../images/wiki/buscar.png')}
                 className="wiki-normal-img"
                 alt=""
               />
@@ -847,7 +865,10 @@ export default class Wiki extends React.Component {
             <div id="creartarea">
               <h3>
                 7. Crear Tarea
-                <img src={require('../images/wiki/agregaricon.png')} alt="" />
+                <img
+                  src={require('../../images/wiki/agregaricon.png')}
+                  alt=""
+                />
               </h3>
               <p>
                 Podremos crear tareas al dar click en el botón agregar. Las
@@ -856,7 +877,7 @@ export default class Wiki extends React.Component {
                 tablero en la columna de asignados.
               </p>
               <img
-                src={require('../images/wiki/agregar.png')}
+                src={require('../../images/wiki/agregar.png')}
                 className="wiki-normal-img"
                 alt=""
               />
@@ -864,7 +885,7 @@ export default class Wiki extends React.Component {
             <div id="salir">
               <h3>
                 8. Salir
-                <img src={require('../images/wiki/saliricon.png')} alt="" />
+                <img src={require('../../images/wiki/saliricon.png')} alt="" />
               </h3>
               <p>
                 Al dar click en el botón terminaremos la sesión y regresaremos a
@@ -887,7 +908,7 @@ export default class Wiki extends React.Component {
               <h3>
                 1. Tablero
                 <img
-                  src={require('../images/wiki/tableroIconSupervisor.png')}
+                  src={require('../../images/wiki/tableroIconSupervisor.png')}
                   alt=""
                 />
               </h3>
@@ -905,7 +926,7 @@ export default class Wiki extends React.Component {
                 de todo el equipo.
               </p>
               <img
-                src={require('../images/wiki/tableroImgSupervisor.png')}
+                src={require('../../images/wiki/tableroImgSupervisor.png')}
                 alt=""
               />
               <div className="jerarquia-uno">
@@ -919,7 +940,7 @@ export default class Wiki extends React.Component {
                   información respectiva.
                 </p>
                 <img
-                  src={require('../images/wiki/filtrooperadoresImgSupervisor1.png')}
+                  src={require('../../images/wiki/filtrooperadoresImgSupervisor1.png')}
                   className="wiki-normal-img"
                   alt=""
                 />
@@ -927,18 +948,18 @@ export default class Wiki extends React.Component {
                   Si damos click en cualquier operador, filtraremos las órdenes
                   del mismo, se activará su respectivo botón{' '}
                   <img
-                    src={require('../images/wiki/filtrooperadoresIconSupervisor1.png')}
+                    src={require('../../images/wiki/filtrooperadoresIconSupervisor1.png')}
                     alt=""
                   />{' '}
                   y aparecerá uno nuevo{' '}
                   <img
-                    src={require('../images/wiki/filtrooperadoresIconSupervisor2.png')}
+                    src={require('../../images/wiki/filtrooperadoresIconSupervisor2.png')}
                     alt=""
                   />{' '}
                   donde podremos regresar a ver todas las órdenes.
                 </p>
                 <img
-                  src={require('../images/wiki/filtrooperadoresImgSupervisor2.png')}
+                  src={require('../../images/wiki/filtrooperadoresImgSupervisor2.png')}
                   className="wiki-normal-img"
                   alt=""
                 />
@@ -949,7 +970,7 @@ export default class Wiki extends React.Component {
                 <div className="wiki-contenedor-componentes">
                   <div className="wiki-izquierda">
                     <img
-                      src={require('../images/wiki/navecacionImgSupervisor.png')}
+                      src={require('../../images/wiki/navecacionImgSupervisor.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -966,7 +987,7 @@ export default class Wiki extends React.Component {
                 <div id="entregas-supervisor" className="wiki-title">
                   3. Entregas
                   <img
-                    src={require('../images/wiki/entregasIconSupervisor.png')}
+                    src={require('../../images/wiki/entregasIconSupervisor.png')}
                     alt=""
                   />
                 </div>
@@ -975,7 +996,7 @@ export default class Wiki extends React.Component {
                   una lista de todas las órdenes que se han entregado.
                 </p>
                 <img
-                  src={require('../images/wiki/entregasImgSupervisor.png')}
+                  src={require('../../images/wiki/entregasImgSupervisor.png')}
                   className="wiki-normal-img"
                   alt=""
                 />
@@ -991,7 +1012,7 @@ export default class Wiki extends React.Component {
                     palabra clave.
                   </p>
                   <img
-                    src={require('../images/wiki/filtroImgSupervisor1.png')}
+                    src={require('../../images/wiki/filtroImgSupervisor1.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -1000,7 +1021,7 @@ export default class Wiki extends React.Component {
                     un indicador que nos indica que nuestro filtro está activo.
                   </p>
                   <img
-                    src={require('../images/wiki/filtroImgSupervisor2.png')}
+                    src={require('../../images/wiki/filtroImgSupervisor2.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -1009,7 +1030,7 @@ export default class Wiki extends React.Component {
                     un documento Excel.
                   </p>
                   <img
-                    src={require('../images/wiki/filtroImgSupervisor3.png')}
+                    src={require('../../images/wiki/filtroImgSupervisor3.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -1022,7 +1043,7 @@ export default class Wiki extends React.Component {
                     lista con todas las órdenes del mes en curso.
                   </p>
                   <img
-                    src={require('../images/wiki/listadeordenesImgSupervisor.png')}
+                    src={require('../../images/wiki/listadeordenesImgSupervisor.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -1052,7 +1073,7 @@ export default class Wiki extends React.Component {
                       </li>
                     </ul>
                     <img
-                      src={require('../images/wiki/operadorImgSupervisor.png')}
+                      src={require('../../images/wiki/operadorImgSupervisor.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -1064,7 +1085,7 @@ export default class Wiki extends React.Component {
                       orden.
                     </p>
                     <img
-                      src={require('../images/wiki/accionesImgSupervisor.png')}
+                      src={require('../../images/wiki/accionesImgSupervisor.png')}
                       className="wiki-normal-img"
                       alt=""
                     />
@@ -1072,7 +1093,7 @@ export default class Wiki extends React.Component {
                       <div id="ver-supervisores" className="wiki-title">
                         0.1. Ver
                         <img
-                          src={require('../images/wiki/verIconSupervisor.png')}
+                          src={require('../../images/wiki/verIconSupervisor.png')}
                           alt=""
                         />
                       </div>
@@ -1083,14 +1104,14 @@ export default class Wiki extends React.Component {
                         visual.
                       </p>
                       <img
-                        src={require('../images/wiki/verImgSupervisor.png')}
+                        src={require('../../images/wiki/verImgSupervisor.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
                       <div id="reabrir-supervisores" className="wiki-title">
                         0.2. Reabrir
                         <img
-                          src={require('../images/wiki/reabrirIconSupervisor.png')}
+                          src={require('../../images/wiki/reabrirIconSupervisor.png')}
                           alt=""
                         />
                       </div>
@@ -1100,7 +1121,7 @@ export default class Wiki extends React.Component {
                         pueda gestionar.
                       </p>
                       <img
-                        src={require('../images/wiki/reabrirImgSupervisor.png')}
+                        src={require('../../images/wiki/reabrirImgSupervisor.png')}
                         className="wiki-normal-img"
                         alt=""
                       />
@@ -1110,7 +1131,7 @@ export default class Wiki extends React.Component {
                 <div id="miequipo-supervisor" className="wiki-title">
                   4. Mi Equipo
                   <img
-                    src={require('../images/wiki/miequipoIconSupervisor.png')}
+                    src={require('../../images/wiki/miequipoIconSupervisor.png')}
                     alt=""
                   />
                 </div>
@@ -1120,7 +1141,7 @@ export default class Wiki extends React.Component {
                   global.
                 </p>
                 <img
-                  src={require('../images/wiki/miequipoImgSupervisor.png')}
+                  src={require('../../images/wiki/miequipoImgSupervisor.png')}
                   className="wiki-normal-img"
                   alt=""
                 />
@@ -1134,7 +1155,7 @@ export default class Wiki extends React.Component {
                     una tabla y en un diagrama.
                   </p>
                   <img
-                    src={require('../images/wiki/operadorMiequipoImgSupervisor.png')}
+                    src={require('../../images/wiki/operadorMiequipoImgSupervisor.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -1149,7 +1170,7 @@ export default class Wiki extends React.Component {
                     <li>El Total de órdenes a cargo del operador.</li>
                   </ul>
                   <img
-                    src={require('../images/wiki/operadorMiequipoImgSupervisor2.png')}
+                    src={require('../../images/wiki/operadorMiequipoImgSupervisor2.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -1160,7 +1181,7 @@ export default class Wiki extends React.Component {
                     porcentaje.
                   </p>
                   <img
-                    src={require('../images/wiki/operadorMiequipoImgSupervisor3.png')}
+                    src={require('../../images/wiki/operadorMiequipoImgSupervisor3.png')}
                     className="wiki-normal-img"
                     alt=""
                   />
@@ -1176,7 +1197,7 @@ export default class Wiki extends React.Component {
                     su propio Diagrama Circular global.
                   </p>
                   <img
-                    src={require('../images/wiki/reportesderendimientoImgSupervisor.png')}
+                    src={require('../../images/wiki/reportesderendimientoImgSupervisor.png')}
                     className="wiki-normal-img"
                     alt=""
                   />

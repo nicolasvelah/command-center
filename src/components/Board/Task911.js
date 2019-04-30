@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import MapServiceTacking from './MapServiceTacking'
+import MapServiceTacking from '../Maps/MapServiceTacking'
 import Chat from './Chat'
-import phone from '../images/phone.svg'
+import phone from '../../images/phone.svg'
 import axios from 'axios'
-import { getUser } from '../services/auth'
+import { getUser } from '../../services/auth'
 import scrollIntoView from 'scroll-into-view'
 
-import '../assets/css/task.css'
+import '../../assets/css/task.css'
 
 export default class Task extends Component {
   constructor(props) {

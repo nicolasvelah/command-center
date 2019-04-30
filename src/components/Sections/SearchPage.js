@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import axios from 'axios'
-import { getUser } from '../services/auth'
+import { getUser } from '../../services/auth'
 
-import '../assets/css/search.css'
+import '../../assets/css/search.css'
 
 const StyledAutocomplete = styled.input`
   width: 100%;

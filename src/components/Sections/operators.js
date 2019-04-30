@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { getUser } from '../services/auth'
+import { getUser } from '../../services/auth'
 import Chart from 'react-google-charts'
-import '../assets/css/operators.css'
-import flag from '../images/flag.svg'
-import star from '../images/star-full.svg'
+import '../../assets/css/operators.css'
+import flag from '../../images/flag.svg'
+import star from '../../images/star-full.svg'
 
 export default class Operators extends Component {
   constructor(props) {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { navigate } from 'gatsby'
-import { handleLogin, isLoggedIn } from '../services/auth'
+import { handleLogin, isLoggedIn } from '../../services/auth'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 

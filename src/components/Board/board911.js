@@ -1,17 +1,17 @@
 import React, { Component } from 'react'
-import { getUser, logout } from '../services/auth'
+import { getUser, logout } from '../../services/auth'
 import { navigate } from 'gatsby'
 
 import axios from 'axios'
 
-import notifications from '../images/notifications_none.svg'
-import { askForPermissioToReceiveNotifications } from '../services/push-notification'
+import notifications from '../../images/notifications_none.svg'
+import { askForPermissioToReceiveNotifications } from '../../services/push-notification'
 import { ToastContainer, toast } from 'react-toastify'
 
 import Task911 from './Task911'
 
 import 'react-toastify/dist/ReactToastify.css'
-import '../assets/css/911board.css'
+import '../../assets/css/911board.css'
 
 export default class Board extends Component {
   constructor(props) {
@@ -186,7 +186,7 @@ export default class Board extends Component {
             <div className="task-header">
               <div className="category-icon">
                 <img
-                  src={require('../images/sos.svg')}
+                  src={require('../../images/sos.svg')}
                   alt={t.service.category}
                 />
               </div>

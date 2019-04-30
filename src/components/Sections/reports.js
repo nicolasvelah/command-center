@@ -7,7 +7,7 @@ import { DatePickerInput } from 'rc-datepicker'
 
 import 'moment/locale/es.js'
 import 'rc-datepicker/lib/style.css'
-import '../assets/css/reports.css'
+import '../../assets/css/reports.css'
 
 export default class Reports extends Component {
   constructor(props) {

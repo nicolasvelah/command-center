@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { getUser } from '../services/auth'
+import { getUser } from '../../services/auth'
 import Select, { Async } from 'react-select'
 import styled from 'styled-components'
-import MapServiceLocator from './MapServiceLocator'
+import MapServiceLocator from '../Maps/MapServiceLocator'
 
 const StyledAutocomplete = styled(Async)`
   .Select-control {

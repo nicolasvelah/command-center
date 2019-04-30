@@ -10,13 +10,12 @@ export default class TaskClientData extends React.Component {
       bloodType: this.props.task.client.bloodType,
       birthday: this.props.task.client.birthday,
       idCard: this.props.task.client.idCard,
-      isLoadingForm: this.props.isLoadingForm
+      isLoadingForm: this.props.isLoadingForm,
     }
   }
-  
 
   render() {
-    console.log('isLoadingForm TCD',this.props.isLoadingForm)
+    console.log('isLoadingForm TCD', this.props.isLoadingForm)
     return (
       <div className="TaskClientData">
         <div className="inputMasterContainerCD">
@@ -46,7 +45,7 @@ export default class TaskClientData extends React.Component {
                 option => option.value === this.state.bloodType
               )}
               options={this.props.bloodTypes}
-              onChange={e =>this.props.setBloodType(e)}
+              onChange={e => this.props.setBloodType(e)}
             />
           </div>
         </div>
@@ -57,7 +56,7 @@ export default class TaskClientData extends React.Component {
             <DatePickerInput
               value={this.state.birthday}
               className="my-custom-datepicker-component"
-              onChange={e =>this.props.setBirthday(e)}
+              onChange={e => this.props.setBirthday(e)}
             />
           </div>
         </div>
@@ -74,15 +73,13 @@ export default class TaskClientData extends React.Component {
           </div>
         </div>
         <div className="inputMasterContainerCD">
-        {
-            this.props.isLoadingForm ?(
-              <div className="loaderGif"></div>
-            ):(
-              <button className="btn" onClick={e => this.props.sendDataClient(e)}>
-                  Guardar
-              </button>
-            )
-          } 
+          {this.props.isLoadingForm ? (
+            <div className="loaderGif" />
+          ) : (
+            <button className="btn" onClick={e => this.props.sendDataClient(e)}>
+              Guardar
+            </button>
+          )}
         </div>
       </div>
     )

@@ -1,5 +1,5 @@
 import React from 'react'
-import star from '../images/star-full.svg'
+import star from '../../images/star-full.svg'
 
 export default class TaskProviderData extends React.Component {
   constructor(props) {

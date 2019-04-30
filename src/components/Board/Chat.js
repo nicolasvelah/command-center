@@ -1,7 +1,7 @@
 import React from 'react'
-import { getUser } from '../services/auth'
-import send from '../images/send.svg'
-import '../assets/css/chat.css'
+import { getUser } from '../../services/auth'
+import send from '../../images/send.svg'
+import '../../assets/css/chat.css'
 
 export default class Chat extends React.Component {
   constructor(props) {
@@ -81,7 +81,7 @@ export default class Chat extends React.Component {
                 : ''}
               <div
                 ref={el => {
-                  console.log(el)
+                  //console.log(el)
                   this.messagesEnd = el
                 }}
                 id={this.props.id}
@@ -114,6 +114,7 @@ export default class Chat extends React.Component {
             />
           </form>
         </div>
+        
       </div>
     )
   }

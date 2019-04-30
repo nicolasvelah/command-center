@@ -1,20 +1,20 @@
 import React, { Component } from 'react'
-import { getUser, logout, isLoggedIn, logoutLocal } from '../services/auth'
-import { Link, navigate } from 'gatsby'
+import { getUser, logout, isLoggedIn, logoutLocal } from '../../services/auth'
+import { navigate } from 'gatsby'
 
 import axios from 'axios'
 
-import arrowDownIcon from '../images/arrow-down.svg'
-import notifications from '../images/notifications_none.svg'
-import { askForPermissioToReceiveNotifications } from '../services/push-notification'
+import { askForPermissioToReceiveNotifications } from '../../services/push-notification'
 import { ToastContainer, toast } from 'react-toastify'
+import TaskItem from './TaskItem'
+import ChatContainer from './ChatContainer'
+import { save, get } from '../../services/Storage'
 
-import Modal from './modal'
-import Task from './Task'
+import Modal from '../Tools/modal'
 import Filter from './Filter'
 
 import 'react-toastify/dist/ReactToastify.css'
-import '../assets/css/board.css'
+import '../../assets/css/board.css'
 
 export default class Board extends Component {
   constructor(props) {
@@ -32,7 +32,8 @@ export default class Board extends Component {
       operators: [],
       providerState: '',
       messaging: null,
-      idClick: null
+      idClick: null,
+      activeTasks: [],
     }
     this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)
@@ -43,6 +44,8 @@ export default class Board extends Component {
     this.getOperators = this.getOperators.bind(this)
     this.update911state = this.update911state.bind(this)
     this.updateLocalTask = this.updateLocalTask.bind(this)
+    this.onDragStart = this.onDragStart.bind(this)
+    this.activateTask = this.activateTask.bind(this)
   }
 
   async componentDidMount() {
@@ -82,6 +85,10 @@ export default class Board extends Component {
     if (getUser().type !== 'operator') {
       this.getOperators()
     }
+    console.log('GET   ---====', get('activeTasks'))
+    await this.setState({
+      activeTasks: get('activeTasks'),
+    })
   }
   startNotifications(messaging) {
     const context = this
@@ -259,6 +266,47 @@ export default class Board extends Component {
       chageProviderVal: false,
     })
   }
+
+  activateTask = async id => {
+    try {
+      const { activeTasks } = this.state
+
+      let includesThis = false
+      activeTasks.filter(item => {
+        if (item.task.id === id) {
+          includesThis = true
+        }
+        return item
+      })
+
+      if (!includesThis) {
+        let task = null
+        await this.state.tasks.filter(item => {
+          if (item.id === id) {
+            task = item
+          }
+          return item
+        })
+
+        activeTasks.push({ task })
+
+        save('activeTasks', activeTasks)
+
+        this.setState({
+          activeTasks,
+        })
+
+        console.log('activeTasks ------------', activeTasks)
+
+        await this.getMessages(task.id)
+        await this.getNotes(task.id)
+
+        //this.notificationOff(task.id, 'provider')
+      }
+    } catch (err) {
+      console.log('error', err.message)
+    }
+  }
   updateChatState = async orderId => {
     try {
       await axios.post(
@@ -416,8 +464,8 @@ export default class Board extends Component {
     }
   }
   handleFilterOperatorChange = option => {
-    console.log('Dio click: ',option)
-    
+    console.log('Dio click: ', option)
+
     if (option) {
       this.setState({ filterByoperator: option })
       this.setState({ idClick: option })
@@ -481,89 +529,13 @@ export default class Board extends Component {
             .replace(/-+$/, '') + '.svg'
 
         tasks[t.status.name].push(
-          <div
+          <TaskItem
             key={t.id}
-            onDragStart={e => this.onDragStart(e, 'id_' + t.id)}
-            draggable
-            className={
-              'draggable task ' +
-              t.cssClasses +
-              ' ' +
-              (t.appStatus === 'WORKFINISHED' || t.appStatus === 'FINISHED'
-                ? 'wf'
-                : '') +
-              ' ' +
-              (t.appStatus === 'WORKINPROGRESS' || t.appStatus === 'STARTED'
-                ? 'wip'
-                : '') +
-              ' ' +
-              (t.appStatus === 'GOING' ? 'going ' : '') +
-              (t.message.length > 0 ? 'haveNotification not_provider' : '')
-            }
-            onClick={e => this.setModal(t.id)}
-            id={'taskid_' + t.id}
-          >
-            <div className="task-header">
-              <div className="category-icon">
-                <img
-                  src={require('../images/' + icon)}
-                  alt={t.service.category}
-                />
-              </div>
-              <h3>{t.service.name}</h3>
-              <div id="ProviderState">{t.appStatus}</div>
-              {getUser().type !== 'operator' ? (
-                <div className="operator">
-                  {t.operator !== null ? (
-                    <div>
-                      <span>
-                        {t.operator.name.charAt(0) +
-                          t.operator.lastName.charAt(0)}
-                      </span>
-                      <div className="dropdownOperatorData">
-                        <b>Nombre:</b>{' '}
-                        {t.operator.name + ' ' + t.operator.lastName} <br />
-                        <b>Email:</b> {t.operator.email} <br />
-                        <b>Teléfono:</b> {t.operator.phone}
-                        <br />
-                        <b>Tipo:</b> {t.operator.type}
-                        <br />
-                      </div>
-                    </div>
-                  ) : (
-                    <Link to="" className="btn-nbg">
-                      Asignar <img src={arrowDownIcon} alt="Asignar" />
-                    </Link>
-                  )}
-                </div>
-              ) : (
-                ''
-              )}
-            </div>
-            <p className="task-data">
-              <b>Cliente:</b> {t.client.name + ' ' + t.client.lastName} <br />
-              <b>Proveedor:</b> {t.provider.busnessName} <br />
-              <b>Creada el:</b> {t.createdAt} <br />
-              <b>Locación: </b> {t.country} / {t.city}
-            </p>
-            <div className="task-footer">
-              <img
-                src={notifications}
-                alt="notifications"
-                className={'notificationIcon notProvider '}
-              />
-
-              <div className={'notificationNumber notProvider '}>
-                {t.message.length > 0 ? t.message.length : 0}
-              </div>
-
-              <img
-                src={notifications}
-                alt="notifications"
-                className="notificationIcon notClient"
-              />
-            </div>
-          </div>
+            icon={icon}
+            t={t}
+            onDragStart={this.onDragStart}
+            activateTask={this.activateTask}
+          />
         )
         return true
       })
@@ -662,10 +634,15 @@ export default class Board extends Component {
             )}
           </div>
         </div>
+        <div className="chatsBar">
+          {this.state.activeTasks.map(item => (
+            <ChatContainer item={item.task} key={item.task.id} />
+          ))}
+        </div>
         <ToastContainer />
         {this.state.showModal ? (
           <Modal closeModal={this.closeModal} showModal={this.state.showModal}>
-            <Task
+            {/*<Task
               task={this.state.curTask}
               messagesTask={this.state.messagesTask}
               getMessages={this.getMessages}
@@ -679,7 +656,7 @@ export default class Board extends Component {
               chageProviderVal={this.state.chageProviderVal}
               update911state={this.update911state}
               updateLocalTask={this.updateLocalTask}
-            />
+            />*/}
           </Modal>
         ) : (
           ''

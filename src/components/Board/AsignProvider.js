@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { getUser } from '../services/auth'
+import { getUser } from '../../services/auth'
 import Select from 'react-select'
 import styled from 'styled-components'
-import star from '../images/star-full.svg'
+import star from '../../images/star-full.svg'
 
 const Error = styled.div`
   color: red;

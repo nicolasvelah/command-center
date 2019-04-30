@@ -1,5 +1,5 @@
 import React from 'react'
-import '../assets/css/modal.css'
+import '../../assets/css/modal.css'
 
 const Modal = ({ closeModal, showModal, children }) => {
   return (
