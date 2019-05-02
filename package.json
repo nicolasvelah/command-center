@@ -9,15 +9,15 @@
     "file-saver": "^2.0.1",
     "firebase": "^5.7.2",
     "fs": "0.0.1-security",
-    "gatsby": "^2.3.29",
+    "gatsby": "^2.0.53",
     "gatsby-image": "^2.0.20",
     "gatsby-plugin-create-client-paths": "^2.0.3",
     "gatsby-plugin-manifest": "^2.0.13",
     "gatsby-plugin-netlify": "^2.0.6",
     "gatsby-plugin-offline": "^2.0.20",
     "gatsby-plugin-react-helmet": "^3.0.2",
-    "gatsby-plugin-sharp": "^2.0.35",
-    "gatsby-source-filesystem": "^2.0.32",
+    "gatsby-plugin-sharp": "^2.0.14",
+    "gatsby-source-filesystem": "^2.0.8",
     "gatsby-transformer-sharp": "^2.1.8",
     "google-map-react": "^1.1.2",
     "moment": "^2.24.0",
@@ -49,18 +49,12 @@
     "develop": "gatsby develop",
     "start": "npm run develop",
     "format": "prettier --write \"src/**/*.js\"",
-    "test": "/node_modules/.bin/cypress run",
-    "serve": "gatsby serve",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run --browser chrome",
-    "test:e2e": "start-server-and-test develop http://localhost:8000 cy:open",
-    "test:e2e:ci": "start-server-and-test develop http://localhost:8000 cy:run"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "gatsby serve"
   },
   "devDependencies": {
-    "cypress": "^3.2.0",
     "json-loader": "^0.5.7",
-    "prettier": "^1.15.2",
-    "start-server-and-test": "^1.9.0"
+    "prettier": "^1.15.2"
   },
   "repository": {
     "type": "git",

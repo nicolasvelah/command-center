@@ -90,8 +90,14 @@ export default class Chat extends React.Component {
           </div>
         </div>
         <div className="mensagessForm">
-          <form id={'chat-' + this.props.idInput}>
-            <input
+          <form
+            id={'chat-' + this.props.idInput}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <textarea
               type="text"
               className="input"
               placeholder="Escribe un mensaje"
@@ -104,6 +110,13 @@ export default class Chat extends React.Component {
                   this.props.id
                 )
               }
+              style={{
+                resize: 'none',
+                width: '90%',
+                marginTop: '20px',
+                overflow: 'hidden',
+              }}
+              rows="2"
               onKeyPress={this.props.sendMenssageByEnter}
             />
             <img
@@ -111,6 +124,11 @@ export default class Chat extends React.Component {
               alt=""
               className="sendMenssage"
               onClick={this.props.sendMenssage}
+              style={{
+                width: '5%',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
             />
           </form>
         </div>
