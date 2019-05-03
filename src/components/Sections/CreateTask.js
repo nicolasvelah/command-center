@@ -3,7 +3,7 @@ import axios from 'axios'
 import { getUser } from '../../services/auth'
 import Select, { Async } from 'react-select'
 import styled from 'styled-components'
-import MapServiceLocator from '../Maps/MapServiceLocator'
+//import MapServiceLocator from '../Maps/MapServiceLocator'
 
 const StyledAutocomplete = styled(Async)`
   .Select-control {
@@ -533,7 +533,7 @@ export default class CreateTask extends Component {
           <Error>{this.state.category.error}</Error>
         </InputContainer>
         <textarea onChange={this.setComment} placeholder="Comentario" />
-        {this.state.mapShow ? (
+        {/*this.state.mapShow ? (
           <MapServiceLocator
             userId={this.state.clientId}
             providerId={this.state.provider.value}
@@ -542,7 +542,7 @@ export default class CreateTask extends Component {
           />
         ) : (
           ''
-        )}
+        )*/}
         <div className="text-right">
           <button onClick={this.sendTask} className="btn">
             Crear Tarea

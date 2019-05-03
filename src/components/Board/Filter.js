@@ -58,7 +58,7 @@ const Filter = ({
   operators,
   idClick,
 }) => {
-  console.log('operators', operators)
+  //console.log('operators', operators)
   return (
     <Container>
       {/*<FilterOption>

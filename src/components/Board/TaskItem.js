@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'gatsby'
 import arrowDownIcon from '../../images/arrow-down.svg'
 import ChatNotificationsCounter from './ChatNotificationsCounter'
+import TimerComp from '../Tools/TimerComp'
 
 import { getUser } from '../../services/auth'
 
@@ -35,9 +36,16 @@ export default class TaskItem extends React.Component {
             ? 'haveNotification not_provider'
             : '')
         }
-        onClick={e => this.props.activateTask(this.props.t.id)}
+        onClick={e => this.props.activateTask(this.props.t.id, this.props.icon)}
         id={'taskid_' + this.props.t.id}
       >
+        <div>
+          {this.props.t.status.name === 'asigned' ? (
+            <TimerComp orderDate={this.props.t.createdAt} />
+          ) : (
+            ''
+          )}
+        </div>
         <div className="task-header">
           <div className="category-icon">
             <img

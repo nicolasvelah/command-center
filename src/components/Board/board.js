@@ -2,16 +2,22 @@ import React, { Component } from 'react'
 import { getUser, logout, isLoggedIn, logoutLocal } from '../../services/auth'
 import { navigate } from 'gatsby'
 
-import axios from 'axios'
-
 import { askForPermissioToReceiveNotifications } from '../../services/push-notification'
-import { ToastContainer, toast } from 'react-toastify'
+import { ToastContainer } from 'react-toastify'
 import TaskItem from './TaskItem'
 import ChatContainer from './ChatContainer'
 import { save, get } from '../../services/Storage'
+import {
+  operatorsAll,
+  MsmNewTask,
+  messagesAll,
+  notesAll,
+  getAllTasks,
+  updateStatus,
+} from '../../services/helpers'
 
-import Modal from '../Tools/modal'
 import Filter from './Filter'
+import Loading from '../Tools/Loading'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
@@ -34,6 +40,8 @@ export default class Board extends Component {
       messaging: null,
       idClick: null,
       activeTasks: [],
+      openChat: [],
+      isLoading: false,
     }
     this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)
@@ -56,7 +64,7 @@ export default class Board extends Component {
       logout()
     }
     //Tasks
-    console.log('init traer ordenes en did mount ')
+    //console.log('init traer ordenes en did mount ')
     await this.getMyTasks()
 
     //Push Notifications
@@ -74,7 +82,7 @@ export default class Board extends Component {
         if (isLoggedIn()) {
           context.getMyTasks(context.state.curTask)
           if (typeof context.state.curTask[0] !== 'undefined') {
-            console.log('entro para traer mensajes')
+            //console.log('entro para traer mensajes')
             context.chatNotifications(context.state.curTask[0].id)
           }
         }
@@ -85,43 +93,45 @@ export default class Board extends Component {
     if (getUser().type !== 'operator') {
       this.getOperators()
     }
-    console.log('GET   ---====', get('activeTasks'))
+    //console.log('GET   ---====', get('activeTasks'))
     await this.setState({
       activeTasks: get('activeTasks'),
     })
   }
+  componentWillUnmount() {
+    this._ismounted = false
+  }
+
+  //FIREBASE NOTIFICATIONS TRIEGER
   startNotifications(messaging) {
     const context = this
     messaging.onMessage(function(payload) {
-      console.log('Frond Message received.', payload)
-      const notification = JSON.parse(payload.data.content)
-      if (notification.type === 'chat') {
-        context.chatNotifications(notification.orderId)
-      } else if (
-        notification.type === 'WORKINPROGRESS' ||
-        notification.type === 'WORKFINISHED'
-      ) {
-        context.providerState(notification.orderId, notification.type)
-      } else {
-        context.getMyTasks()
-        if (notification.type !== 'updateOrder') {
-          context.MsmNewTask(payload.data.title)
+      if (isLoggedIn()) {
+        //console.log('Frond Message received.', payload)
+        const notification = JSON.parse(payload.data.content)
+        if (notification.type === 'chat') {
+          context.chatNotifications(notification.orderId)
+        } else if (
+          notification.type === 'WORKINPROGRESS' ||
+          notification.type === 'WORKFINISHED'
+        ) {
+          context.providerState(notification.orderId, notification.type)
+        } else {
+          context.getMyTasks()
+          if (notification.type !== 'updateOrder') {
+            MsmNewTask(payload.data.title)
+          }
         }
       }
     })
   }
 
-  componentWillUnmount() {
-    this._ismounted = false
-  }
+  //PROVIDER
   chageProvider = () => {
     this.setState({
       chageProviderVal: true,
     })
   }
-  //ALERTS
-  MsmNewTask = title => toast(title)
-  //WORKSTATES
   providerState = (id, type) => {
     const { tasks } = this.state
     var index = tasks
@@ -129,7 +139,7 @@ export default class Board extends Component {
         return x.id
       })
       .indexOf(id)
-    console.log('tasks[index]', tasks[index])
+    //console.log('tasks[index]', tasks[index])
 
     if (type === 'WORKINPROGRESS' || type === 'STARTED') {
       type = 'wip'
@@ -154,18 +164,18 @@ export default class Board extends Component {
   chatNotifications = id => {
     if (typeof this.state.curTask[0] !== 'undefined') {
       if (this.state.curTask[0].id === Number(id)) {
-        console.log('Si esta activa')
+        //console.log('Si esta activa')
         this.getMessages(id)
       } else {
-        console.log('No esta activa')
+        //console.log('No esta activa')
         this.notificationMessages(id, 'provider')
       }
     } else {
-      console.log('No esta activa')
+      //console.log('No esta activa')
       this.notificationMessages(id, 'provider')
     }
   }
-  //NOTIFICATIONS
+  //NOTIFICATIONS ICON ALERT CONTROL
   notificationMessages = (id, type) => {
     document.getElementById('taskid_' + id).classList.add('haveNotification')
     document.getElementById('taskid_' + id).classList.add('not_' + type)
@@ -193,19 +203,8 @@ export default class Board extends Component {
 
   //CHAT
   getMessages = async id => {
-    const messages = await axios.post(
-      `${process.env.API_URL}/getMessages`,
-      {
-        orderId: id,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
-        },
-      }
-    )
-    console.log('messages ------------- ', messages)
+    const messages = messagesAll(id)
+    //console.log('messages ------------- ', messages)
     await this.setState({
       messagesTask: messages.data,
     })
@@ -213,26 +212,38 @@ export default class Board extends Component {
   }
   addMensages = (msm, type) => {
     let { messagesTask } = this.state
-    console.log('messagesTask ', messagesTask)
+    //console.log('messagesTask ', messagesTask)
     messagesTask[type].push(msm)
     this.setState({
       messagesTask,
     })
   }
+  openChat = async id => {
+    let { openChat } = this.state
+    let includesThis = true
+
+    openChat = openChat.filter(item => {
+      let itemResp = item
+      if (item === id) {
+        includesThis = false
+        itemResp = null
+      }
+      return itemResp
+    })
+
+    if (includesThis) {
+      openChat.push(id)
+      this.trigerColumn('live', id)
+    } else {
+      this.trigerColumn('standby', id)
+    }
+    this.setState({ openChat })
+    //console.log('openChat', openChat)
+  }
+
   //NOTES
   getNotes = async id => {
-    const notes = await axios.post(
-      `${process.env.API_URL}/orders/getNotes`,
-      {
-        orderId: id,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
-        },
-      }
-    )
+    const notes = notesAll(id)
     this.setState({
       notesTask: notes.data.notes,
     })
@@ -246,28 +257,9 @@ export default class Board extends Component {
     })
     return notesTask
   }
-  //MODAL
-  setModal = async id => {
-    let task = []
-    await this.state.tasks.filter(item => {
-      if (item.id === id) {
-        task.push(item)
-      }
-      return item
-    })
 
-    await this.getMessages(task[0].id)
-    await this.getNotes(task[0].id)
-
-    this.notificationOff(task[0].id, 'provider')
-    this.setState({
-      curTask: task,
-      showModal: true,
-      chageProviderVal: false,
-    })
-  }
-
-  activateTask = async id => {
+  //ORDERS TRIGERS
+  activateTask = async (id, icon) => {
     try {
       const { activeTasks } = this.state
 
@@ -281,52 +273,96 @@ export default class Board extends Component {
 
       if (!includesThis) {
         let task = null
-        await this.state.tasks.filter(item => {
+        await this.state.tasks.filter((item, index) => {
           if (item.id === id) {
             task = item
           }
           return item
         })
+        task.icon = icon
+        if (task.status.name !== 'complete') {
+          await this.trigerColumn('live', id)
+          await this.openChat(task.id)
+          activeTasks.push({ task })
 
-        activeTasks.push({ task })
+          save('activeTasks', activeTasks)
 
-        save('activeTasks', activeTasks)
+          this.setState({
+            activeTasks,
+          })
 
-        this.setState({
-          activeTasks,
-        })
+          //console.log('activeTasks ------------', activeTasks)
 
-        console.log('activeTasks ------------', activeTasks)
+          await this.getMessages(task.id)
+          //await this.getNotes(task.id)
 
-        await this.getMessages(task.id)
-        await this.getNotes(task.id)
-
-        //this.notificationOff(task.id, 'provider')
+          this.notificationOff(task.id, 'provider')
+        } else {
+          alert(
+            'Las tareas en la columna de resuelto no pueden ser gestionadas. Debes reabrirla para poder gestionarla.'
+          )
+        }
       }
     } catch (err) {
       console.log('error', err.message)
     }
   }
-  updateChatState = async orderId => {
+  desactivateTask = async id => {
+    //console.log('dasactivar' + id)
     try {
-      await axios.post(
-        `${process.env.API_URL}/updateChatState/` + orderId,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
-          },
-        }
+      const result = window.confirm(
+        'Si cierras la tarea solicitaras Rate del servicio al cliente y liberaras las aplicaciones de los actores. ¿Quiéres cerrar la tarea?'
       )
-      console.log('Exito en updateChatState')
-    } catch (error) {
-      console.log('Error en updateChatState', error.message)
+
+      if (result) {
+        const { activeTasks } = this.state
+        console.log('des activeTasks', activeTasks)
+        const activeTasksFilter = activeTasks.filter((item, index) => {
+          let itemRet = item
+          //console.log('item.task.id', item.task.id)
+          if (item.task.id === id) {
+            itemRet = null
+          }
+          return itemRet
+        })
+        //console.log(' des activeTasksFilter', activeTasksFilter)
+
+        this.trigerColumn('complete', id)
+        await save('activeTasks', activeTasksFilter)
+
+        await this.setState({
+          activeTasks: activeTasksFilter,
+        })
+      }
+    } catch (err) {
+      console.log('error', err.message)
     }
-    return
   }
+
+  //COLUMN OR STATUS TRIGER
+  trigerColumn = async (col, id) => {
+    try {
+      await updateStatus(id, col)
+
+      let { tasks } = this.state
+
+      tasks = await tasks.filter(item => {
+        if (item.id === id) {
+          item.status.name = col
+        }
+        return item
+      })
+
+      await this.setState({
+        tasks,
+      })
+    } catch (err) {
+      console.error('Error', err.message)
+    }
+  }
+
   update911state = async id => {
-    console.log('id del 911 user:', id)
+    //console.log('id del 911 user:', id)
     let { tasks, curTask } = this.state
     await tasks.map((item, index) => {
       if (item.id === curTask[0].id) {
@@ -340,34 +376,12 @@ export default class Board extends Component {
       curTask,
     })
   }
-  closeModal = async () => {
-    await this.updateChatState(this.state.curTask[0].id)
-    this.setState({
-      curTask: [],
-      showModal: false,
-    })
-  }
 
   //TASKS
   getMyTasks = async () => {
-    console.log('init traer ordenes')
     try {
-      const tasks = await axios.post(
-        `${process.env.API_URL}/orders/getOrders`,
-        {},
-        {
-          headers: {
-            'x-access-token': getUser().token,
-          },
-        }
-      )
-      var CryptoJS = require('crypto-js')
-      let decryptedData = CryptoJS.AES.decrypt(
-        tasks.data,
-        process.env.CRYPTO_SECRET
-      ).toString(CryptoJS.enc.Utf8)
-      decryptedData = JSON.parse(decryptedData)
-      console.log('tasks ', decryptedData)
+      const decryptedData = await getAllTasks()
+      //console.log('tasks ', decryptedData)
       if (this._ismounted) {
         this.setState({
           tasks: decryptedData.tasks,
@@ -379,6 +393,7 @@ export default class Board extends Component {
     }
     return true
   }
+
   //BOARD ACTIONS
   onDragOver = ev => {
     ev.preventDefault()
@@ -389,9 +404,86 @@ export default class Board extends Component {
       dragStard: true,
     })
   }
+
+  onDrop = async (ev, cat) => {
+    ev.preventDefault()
+
+    let id = ev.dataTransfer.getData('text')
+
+    let result = true
+    if (cat === 'complete') {
+      result = window.confirm(
+        'Si cierras la tarea solicitaras Rate del servicio al cliente y liberaras las aplicaciones de los actores. ¿Quiéres cerrar la tarea?'
+      )
+    }
+    if (result) {
+      let reopen = false
+      let idNumber = null
+      let operator = null
+      await this.state.tasks.filter(task => {
+        if ('id_' + task.id === id) {
+          idNumber = task.id
+          operator = task.assignedTo
+          if (task.status.name === 'complete') {
+            reopen = true
+          }
+        }
+        return task
+      })
+      if (cat === 'backlog' && operator !== null) {
+        alert(
+          'Esta columna es solo para tareas que no tengan asiganado un operador.'
+        )
+        this.setState({
+          dragStard: false,
+        })
+        return
+      }
+      let reopenconfirm = true
+      if (reopen) {
+        reopenconfirm = window.confirm('¿Estás segur@ de lo que haces?')
+      }
+      if (reopenconfirm) {
+        this.trigerColumn(cat, idNumber)
+
+        if (cat === 'complete') {
+          id = id.split('_')
+          id = Number(id[1])
+          this.desactivateTask(id)
+        }
+      }
+    }
+    this.setState({
+      dragStard: false,
+    })
+  }
+  Delivery = async () => {
+    this.setState({
+      isLoading: true,
+    })
+
+    const promises = this.state.tasks.map(async item => {
+      if (item.status.name === 'complete') {
+        try {
+          await updateStatus(item.id, 'delivered')
+          this.getMyTasks()
+        } catch (err) {
+          console.log(err)
+        }
+      }
+      return item
+    })
+
+    await Promise.all(promises)
+    this.setState({
+      isLoading: false,
+    })
+
+    return
+  }
   updateLocalTask = async (id, cat) => {
-    console.log('local update cat -----------', cat)
-    console.log('local update id -----------', id)
+    //console.log('local update cat -----------', cat)
+    //console.log('local update id -----------', id)
     let idNumber = null
     let tasks = await this.state.tasks.filter(task => {
       if ('id_' + task.id === id) {
@@ -400,62 +492,14 @@ export default class Board extends Component {
       }
       return task
     })
-
     this.setState({
       tasks,
       dragStard: false,
     })
-
+    //console.log('Post state', this.state.tasks)
     return idNumber
   }
-  onDrop = async (ev, cat) => {
-    ev.preventDefault()
-    let id = ev.dataTransfer.getData('text')
-
-    const idNumber = await this.updateLocalTask(id, cat)
-
-    await axios.post(
-      `${process.env.API_URL}/orders/updateStatus`,
-      {
-        statusName: cat,
-        orderId: idNumber,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
-        },
-      }
-    )
-  }
-  Delivery = async () => {
-    await this.state.tasks.map(async item => {
-      if (item.status.name === 'complete') {
-        try {
-          await axios.post(
-            `${process.env.API_URL}/orders/updateStatus`,
-            {
-              statusName: 'delivered',
-              orderId: item.id,
-            },
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': getUser().token,
-              },
-            }
-          )
-
-          this.getMyTasks()
-        } catch (err) {
-          console.log(err)
-        }
-      }
-      return await item
-    })
-
-    return
-  }
+  //FILTROS
   handleFilterChange = option => {
     if (option) {
       this.setState({ filterOption: option.value })
@@ -464,7 +508,7 @@ export default class Board extends Component {
     }
   }
   handleFilterOperatorChange = option => {
-    console.log('Dio click: ', option)
+    //console.log('Dio click: ', option)
 
     if (option) {
       this.setState({ filterByoperator: option })
@@ -474,19 +518,11 @@ export default class Board extends Component {
       this.setState({ idClick: null })
     }
   }
+
   //OPERATORS
   getOperators = async () => {
     try {
-      const data = await axios.post(
-        `${process.env.API_URL}/getOperators`,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
-          },
-        }
-      )
+      const data = await operatorsAll()
       this.setState({ operators: data.data.users })
       return data
     } catch (err) {
@@ -509,7 +545,7 @@ export default class Board extends Component {
     const context = this
     this.state.tasks
       .sort(function(a, b) {
-        return b.priority - a.priority
+        return a.priority - b.priority
       })
       .filter(function(c) {
         if (context.state.filterByoperator !== null) {
@@ -598,7 +634,7 @@ export default class Board extends Component {
               onDragOver={e => this.onDragOver(e)}
               onDrop={e => this.onDrop(e, 'standby')}
             >
-              <span className="column-header">Work in progress</span>
+              <span className="column-header">En Espera</span>
               {tasks.standby}
             </div>
             <div
@@ -606,7 +642,14 @@ export default class Board extends Component {
               onDragOver={e => this.onDragOver(e)}
               onDrop={e => this.onDrop(e, 'notresponse')}
             >
-              <span className="column-header">Sin respuesta</span>
+              <span className="column-header">
+                Sin respuesta
+                <img
+                  src={require('../../images/flag-red.svg')}
+                  alt="Sin Respuesta"
+                  style={{ width: '20px', margin: '0px 0px 0px 0px' }}
+                />
+              </span>
               {tasks.notresponse}
             </div>
           </div>
@@ -636,31 +679,19 @@ export default class Board extends Component {
         </div>
         <div className="chatsBar">
           {this.state.activeTasks.map(item => (
-            <ChatContainer item={item.task} key={item.task.id} />
+            <ChatContainer
+              item={item.task}
+              desactivateTask={this.desactivateTask}
+              key={item.task.id}
+              messagesTask={this.state.messagesTask}
+              openChatTriger={this.openChat}
+              openChat={this.state.openChat}
+              trigerColumn={this.trigerColumn}
+            />
           ))}
         </div>
         <ToastContainer />
-        {this.state.showModal ? (
-          <Modal closeModal={this.closeModal} showModal={this.state.showModal}>
-            {/*<Task
-              task={this.state.curTask}
-              messagesTask={this.state.messagesTask}
-              getMessages={this.getMessages}
-              addMensages={this.addMensages}
-              addNote={this.addNote}
-              notesTask={this.state.notesTask}
-              getMyTasks={this.getMyTasks}
-              setModal={this.setModal}
-              getNotes={this.getNotes}
-              chageProvider={this.chageProvider}
-              chageProviderVal={this.state.chageProviderVal}
-              update911state={this.update911state}
-              updateLocalTask={this.updateLocalTask}
-            />*/}
-          </Modal>
-        ) : (
-          ''
-        )}
+        {this.state.isLoading === true ? <Loading /> : ''}
       </div>
     )
   }

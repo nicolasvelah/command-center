@@ -223,15 +223,99 @@
   width: 100%;
   background: transparent;
   z-index: 1;
-  display: inline-flex;
+  padding-left: 50px;
 }
 .chat-container {
   font-family: 'Yanone Kaffeesatz', sans-serif;
   background: #333;
   color: #fff;
   font-size: 10px;
-  padding: 10px;
-  margin: 0px 0.1%;
+  margin: 0px 0.3%;
+  display: inline-block;
+  bottom: 0;
+  vertical-align: bottom;
+}
+.chat-container .subcontainer {
+  padding: 5px 10px 0px;
+}
+.chat-container .live {
+  background: #53a93f;
+}
+.chat-container .standby {
+  background: #fdc509;
+}
+.chat-container .notresponse {
+  background: #c62b20;
+}
+.chat-container.notresponse .NotAswere {
+  display: none;
+}
+.ChatHeader {
+  display: inline-flex;
+}
+.chat-container .ChatNotificationsCounter {
+  position: relative;
+}
+.chat-container .ChatNotificationsCounter img {
+  display: none !important;
+}
+.chat-container .ChatNotificationsCounter .notificationNumber {
+  top: -10px;
+  right: 10px;
+}
+.chat-container .category-icon {
+  margin-right: 5px;
+  width: 26px;
+  height: 26px;
+  background: #fff;
+  border-radius: 50%;
+  text-align: center;
+  padding-top: 2px;
+}
+.chat-container .category-icon img {
+  margin: 0px;
+}
+.clientName {
+}
+.ChatContainerTools {
+  float: right;
+  margin-left: 10px;
+  font-size: 15px;
+  display: inline-flex;
+}
+.chat-container .closeChat {
+  margin-left: 10px;
+  cursor: pointer;
+}
+.openChat {
+  margin-top: 10px;
+  cursor: pointer;
+}
+.openBar {
+  background: #fff;
+  height: 3px;
+  width: 15px;
+}
+.chat-container.haveNotification {
+  background-color: #53a93f;
+  border-bottom-color: #53a93f;
+  -webkit-animation: title_widget_alert 1.5s 3;
+  animation: title_widget_alert 1.5s 3;
+}
+.chatTool {
+  width: 100%;
+  background: #0047b3;
+  height: 150px;
+}
+.NotAswere {
+  cursor: pointer;
+
+  margin: 3px 0px 0px 5px;
+}
+.NotAswere img {
+  width: 20px;
+  border-left: 1px solid #fff;
+  margin: 1px 0px 0px 5px;
 }
 
 @media (max-width: 767px) {
