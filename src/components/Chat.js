@@ -1,6 +1,6 @@
 import React from 'react'
 import { getUser } from '../services/auth'
-import send from '../images/send.svg'
+//import send from '../images/send.svg'
 import '../assets/css/chat.css'
 
 export default class Chat extends React.Component {
@@ -91,7 +91,7 @@ export default class Chat extends React.Component {
         </div>
         <div className="mensagessForm">
           <form id={'chat-' + this.props.idInput}>
-            <input
+            <textarea
               type="text"
               className="input"
               placeholder="Escribe un mensaje"
@@ -106,12 +106,12 @@ export default class Chat extends React.Component {
               }
               onKeyPress={this.props.sendMenssageByEnter}
             />
-            <img
+            {/*<img
               src={send}
               alt=""
               className="sendMenssage"
               onClick={this.props.sendMenssage}
-            />
+            />*/}
           </form>
         </div>
       </div>

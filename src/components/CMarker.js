@@ -57,7 +57,8 @@ export default class CMarker extends React.Component {
   render() {
     const { id, info, isProvider } = this.props
     const { active } = this.state
-    return (
+    console.log('INFO', info)
+    return typeof info !== undefined ? (
       <Wrapper
         className={`${active ? 'active' : ''}`}
         style={{ backgroundColor: isProvider ? '#ffa97a' : '#2abbdd' }}
@@ -77,6 +78,8 @@ export default class CMarker extends React.Component {
           </p>
         </div>
       </Wrapper>
+    ) : (
+      ''
     )
   }
 }
