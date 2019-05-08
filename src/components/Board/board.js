@@ -42,6 +42,8 @@ export default class Board extends Component {
       activeTasks: [],
       openChat: [],
       isLoading: false,
+      chatTopPosition: '-37px',
+      whoFocusItem: null,
     }
     this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)
@@ -54,6 +56,8 @@ export default class Board extends Component {
     this.updateLocalTask = this.updateLocalTask.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
     this.activateTask = this.activateTask.bind(this)
+
+    this.RefChatContainer = new Map()
   }
 
   async componentDidMount() {
@@ -175,6 +179,12 @@ export default class Board extends Component {
       this.notificationMessages(id, 'provider')
     }
   }
+  whoFocus = id => {
+    console.log('focussssssss', id)
+    this.setState({
+      whoFocusItem: id,
+    })
+  }
   //NOTIFICATIONS ICON ALERT CONTROL
   notificationMessages = (id, type) => {
     document.getElementById('taskid_' + id).classList.add('haveNotification')
@@ -218,7 +228,7 @@ export default class Board extends Component {
       messagesTask,
     })
   }
-  openChat = async id => {
+  openChat = async (id, column) => {
     let { openChat } = this.state
     let includesThis = true
 
@@ -233,12 +243,25 @@ export default class Board extends Component {
 
     if (includesThis) {
       openChat.push(id)
-      this.trigerColumn('live', id)
-    } else {
-      this.trigerColumn('standby', id)
     }
+
+    await this.trigerColumn(column, id)
+
     this.setState({ openChat })
-    //console.log('openChat', openChat)
+
+    return true
+  }
+  chatTopPositionTriger = async () => {
+    let { chatTopPosition } = this.state
+    chatTopPosition = '-37px'
+    let activetask = get('activeTasks')
+    await activetask.filter(item => {
+      if (item.task.status.name === 'live') {
+        chatTopPosition = '-188px'
+      }
+      return item
+    })
+    this.setState({ chatTopPosition })
   }
 
   //NOTES
@@ -259,49 +282,94 @@ export default class Board extends Component {
   }
 
   //ORDERS TRIGERS
+  updateActivateTask = async (column, id) => {
+    let activetask = get('activeTasks')
+    activetask = await activetask.filter(item => {
+      if (item.task.id === id) {
+        item.task.status.name = column
+      }
+      return item
+    })
+    save('activeTasks', activetask)
+
+    await this.setState({ activeTasks: activetask })
+    console.log('updateActivateTask', activetask)
+  }
   activateTask = async (id, icon) => {
     try {
-      const { activeTasks } = this.state
+      let { activeTasks } = this.state
 
       let includesThis = false
-      activeTasks.filter(item => {
+      let statusS = null
+      let task = null
+      let execute = false
+      let index = null
+      activeTasks = activeTasks.filter((item, i) => {
         if (item.task.id === id) {
           includesThis = true
+          statusS = item.task.status.name
+          item.task.status.name = 'live'
+          task = item
+          item.icon = icon
+          index = i
         }
         return item
       })
-
       if (!includesThis) {
-        let task = null
+        index = activeTasks.length
         await this.state.tasks.filter((item, index) => {
           if (item.id === id) {
             task = item
           }
           return item
         })
-        task.icon = icon
+      }
+      task.icon = icon
+
+      if (!includesThis) {
         if (task.status.name !== 'complete') {
-          await this.trigerColumn('live', id)
-          await this.openChat(task.id)
           activeTasks.push({ task })
-
-          save('activeTasks', activeTasks)
-
-          this.setState({
-            activeTasks,
-          })
-
-          //console.log('activeTasks ------------', activeTasks)
-
-          await this.getMessages(task.id)
-          //await this.getNotes(task.id)
-
-          this.notificationOff(task.id, 'provider')
+          execute = true
         } else {
           alert(
             'Las tareas en la columna de resuelto no pueden ser gestionadas. Debes reabrirla para poder gestionarla.'
           )
+          execute = false
         }
+      } else if (statusS !== 'live') {
+        execute = true
+      }
+
+      if (execute) {
+        console.log('execute', execute)
+        await this.openChat(id, 'live')
+
+        save('activeTasks', activeTasks)
+
+        this.setState({
+          activeTasks,
+        })
+
+        console.log('this.RefChatContainer--------', this.RefChatContainer)
+        Array.from(this.RefChatContainer.values())
+          .filter(node => node != null)
+          .forEach(node => {
+            if (node.props.item.id === id) {
+              node.haveToOpenChat('live', 'board')
+            }
+          })
+
+        console.log('activeTasks ------------', activeTasks)
+
+        //await this.getMessages(task.id)
+        //await this.getNotes(task.id)
+
+        //this.notificationOff(task.id, 'provider')
+
+        const scrollWidthValue = (index - 1) * 420
+        //console.log('scrollWidthValue', scrollWidthValue)
+        const chatsBar = document.getElementById('chatsBar')
+        chatsBar.scrollTo(scrollWidthValue, 0)
       }
     } catch (err) {
       console.log('error', err.message)
@@ -319,16 +387,16 @@ export default class Board extends Component {
         console.log('des activeTasks', activeTasks)
         const activeTasksFilter = activeTasks.filter((item, index) => {
           let itemRet = item
-          //console.log('item.task.id', item.task.id)
+          console.log('item.task.id', item.task.id)
           if (item.task.id === id) {
             itemRet = null
           }
           return itemRet
         })
-        //console.log(' des activeTasksFilter', activeTasksFilter)
+        console.log(' des activeTasksFilter', activeTasksFilter)
 
-        this.trigerColumn('complete', id)
-        await save('activeTasks', activeTasksFilter)
+        await this.trigerColumn('complete', id)
+        //await save('activeTasks', activeTasksFilter)
 
         await this.setState({
           activeTasks: activeTasksFilter,
@@ -342,6 +410,9 @@ export default class Board extends Component {
   //COLUMN OR STATUS TRIGER
   trigerColumn = async (col, id) => {
     try {
+      console.log('col', col)
+      console.log('id', id)
+      await this.updateActivateTask(col, id)
       await updateStatus(id, col)
 
       let { tasks } = this.state
@@ -420,10 +491,12 @@ export default class Board extends Component {
       let reopen = false
       let idNumber = null
       let operator = null
+      let service = null
       await this.state.tasks.filter(task => {
         if ('id_' + task.id === id) {
           idNumber = task.id
           operator = task.assignedTo
+          service = task.service.categories.name
           if (task.status.name === 'complete') {
             reopen = true
           }
@@ -434,24 +507,42 @@ export default class Board extends Component {
         alert(
           'Esta columna es solo para tareas que no tengan asiganado un operador.'
         )
-        this.setState({
-          dragStard: false,
-        })
+
         return
       }
       let reopenconfirm = true
       if (reopen) {
         reopenconfirm = window.confirm('¿Estás segur@ de lo que haces?')
       }
+      id = id.split('_')
+      id = Number(id[1])
       if (reopenconfirm) {
         this.trigerColumn(cat, idNumber)
 
         if (cat === 'complete') {
-          id = id.split('_')
-          id = Number(id[1])
-          this.desactivateTask(id)
+          await this.desactivateTask(id)
         }
       }
+      if (cat !== 'complete') {
+        let icon = service
+        icon =
+          icon
+            .toString()
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w]+/g, '')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '') + '.svg'
+        await this.activateTask(id, icon)
+      }
+      //console.log('this.RefChatContainer--------', this.RefChatContainer)
+      Array.from(this.RefChatContainer.values())
+        .filter(node => node != null)
+        .forEach(node => {
+          if (node.props.item.id === id) {
+            node.haveToOpenChat(cat, 'board')
+          }
+        })
     }
     this.setState({
       dragStard: false,
@@ -530,6 +621,7 @@ export default class Board extends Component {
       return []
     }
   }
+
   render() {
     //TASK STATES
     let tasks = {
@@ -571,6 +663,7 @@ export default class Board extends Component {
             t={t}
             onDragStart={this.onDragStart}
             activateTask={this.activateTask}
+            whoFocusItem={this.state.whoFocusItem}
           />
         )
         return true
@@ -677,18 +770,34 @@ export default class Board extends Component {
             )}
           </div>
         </div>
-        <div className="chatsBar">
-          {this.state.activeTasks.map(item => (
-            <ChatContainer
-              item={item.task}
-              desactivateTask={this.desactivateTask}
-              key={item.task.id}
-              messagesTask={this.state.messagesTask}
-              openChatTriger={this.openChat}
-              openChat={this.state.openChat}
-              trigerColumn={this.trigerColumn}
-            />
-          ))}
+        <div className="chatsBar" id="chatsBar">
+          <div
+            className="absoluteChatBottom"
+            style={{
+              top: this.state.chatTopPosition,
+              width: this.state.activeTasks.length * 300 + 'px',
+            }}
+          >
+            {this.state.activeTasks
+              .sort(function(a, b) {
+                return ('' + a.task.status.name).localeCompare(
+                  b.task.status.name
+                )
+              })
+              .map(item => (
+                <ChatContainer
+                  ref={c => this.RefChatContainer.set(item.task.id, c)}
+                  item={item.task}
+                  desactivateTask={this.desactivateTask}
+                  key={item.task.id}
+                  messagesTask={this.state.messagesTask}
+                  openChatTriger={this.openChat}
+                  chatTopPositionTriger={this.chatTopPositionTriger}
+                  whoFocus={this.whoFocus}
+                  whoFocusItem={this.state.whoFocusItem}
+                />
+              ))}
+          </div>
         </div>
         <ToastContainer />
         {this.state.isLoading === true ? <Loading /> : ''}

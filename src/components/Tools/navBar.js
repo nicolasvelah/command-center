@@ -27,7 +27,7 @@ export default class navBar extends Component {
   setModal = ct => {
     let { content } = this.state
     if (ct === 'ct') {
-      content = <CreateTask />
+      //content = <CreateTask />
     } else if (ct === 'bs') {
       content = <SearchPage />
     }

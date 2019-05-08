@@ -177,7 +177,7 @@ class MapServiceTacking extends Component {
       try {
         const user = await this.findUser(this.props.providerId, false)
         console.log('Provider-------------------', user.data)
-        if (user.data !== null) {
+        if (user.data !== null && user.data !== '') {
           await this.setState({ providers: [user.data] })
         }
       } catch (error) {
@@ -395,7 +395,7 @@ class MapServiceTacking extends Component {
             address={this.state.address}
           />
           {clients.map((client, index) =>
-            client !== null ? (
+            client !== null && client !== '' ? (
               <CMarker
                 key={index}
                 lat={client.lat}
@@ -411,7 +411,7 @@ class MapServiceTacking extends Component {
           )}
           {this.props.providerId !== 0 && providers.length > 0
             ? providers.map((provider, index) =>
-                provider !== null ? (
+                provider !== null && provider !== '' ? (
                   <CMarker
                     key={index}
                     lat={provider.lat}

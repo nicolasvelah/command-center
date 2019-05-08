@@ -1,0 +1,67 @@
+.chatContainerV2 {
+  margin-left: 0;
+  width: 100%;
+  position: relative;
+}
+.chatV2 {
+  height: 295px;
+  border-top: 1px solid #dedede;
+}
+
+.mensagessFormV2 {
+  width: 100%;
+  background: #fff;
+  position: relative;
+}
+.mensagessFormV2 .ChatInput {
+  width: 100%;
+  border: none;
+  height: 50px;
+  line-height: normal;
+  padding-right: 5px;
+  padding-left: 5px;
+  border-radius: 0;
+  font-size: 12px;
+}
+.mensagessFormV2 .ChatInput:focus {
+  outline: none;
+  border-top: 1px solid #0047b3;
+}
+
+.mensagessFormV2 .sendMenssage {
+  width: 20px;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 0px;
+  top: 3px;
+  right: 5px;
+  position: absolute;
+  display: none;
+}
+
+.ExtraData {
+  max-height: 0;
+  overflow: hidden;
+  transition: 1s all;
+  line-height: 14px;
+}
+.chatFocus .ExtraData {
+  max-height: initial;
+  height: 72px;
+}
+
+.ChatMap {
+  max-height: 0;
+  overflow: hidden;
+  transition: 1s all;
+  line-height: 14px;
+  background: #fff;
+}
+.ChatMap .mapSearch {
+  display: none;
+}
+.chatFocus .ChatMap {
+  max-height: initial;
+  height: 200px;
+  border: 2px solid #53a93f;
+}

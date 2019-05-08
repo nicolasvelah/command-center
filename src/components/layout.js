@@ -64,7 +64,7 @@ export default class Layout extends React.Component {
               {typeof window !== 'undefined' ? (
                 !window.google ? (
                   <script
-                    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCW_VtwnO2cCNOYEGkd3tigdoCxeRxAnU4&libraries=places"
+                    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnynwND8x-o856iB4XQgsFR9Fr1vqIYGU&libraries=places"
                     async
                     defer
                   />

@@ -49,7 +49,12 @@ export default class TimerComp extends React.Component {
     } else if (diffMs > 60000) {
       alertState = 1
     }
-    this.setState({ alertState })
+
+    if (this.props.status !== 'asigned' && this.props.status !== 'complete') {
+      diffMs = 0
+      alertState = 0
+    }
+    this.setState({ alertState, diffMs })
   }
   render() {
     return (
@@ -66,6 +71,7 @@ export default class TimerComp extends React.Component {
           <Timer
             initialTime={this.state.diffMs}
             lastUnit="h"
+            startImmediately={this.props.startImmediately}
             checkpoints={[
               {
                 time: 60000,

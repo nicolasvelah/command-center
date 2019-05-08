@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: row;
   font-family: Arial, Helvetica, sans-serif;
+  padding-bottom: 420px;
 }
 .b-column {
   width: 23%;
@@ -36,12 +37,31 @@
   padding: 0px 3px;
   font-size: 11px;
 }
+.taskVisualTraking {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  color: #fff;
+  text-align: center;
+  font-size: 11px;
+  margin-right: 5px;
+}
+.ChatHeader .taskVisualTraking {
+  margin-bottom: 5px;
+}
 .task {
   margin: 5px 0 0;
   background: #fff;
   border-radius: 5px;
   padding: 5px 10px;
   cursor: pointer;
+}
+.taskHead div {
+  display: inline-block;
+}
+.taskHead .clientName {
+  font-size: 12px;
 }
 .asigned .task {
   background: #fff;
@@ -61,9 +81,14 @@
 }
 
 .task-header {
-  display: flex;
-  flex-direction: row;
   height: 25px;
+  position: relative;
+}
+.task-header.complete .timerState {
+  display: none;
+}
+.task-header.complete div {
+  color: #999;
 }
 .task h3 {
   font-weight: normal;
@@ -82,14 +107,45 @@
   max-width: 22px;
   width: 100%;
 }
+.task.SOS {
+  border: 1px solid red;
+}
+.task.SOS .serviceTitle {
+  color: red;
+}
+.task.SOS.complete {
+  border: none;
+}
+.task.SOS .serviceTitle {
+  color: inherit;
+}
 .task-data {
   font-size: 11px;
   line-height: normal;
-  margin-bottom: 5px;
+  margin: 5px 0px;
+  border-top: 1px solid #dedede;
+  padding-top: 5px;
+  display: flex;
+}
+.service img {
+  max-width: 30px;
+  margin: 10px 5px 0px;
+  vertical-align: middle;
+}
+.serviceTitle {
+  font-size: 15px;
+}
+.service {
+  font-size: 10px;
+  text-align: center;
+  line-height: 11px;
+  width: 18%;
+  margin-right: 5px;
 }
 .operator {
   position: absolute;
-  right: 27px;
+  right: -5px;
+  top: -30px;
 }
 .operator span {
   text-transform: uppercase;
@@ -180,12 +236,13 @@
   display: none;
   font-size: 8px;
   height: 23px;
-  right: 42px;
+  right: 0px;
   position: relative;
   top: 3px;
   border-radius: 5px;
   color: #fff;
   padding: 0 5px;
+  float: right;
 }
 .going #ProviderState {
   background: rgba(0, 204, 255, 0.767);
@@ -223,20 +280,37 @@
   width: 100%;
   background: transparent;
   z-index: 1;
-  padding-left: 50px;
+  padding-left: 0px;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  /*visibility: hidden;*/
+  scrollbar-width: none;
+}
+.chatsBar::-webkit-scrollbar {
+  visibility: visible;
+  display: none;
+}
+.absoluteChatBottom {
+  visibility: hidden;
 }
 .chat-container {
   font-family: 'Yanone Kaffeesatz', sans-serif;
   background: #333;
   color: #fff;
   font-size: 10px;
-  margin: 0px 0.3%;
+  margin: 0px 0.1%;
   display: inline-block;
-  bottom: 0;
   vertical-align: bottom;
+  position: relative;
+  width: 420px;
+  visibility: visible;
 }
 .chat-container .subcontainer {
-  padding: 5px 10px 0px;
+  padding: 5px 0px 0px;
 }
 .chat-container .live {
   background: #53a93f;
@@ -252,6 +326,12 @@
 }
 .ChatHeader {
   display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0px 10px;
+}
+.ChatHeader .clientDataName {
+  display: flex;
 }
 .chat-container .ChatNotificationsCounter {
   position: relative;
@@ -275,7 +355,9 @@
 .chat-container .category-icon img {
   margin: 0px;
 }
-.clientName {
+.serviceNameChat {
+  font-weight: bold;
+  font-size: 14px;
 }
 .ChatContainerTools {
   float: right;
@@ -304,8 +386,28 @@
 }
 .chatTool {
   width: 100%;
-  background: #0047b3;
-  height: 150px;
+  background: #f5f5f5;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  height: 380px;
+  display: flex;
+}
+.chatFocus .chatTool {
+  height: 455px;
+}
+.chatGeneric {
+  width: 50%;
+  height: 100%;
+  color: #37474f;
+  display: inline-block;
+  padding: 0px;
+}
+.ChatInfoMain {
+  padding: 0px 10px;
+  margin-bottom: 10px;
+}
+.ChatClient {
+  border-right: 1px solid #ddd;
 }
 .NotAswere {
   cursor: pointer;
@@ -316,6 +418,12 @@
   width: 20px;
   border-left: 1px solid #fff;
   margin: 1px 0px 0px 5px;
+}
+.chatFocusBoard {
+  -webkit-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
+  -moz-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
+  box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
+  border: 2px solid #53a93f !important;
 }
 
 @media (max-width: 767px) {
