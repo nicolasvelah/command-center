@@ -14,17 +14,17 @@ const Error = styled.div`
 `
 
 const ProviderItemSearch = styled.div`
+  overflow: auto;
+  height: 340px;
   .providerItemSearch {
-    width: 32%;
-    display: inline-block;
-    border: 12px solid #eee;
+    width: 90%;
+    border: 1px solid #eee;
     padding: 10px;
     margin-left: 1%;
     font-size: 12px;
-    height: 270px;
+    line-height: 13px;
     h3 {
       font-size: 15px;
-      min-height: 45px;
     }
   }
 `
@@ -192,8 +192,8 @@ export default class AsignProvider extends Component {
       return
     }
     try {
-      console.log('this.props.orderId', this.props.orderId)
-      console.log('providerId', providerId)
+      //console.log('this.props.orderId', this.props.orderId)
+      //console.log('providerId', providerId)
       await axios.post(
         `${process.env.API_URL}/orders/changeOrderProvider`,
         {
@@ -213,9 +213,9 @@ export default class AsignProvider extends Component {
         service: { value: '' },
         provider: { value: '' },
       })
-      await this.props.getMyTasks()
-      this.props.setModal(this.props.orderId)
-      this.props.activateProviderTools()
+      //await this.props.getMyTasks()
+      //this.props.setModal(this.props.orderId)
+      //this.props.activateProviderTools()
     } catch (err) {
       console.log(err)
       this.setState({ isSending: false, errorSending: true })
@@ -237,7 +237,7 @@ export default class AsignProvider extends Component {
 
   render() {
     return (
-      <form className="form">
+      <form className="form ProviderAsignsV2">
         <div
           className={
             this.state.errorSending ? 'errorSending' : 'noErrorSending'
@@ -282,53 +282,55 @@ export default class AsignProvider extends Component {
         )}
         {this.state.providerShow ? (
           <ProviderItemSearch>
-            {typeof this.state.providers !== undefined &&
-            this.state.providers.length > 0
-              ? this.state.providers.map((provider, key) => (
-                  <div key={key} className={'providerItemSearch'}>
-                    <h3>{provider.Provider.busnessName}</h3>
-                    <div>
-                      Representante:{' '}
-                      {provider.Provider.user.name +
-                        ' ' +
-                        provider.Provider.user.lastName}
+            <div>
+              {typeof this.state.providers !== undefined &&
+              this.state.providers.length > 0
+                ? this.state.providers.map((provider, key) => (
+                    <div key={key} className={'providerItemSearch'}>
+                      <h3>{provider.Provider.busnessName}</h3>
+                      <div>
+                        Representante:{' '}
+                        {provider.Provider.user.name +
+                          ' ' +
+                          provider.Provider.user.lastName}
+                      </div>
+                      <div>
+                        Rate:{' '}
+                        {((rows, i) => {
+                          const context = provider
+                          while (++i <= context.Provider.rate - 1) {
+                            rows.push(
+                              <div className="stars" key={i}>
+                                <img src={star} alt="rate" />
+                              </div>
+                            )
+                          }
+                          return rows
+                        })([], 0, 10)}
+                      </div>
+                      <div>Telefono: {provider.Provider.user.phone}</div>
+                      <div>Estado: {provider.Provider.user.appState}</div>
+                      <div>País: {provider.Provider.user.country}</div>
+                      <div>
+                        Ciudad:{' '}
+                        {provider.Provider.user.city !== null
+                          ? provider.Provider.user.city
+                          : 'Sin definir'}
+                      </div>
+                      <div className="text-left">
+                        <button className="btn ma-right-5">Mapa</button>
+                        <button className="btn ma-right-5">Contactar</button>
+                        <button
+                          onClick={e => this.sendTask(e, provider.providerId)}
+                          className="btn b-verde"
+                        >
+                          Asignar
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      Rate:{' '}
-                      {((rows, i) => {
-                        const context = provider
-                        while (++i <= context.Provider.rate - 1) {
-                          rows.push(
-                            <div className="stars" key={i}>
-                              <img src={star} alt="rate" />
-                            </div>
-                          )
-                        }
-                        return rows
-                      })([], 0, 10)}
-                    </div>
-                    <div>Telefono: {provider.Provider.user.phone}</div>
-                    <div>Estado: {provider.Provider.user.appState}</div>
-                    <div>País: {provider.Provider.user.country}</div>
-                    <div>
-                      Ciudad:{' '}
-                      {provider.Provider.user.city !== null
-                        ? provider.Provider.user.city
-                        : 'Sin definir'}
-                    </div>
-                    <div className="text-left">
-                      <button className="btn ma-right-5">Mapa</button>
-                      <button className="btn ma-right-5">Contactar</button>
-                      <button
-                        onClick={e => this.sendTask(e, provider.providerId)}
-                        className="btn b-verde"
-                      >
-                        Asignar
-                      </button>
-                    </div>
-                  </div>
-                ))
-              : ''}
+                  ))
+                : ''}
+            </div>
           </ProviderItemSearch>
         ) : (
           ''

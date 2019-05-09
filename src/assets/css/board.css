@@ -1,12 +1,12 @@
 .board {
   width: 100%;
-  display: flex;
+  display: block;
   flex-direction: row;
   font-family: Arial, Helvetica, sans-serif;
   padding-bottom: 40px;
 }
 .b-column {
-  width: 23%;
+  width: 33%;
   margin: 10px 1%;
   padding: 10px;
   background-color: #eaeaea;
@@ -133,7 +133,7 @@
   vertical-align: middle;
 }
 .serviceTitle {
-  font-size: 15px;
+  font-size: 13px;
 }
 .service {
   font-size: 10px;
@@ -222,7 +222,7 @@
   margin-bottom: 0px;
   float: right;
   position: relative;
-  bottom: 25px;
+  bottom: 0px;
   display: none;
 }
 .haveNotification.not_provider .notProvider {
@@ -267,7 +267,7 @@
   margin-right: -27px;
   float: right;
   position: relative;
-  bottom: 29px;
+  bottom: 4px;
 
   -webkit-border-radius: 20px 20px 20px 20px;
   display: none;
@@ -388,7 +388,7 @@
   background: #f5f5f5;
   border-left: 1px solid #ddd;
   border-right: 1px solid #ddd;
-  height: 380px;
+  height: 391px;
   display: flex;
 }
 .chatFocus .chatTool {
@@ -429,6 +429,142 @@
 }
 .live .timerTask {
   color: #333 !important;
+}
+.backlog {
+  display: none;
+}
+.asignetOverflow {
+  overflow: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 2;
+  margin: 0px;
+  padding: 0px;
+  border-radius: 0;
+  min-height: 80px;
+  border-bottom: 1px solid #b4b4b4;
+  text-align: right;
+  background: #fdfdfd;
+}
+
+.asigned.b-column {
+  margin: 0px;
+  padding: 5px 0px 10px 30px;
+  border-radius: 0;
+  min-height: 80px;
+  display: inline-flex;
+  width: 180px;
+  background: #fdfdfd;
+}
+.incurse.b-column .operator {
+  float: none;
+  margin: 0px;
+}
+.asigned.b-column .clientName,
+.asigned.b-column .task-data {
+  display: none;
+}
+.asigned.b-column .task {
+  display: inline-block;
+  margin: 0px 10px 0px 0px;
+  text-align: left;
+  background: #eee;
+  border: 1px solid #ddd;
+}
+.asigned.b-column .task.SOS {
+  border: 1px solid #c62b20;
+}
+.asigned.b-column .column-header {
+  display: inline-block;
+  font-size: 10px;
+  margin: 0px;
+  transform: rotate(-90deg);
+  position: absolute;
+  left: -10px;
+  top: 25px;
+}
+.incurse.b-column {
+  width: 100%;
+  margin: 80px 0 0;
+  background: none;
+}
+.incurse.b-column .b-row {
+  display: inline-block;
+  vertical-align: top;
+  width: 32.6%;
+  margin: 0px 0.3%;
+  padding: 10px;
+  background-color: #eaeaea;
+  min-height: 230px;
+  border-radius: 5px;
+  position: relative;
+}
+.incurse.b-column .column-header {
+  display: none;
+  font-size: 11px;
+  text-align: right;
+  padding-right: 40px;
+}
+.incurse.b-column .b-row .column-header {
+  font-size: 11px;
+  padding-right: 0px;
+  display: block;
+}
+.b-row .task {
+  float: left;
+  width: 48%;
+  min-height: 160px;
+}
+.b-row .task:nth-child(1n + 1) {
+  margin-right: 2%;
+}
+.complete.b-column {
+  width: 97.5%;
+  padding-left: 35px;
+}
+
+.complete.b-column .clientName,
+.complete.b-column .task-data {
+  display: none;
+}
+.complete.b-column .task {
+  display: inline-block;
+  margin: 0px 5px 5px 0px;
+  text-align: left;
+  background: #eee;
+  border: 1px solid #ddd;
+  width: 175px;
+}
+
+.complete.b-column .column-header {
+  display: inline-block;
+  font-size: 10px;
+  margin: 0px;
+  transform: rotate(-90deg);
+  position: absolute;
+  left: -10px;
+  top: 25px;
+}
+.complete.b-column .taskVisualTraking {
+  background: #999 !important;
+}
+.complete.b-column #ProviderState {
+  display: none !important;
+}
+.ProviderAsignsV2 {
+  color: #37474f;
+  padding: 10px;
+}
+.ProviderAsignsV2 h1 {
+  font-size: 15px;
+  margin: 0px;
+}
+.ProviderAsignsV2 .input {
+  margin-bottom: 5px;
+  max-width: 210px;
 }
 
 @media (max-width: 767px) {

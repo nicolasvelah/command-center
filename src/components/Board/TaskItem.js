@@ -95,7 +95,7 @@ export default class TaskItem extends React.Component {
               : 'No definido'}{' '}
             <br />
             <b>Creada el:</b> {this.props.t.createdAt} <br />
-            <b>Locación: </b> {this.props.t.country} / {this.props.t.city}
+            {/*<b>Locación: </b> {this.props.t.country} / {this.props.t.city}*/}
           </div>
         </div>
         <div className="task-footer">

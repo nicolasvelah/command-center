@@ -17,7 +17,7 @@ import {
   updateChatState,
 } from '../../services/helpers'
 
-import Filter from './Filter'
+//import Filter from './Filter'
 import Loading from '../Tools/Loading'
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -712,7 +712,7 @@ export default class Board extends Component {
     //DASHBOARD
     return (
       <div className={this.state.dragStard ? 'dragging' : ''}>
-        <div className="Welcome">Bienvenido {getUser().name}</div>
+        {/*<div className="Welcome">Bienvenido {getUser().name}</div>}
 
         {getUser().type !== 'operator' ? (
           <Filter
@@ -724,7 +724,7 @@ export default class Board extends Component {
           />
         ) : (
           ''
-        )}
+        )*/}
         <div className="board">
           {getUser().type !== 'operator' ? (
             <div
@@ -740,36 +740,22 @@ export default class Board extends Component {
           ) : (
             <div />
           )}
-          <div
-            className="asigned b-column"
-            onDragOver={e => this.onDragOver(e)}
-            onDrop={e => this.onDrop(e, 'asigned')}
-            style={getUser().type === 'operator' ? { width: '31%' } : {}}
-          >
-            <span className="column-header">Asignados</span>
-            {tasks.asigned}
+          <div className="asignetOverflow">
+            <div
+              className="asigned b-column"
+              onDragOver={e => this.onDragOver(e)}
+              onDrop={e => this.onDrop(e, 'asigned')}
+              style={{ width: tasks.asigned.length * 180 + 'px' }}
+            >
+              <span className="column-header">Asignados</span>
+              {tasks.asigned}
+            </div>
           </div>
           <div
             className="incurse  b-column"
             style={getUser().type === 'operator' ? { width: '31%' } : {}}
           >
             <span className="column-header">En curso</span>
-            <div
-              className="live b-row"
-              onDragOver={e => this.onDragOver(e)}
-              onDrop={e => this.onDrop(e, 'live')}
-            >
-              <span className="column-header">En Vivo</span>
-              {tasks.live}
-            </div>
-            <div
-              className="standby b-row"
-              onDragOver={e => this.onDragOver(e)}
-              onDrop={e => this.onDrop(e, 'standby')}
-            >
-              <span className="column-header">En Espera</span>
-              {tasks.standby}
-            </div>
             <div
               className="notresponse b-row"
               onDragOver={e => this.onDragOver(e)}
@@ -784,6 +770,22 @@ export default class Board extends Component {
                 />
               </span>
               {tasks.notresponse}
+            </div>
+            <div
+              className="standby b-row"
+              onDragOver={e => this.onDragOver(e)}
+              onDrop={e => this.onDrop(e, 'standby')}
+            >
+              <span className="column-header">En Espera</span>
+              {tasks.standby}
+            </div>
+            <div
+              className="live b-row"
+              onDragOver={e => this.onDragOver(e)}
+              onDrop={e => this.onDrop(e, 'live')}
+            >
+              <span className="column-header">En Vivo</span>
+              {tasks.live}
             </div>
           </div>
           <div
@@ -822,6 +824,12 @@ export default class Board extends Component {
               .sort(function(a, b) {
                 return ('' + a.task.status.name).localeCompare(
                   b.task.status.name
+                )
+              })
+              .filter(function(item) {
+                return (
+                  item.task.status.name !== 'asigned' &&
+                  item.task.status.name !== 'complete'
                 )
               })
               .map(item => (

@@ -4,6 +4,7 @@ import React from 'react'
 import Chat from './ChatV2'
 import MapServiceTacking from '../Maps/MapServiceTacking'
 import star from '../../images/star-full.svg'
+import AsignProvider from './AsignProvider'
 
 export default class ChatContainer extends React.Component {
   constructor(props) {
@@ -96,7 +97,9 @@ export default class ChatContainer extends React.Component {
 
   goBottom = id => {
     var element = document.getElementById(id)
-    element.scrollTop = element.scrollHeight - element.clientHeight
+    if (element !== null) {
+      element.scrollTop = element.scrollHeight - element.clientHeight
+    }
   }
 
   render() {
@@ -206,43 +209,49 @@ export default class ChatContainer extends React.Component {
                   addNewMessage={this.props.addNewMessage}
                 />
               </div>
-              <div className="ChatProvider chatGeneric">
-                <div className="ChatInfoMain">
-                  <b>Proveedor:</b>
-                  {' ' +
-                    item.provider.user.name +
-                    ' ' +
-                    item.provider.user.lastName}
-                  <div className="ExtraData ExtraDataProvider">
-                    <b>Negocio:</b> {item.provider.busnessName}
-                    <br />
-                    <b>Rate:</b>{' '}
-                    {((rows, i) => {
-                      while (++i <= item.provider.rate - 1) {
-                        rows.push(
-                          <div className="stars" key={i}>
-                            <img src={star} alt="rate" />
-                          </div>
-                        )
-                      }
-                      return rows
-                    })([], 0, 10)}
-                    <br />
-                    <b>Email:</b> {item.provider.user.email}
-                    <br />
-                    <b>Telf:</b> {item.provider.user.phone}
+              {item.provider.user.name !== 'N/A' &&
+              item.provider.user.name !== 'SIN PROVEEDOR' &&
+              item.provider.user.name !== '911' ? (
+                <div className="ChatProvider chatGeneric">
+                  <div className="ChatInfoMain">
+                    <b>Proveedor:</b>
+                    {' ' +
+                      item.provider.user.name +
+                      ' ' +
+                      item.provider.user.lastName}
+                    <div className="ExtraData ExtraDataProvider">
+                      <b>Negocio:</b> {item.provider.busnessName}
+                      <br />
+                      <b>Rate:</b>{' '}
+                      {((rows, i) => {
+                        while (++i <= item.provider.rate - 1) {
+                          rows.push(
+                            <div className="stars" key={i}>
+                              <img src={star} alt="rate" />
+                            </div>
+                          )
+                        }
+                        return rows
+                      })([], 0, 10)}
+                      <br />
+                      <b>Email:</b> {item.provider.user.email}
+                      <br />
+                      <b>Telf:</b> {item.provider.user.phone}
+                    </div>
                   </div>
+                  <Chat
+                    messagesTask={item.messagesAll.provider}
+                    sid={'prov_' + item.id}
+                    goBottom={this.goBottom}
+                    orderId={item.id}
+                    isClientTo={false}
+                    to={item.provider.user.id}
+                    addNewMessage={this.props.addNewMessage}
+                  />
                 </div>
-                <Chat
-                  messagesTask={item.messagesAll.provider}
-                  sid={'prov_' + item.id}
-                  goBottom={this.goBottom}
-                  orderId={item.id}
-                  isClientTo={false}
-                  to={item.provider.user.id}
-                  addNewMessage={this.props.addNewMessage}
-                />
-              </div>
+              ) : (
+                <AsignProvider orderId={item.id} />
+              )}
             </div>
           ) : (
             ''
