@@ -114,7 +114,6 @@ export default class Chat extends React.Component {
             />
           </form>
         </div>
-        
       </div>
     )
   }

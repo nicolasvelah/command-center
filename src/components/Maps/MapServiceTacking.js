@@ -177,7 +177,11 @@ class MapServiceTacking extends Component {
       try {
         const user = await this.findUser(this.props.providerId, false)
         console.log('Provider-------------------', user.data)
-        if (user.data !== null && user.data !== '') {
+        if (
+          user.data !== null &&
+          typeof user.data !== undefined &&
+          user.data !== ''
+        ) {
           await this.setState({ providers: [user.data] })
         }
       } catch (error) {

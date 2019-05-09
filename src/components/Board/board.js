@@ -14,6 +14,7 @@ import {
   notesAll,
   getAllTasks,
   updateStatus,
+  updateChatState,
 } from '../../services/helpers'
 
 import Filter from './Filter'
@@ -45,12 +46,10 @@ export default class Board extends Component {
       chatTopPosition: '-37px',
       whoFocusItem: null,
     }
-    this.getMessages = this.getMessages.bind(this)
     this.getNotes = this.getNotes.bind(this)
     this.chageProvider = this.chageProvider.bind(this)
     this.addMensages = this.addMensages.bind(this)
     this.addNote = this.addNote.bind(this)
-    this.getMyTasks = this.getMyTasks.bind(this)
     this.getOperators = this.getOperators.bind(this)
     this.update911state = this.update911state.bind(this)
     this.updateLocalTask = this.updateLocalTask.bind(this)
@@ -111,7 +110,7 @@ export default class Board extends Component {
     const context = this
     messaging.onMessage(function(payload) {
       if (isLoggedIn()) {
-        //console.log('Frond Message received.', payload)
+        console.log('Frond Message received.', payload)
         const notification = JSON.parse(payload.data.content)
         if (notification.type === 'chat') {
           context.chatNotifications(notification.orderId)
@@ -165,22 +164,65 @@ export default class Board extends Component {
   }
 
   //CHAT
-  chatNotifications = id => {
-    if (typeof this.state.curTask[0] !== 'undefined') {
-      if (this.state.curTask[0].id === Number(id)) {
-        //console.log('Si esta activa')
-        this.getMessages(id)
-      } else {
-        //console.log('No esta activa')
-        this.notificationMessages(id, 'provider')
-      }
+  chatNotifications = async id => {
+    const ExistsInActivatedTasks = await this.checkExistsInActivatedTasks(
+      Number(id)
+    )
+
+    console.log('ExistsInActivatedTasks.status', ExistsInActivatedTasks)
+    if (ExistsInActivatedTasks[0].exist) {
+      this.addNewMessage(id)
     } else {
-      //console.log('No esta activa')
       this.notificationMessages(id, 'provider')
     }
   }
+  checkExistsInActivatedTasks = async id => {
+    let exist = false
+    let status = null
+    await this.state.activeTasks.filter(item => {
+      if (item.task.id === id) {
+        exist = true
+        status = item.task.status.name
+      }
+      return item
+    })
+    return [{ exist, status }]
+  }
+  addNewMessage = async id => {
+    const messages = await this.getMessages(id)
+
+    let { activeTasks } = this.state
+    let task = null
+    let chatSelector = 0
+    activeTasks = await activeTasks.map(item => {
+      if (item.task.id === Number(id)) {
+        task = item.task
+        if (
+          item.task.messagesAll.client.length === messages.data.client.length
+        ) {
+          chatSelector = 1
+        }
+        item.task.messagesAll = messages.data
+      }
+      return item
+    })
+    await this.setState({ activeTasks })
+    await save('activeTasks', activeTasks)
+    //console.log('task=========', task)
+    if (task.status.name === 'live') {
+      let prov = ''
+      if (chatSelector === 1) {
+        prov = 'prov_'
+      }
+      var element = document.getElementById('scroll_' + prov + id)
+      element.scrollTop = element.scrollHeight - element.clientHeight
+    } else {
+      this.notificationMessages(id, 'provider')
+    }
+  }
+
   whoFocus = id => {
-    console.log('focussssssss', id)
+    //console.log('focussssssss', id)
     this.setState({
       whoFocusItem: id,
     })
@@ -193,13 +235,14 @@ export default class Board extends Component {
     const nodeValue = document
       .getElementById('taskid_' + id)
       .getElementsByClassName('notificationNumber')
+    //console.log('nodeValue', nodeValue)
     if (nodeValue.length > 0) {
       const numberMsm = Number(nodeValue[0].innerHTML) + 1
       nodeValue[0].innerHTML = numberMsm
     }
     return ''
   }
-  notificationOff = (id, type) => {
+  notificationOff = async (id, type) => {
     document.getElementById('taskid_' + id).classList.remove('haveNotification')
     document.getElementById('taskid_' + id).classList.remove('not_' + type)
     const nodeValue = document
@@ -208,26 +251,21 @@ export default class Board extends Component {
     if (nodeValue.length > 0) {
       nodeValue[0].innerHTML = 0
     }
+    await updateChatState(id)
+    await this.getMyTasks()
     return ''
   }
 
   //CHAT
   getMessages = async id => {
-    const messages = messagesAll(id)
+    const messages = await messagesAll(id)
     //console.log('messages ------------- ', messages)
     await this.setState({
       messagesTask: messages.data,
     })
     return messages
   }
-  addMensages = (msm, type) => {
-    let { messagesTask } = this.state
-    //console.log('messagesTask ', messagesTask)
-    messagesTask[type].push(msm)
-    this.setState({
-      messagesTask,
-    })
-  }
+  addMensages = (msm, type) => {}
   openChat = async (id, column) => {
     let { openChat } = this.state
     let includesThis = true
@@ -303,20 +341,23 @@ export default class Board extends Component {
       let statusS = null
       let task = null
       let execute = false
-      let index = null
+      //let index = null
       activeTasks = activeTasks.filter((item, i) => {
         if (item.task.id === id) {
           includesThis = true
           statusS = item.task.status.name
           item.task.status.name = 'live'
           task = item
-          item.icon = icon
-          index = i
+          if (icon !== null) {
+            item.icon = icon
+          }
+
+          //index = i
         }
         return item
       })
       if (!includesThis) {
-        index = activeTasks.length
+        //index = activeTasks.length
         await this.state.tasks.filter((item, index) => {
           if (item.id === id) {
             task = item
@@ -328,6 +369,10 @@ export default class Board extends Component {
 
       if (!includesThis) {
         if (task.status.name !== 'complete') {
+          const messages = await this.getMessages(task.id)
+          //await this.getNotes(task.id)
+
+          task.messagesAll = messages.data
           activeTasks.push({ task })
           execute = true
         } else {
@@ -360,17 +405,12 @@ export default class Board extends Component {
           })
 
         console.log('activeTasks ------------', activeTasks)
-
-        //await this.getMessages(task.id)
-        //await this.getNotes(task.id)
-
-        //this.notificationOff(task.id, 'provider')
-
-        const scrollWidthValue = (index - 1) * 420
+        //const scrollWidthValue = (index - 1) * 420
         //console.log('scrollWidthValue', scrollWidthValue)
-        const chatsBar = document.getElementById('chatsBar')
-        chatsBar.scrollTo(scrollWidthValue, 0)
+        //const chatsBar = document.getElementById('chatsBar')
+        //chatsBar.scrollTo(scrollWidthValue, 0)
       }
+      this.notificationOff(id, 'provider')
     } catch (err) {
       console.log('error', err.message)
     }
@@ -790,11 +830,11 @@ export default class Board extends Component {
                   item={item.task}
                   desactivateTask={this.desactivateTask}
                   key={item.task.id}
-                  messagesTask={this.state.messagesTask}
                   openChatTriger={this.openChat}
                   chatTopPositionTriger={this.chatTopPositionTriger}
                   whoFocus={this.whoFocus}
                   whoFocusItem={this.state.whoFocusItem}
+                  addNewMessage={this.addNewMessage}
                 />
               ))}
           </div>

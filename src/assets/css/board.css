@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: row;
   font-family: Arial, Helvetica, sans-serif;
-  padding-bottom: 420px;
+  padding-bottom: 40px;
 }
 .b-column {
   width: 23%;
@@ -143,9 +143,8 @@
   margin-right: 5px;
 }
 .operator {
-  position: absolute;
-  right: -5px;
-  top: -30px;
+  float: right;
+  margin-top: -30px;
 }
 .operator span {
   text-transform: uppercase;
@@ -287,7 +286,7 @@
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
-  /*visibility: hidden;*/
+  visibility: hidden;
   scrollbar-width: none;
 }
 .chatsBar::-webkit-scrollbar {
@@ -419,11 +418,17 @@
   border-left: 1px solid #fff;
   margin: 1px 0px 0px 5px;
 }
-.chatFocusBoard {
+.live .chatFocusBoard {
   -webkit-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
   -moz-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
   box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
   border: 2px solid #53a93f !important;
+}
+.live .timerState {
+  display: none;
+}
+.live .timerTask {
+  color: #333 !important;
 }
 
 @media (max-width: 767px) {

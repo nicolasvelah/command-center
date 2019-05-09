@@ -2,6 +2,30 @@ import axios from 'axios'
 import { getUser } from './auth'
 import { toast } from 'react-toastify'
 
+export const sendMessage = async (to, content, orderId, isClientTo) => {
+  try {
+    const result = await axios.post(
+      `${process.env.API_URL}/sendMessage`,
+      {
+        to,
+        content,
+        orderId,
+        isClientTo,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': getUser().token,
+        },
+      }
+    )
+    return result
+  } catch (err) {
+    console.log(err.message)
+    return []
+  }
+}
+
 export const operatorsAll = async () => {
   try {
     const data = await axios.post(
@@ -97,19 +121,22 @@ export const getAllTasks = async () => {
 
     decryptedData.tasks = decryptedData.tasks.map(item => {
       let generate = true
-      activeTasks.map(itemAc => {
-        if (item.id === itemAc.task.id) {
-          item.color = itemAc.task.color
-          generate = false
-        }
-        return itemAc
-      })
+      if (typeof activeTasks !== undefined && activeTasks !== null) {
+        activeTasks.map(itemAc => {
+          if (item.id === itemAc.task.id) {
+            item.color = itemAc.task.color
+            generate = false
+          }
+          return itemAc
+        })
+      }
       if (generate) {
         item.color = colorGenerator()
       }
 
       return item
     })
+
     //console.log('tasks ', decryptedData)
     return decryptedData
   } catch (err) {

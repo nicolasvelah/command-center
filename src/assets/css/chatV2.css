@@ -5,9 +5,11 @@
 }
 .chatV2 {
   height: 295px;
+  overflow: auto;
   border-top: 1px solid #dedede;
 }
-
+.mensagessContainerV2 {
+}
 .mensagessFormV2 {
   width: 100%;
   background: #fff;
@@ -64,4 +66,14 @@
   max-height: initial;
   height: 200px;
   border: 2px solid #53a93f;
+}
+.messageItem {
+  width: 100%;
+  word-wrap: break-word;
+  white-space: normal;
+  line-height: 16px;
+  margin: 0px;
+  background: none;
+  padding: 0px 10px;
+  border-radius: 5px;
 }

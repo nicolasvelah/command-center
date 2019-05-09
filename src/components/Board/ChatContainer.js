@@ -1,7 +1,6 @@
 import React from 'react'
-import ChatNotificationsCounter from './ChatNotificationsCounter'
+//import ChatNotificationsCounter from './ChatNotificationsCounter'
 //import { save, get } from '../../services/Storage'
-//import scrollIntoView from 'scroll-into-view'
 import Chat from './ChatV2'
 import MapServiceTacking from '../Maps/MapServiceTacking'
 import star from '../../images/star-full.svg'
@@ -87,15 +86,21 @@ export default class ChatContainer extends React.Component {
       this.props.item.status.name === 'live' &&
       this.props.whoFocusItem !== id
     ) {
-      console.log(this.props.whoFocusItem)
-      console.log(id)
+      //console.log(this.props.whoFocusItem)
+      //console.log(id)
       this.props.whoFocus(id)
+      this.goBottom('scroll_' + id)
+      this.goBottom('scroll_prov_' + id)
     }
+  }
+
+  goBottom = id => {
+    var element = document.getElementById(id)
+    element.scrollTop = element.scrollHeight - element.clientHeight
   }
 
   render() {
     const { item } = this.props
-    //console.log('item', item)
     return item.status.name !== 'complete' ? (
       <div
         className={
@@ -109,17 +114,15 @@ export default class ChatContainer extends React.Component {
       >
         {item.status.name === 'live' ? (
           <div className="ChatMap">
-            {/*
-              <MapServiceTacking
-                userId={item.clientId}
-                lat={item.lat}
-                len={item.len}
-                providerId={item.providerId}
-                latProvider={item.latProvider}
-                lenProvider={item.lenProvider}
-                setLocation={this.setLocation}
-              />
-            */}
+            <MapServiceTacking
+              userId={item.clientId}
+              lat={item.lat}
+              len={item.len}
+              providerId={item.providerId}
+              latProvider={item.latProvider}
+              lenProvider={item.lenProvider}
+              setLocation={this.setLocation}
+            />
           </div>
         ) : (
           ''
@@ -171,7 +174,7 @@ export default class ChatContainer extends React.Component {
               </div>
 
               <div className="ChatNotificationsCounter">
-                <ChatNotificationsCounter t={item} />
+                {/*<ChatNotificationsCounter t={item} />*/}
               </div>
             </div>
           </div>
@@ -193,7 +196,15 @@ export default class ChatContainer extends React.Component {
                     <b>Cédula:</b> {item.client.idCard}
                   </div>
                 </div>
-                <Chat />
+                <Chat
+                  messagesTask={item.messagesAll.client}
+                  sid={item.id}
+                  goBottom={this.goBottom}
+                  orderId={item.id}
+                  isClientTo={true}
+                  to={item.client.id}
+                  addNewMessage={this.props.addNewMessage}
+                />
               </div>
               <div className="ChatProvider chatGeneric">
                 <div className="ChatInfoMain">
@@ -222,7 +233,15 @@ export default class ChatContainer extends React.Component {
                     <b>Telf:</b> {item.provider.user.phone}
                   </div>
                 </div>
-                <Chat />
+                <Chat
+                  messagesTask={item.messagesAll.provider}
+                  sid={'prov_' + item.id}
+                  goBottom={this.goBottom}
+                  orderId={item.id}
+                  isClientTo={false}
+                  to={item.provider.user.id}
+                  addNewMessage={this.props.addNewMessage}
+                />
               </div>
             </div>
           ) : (

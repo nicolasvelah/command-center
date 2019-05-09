@@ -61,11 +61,11 @@ export default class TimerComp extends React.Component {
       <TimerContainer>
         <div
           className={
-            this.state.alertState >= 2
+            (this.state.alertState >= 2
               ? 'dangerTimer'
               : this.state.alertState >= 1
               ? 'warningTimer'
-              : 'goTimer'
+              : 'goTimer') + ' timerTask'
           }
         >
           <Timer

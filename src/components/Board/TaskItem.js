@@ -89,7 +89,11 @@ export default class TaskItem extends React.Component {
           <div>
             <b>Servicio:</b>{' '}
             <b className="serviceTitle">{this.props.t.service.name}</b> <br />
-            <b>Proveedor:</b> {this.props.t.provider.busnessName} <br />
+            <b>Proveedor:</b>{' '}
+            {this.props.t.provider !== null
+              ? this.props.t.provider.busnessName
+              : 'No definido'}{' '}
+            <br />
             <b>Creada el:</b> {this.props.t.createdAt} <br />
             <b>Locación: </b> {this.props.t.country} / {this.props.t.city}
           </div>
