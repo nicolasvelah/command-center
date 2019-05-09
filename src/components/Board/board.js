@@ -753,7 +753,7 @@ export default class Board extends Component {
           </div>
           <div
             className="incurse  b-column"
-            style={getUser().type === 'operator' ? { width: '31%' } : {}}
+            style={getUser().type === 'operator' ? {} : {}}
           >
             <span className="column-header">En curso</span>
             <div
@@ -792,7 +792,7 @@ export default class Board extends Component {
             className="complete b-column"
             onDragOver={e => this.onDragOver(e)}
             onDrop={e => this.onDrop(e, 'complete')}
-            style={getUser().type === 'operator' ? { width: '31%' } : {}}
+            style={getUser().type === 'operator' ? {} : {}}
           >
             <span className="column-header">Resueltos</span>
             {tasks.complete}
