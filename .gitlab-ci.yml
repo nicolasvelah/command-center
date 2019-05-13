@@ -33,7 +33,9 @@ install-dependencies:
     paths:
       - node_modules/
   only:
-    - branches
+    - develop
+    - master
+    - staging
 
 test-apps:
   image: cypress/browsers:chrome67
@@ -48,8 +50,7 @@ test-apps:
       - cypress/screenshots
       - cypress/videos
   only:
-    - branches
-  except:
+    - develop
     - master
     - staging
 
@@ -66,6 +67,9 @@ build-app:
     expire_in: 1hr
     paths:
       - public/
+  only:
+    - master
+    - staging
 
 code_quality:
   image: docker:stable
@@ -84,9 +88,8 @@ code_quality:
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
-  except:
-    - master
-    - staging
+  only:
+    - branches
 
 review:
   stage: review
@@ -97,7 +100,7 @@ review:
     url: https://$CI_ENVIRONMENT_SLUG.$KUBE_DOMAIN
     on_stop: stop_review
   only:
-    - branches
+    - develop
   except:
     - master
     - staging
@@ -113,7 +116,7 @@ stop_review:
     action: stop
   when: manual
   only:
-    - branches
+    - develop
   except:
     - master
     - staging
@@ -126,34 +129,16 @@ deploy-staging:
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
     - eval $(ssh-agent -s)
-
-    ##
-    ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
-    ## We're using tr to fix line endings which makes ed25519 keys work
-    ## without extra base64 encoding.
-    ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
-    ##
     - echo "$SSH_PRIVATE_KEY_STAGING" | tr -d '\r' | ssh-add - > /dev/null
-
-    ##
-    ## Create the SSH directory and give it the right permissions
-    ##
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-
-    ##
-    ## Use ssh-keyscan to scan the keys of your private server. Replace gitlab.com
-    ## with your own domain name. You can copy and repeat that command if you have
-    ## more than one server to connect to.
-    ##
-    - ssh-keyscan 167.99.173.145 >> ~/.ssh/known_hosts
+    - ssh-keyscan $IP_STAGING >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - ls
   script:
-    #- ssh dev@167.99.173.145
-    #- scp -r ~/.ssh/id_rsa public/ dev@167.99.173.145:/var/www/cc
-    ##- ssh dev@167.99.173.145 "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
-    - scp -P22 -r public/ dev@167.99.173.145:/var/www/cc
+    #- ssh dev@$IP_STAGING
+    #- scp -r ~/.ssh/id_rsa public/ dev@$IP_STAGING:/var/www/cc
+    ##- ssh dev@$IP_STAGING "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
+    - scp -P22 -r public/ dev@$IP_STAGING:/var/www/cc
   environment:
     name: staging
     url: https://cc.it-zam.com
@@ -161,12 +146,24 @@ deploy-staging:
     - staging
 
 deploy-production:
-  image: node:10.14.2
+  image: ubuntu:16.04
   stage: production
   dependencies:
     - build-app
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_PRODUCTION" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $IP_PRODUCTION >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ls
   script:
-    - rsync -avuz -e 'ssh -i ~/.ssh/id_rsa' $CI_PROJECT_DIR/public/ dev@167.99.173.145:/var/www/cc
+    #- ssh dev@$IP_PRODUCTION
+    #- scp -r ~/.ssh/id_rsa public/ dev@$IP_PRODUCTION:/var/www/cc
+    ##- ssh dev@$IP_PRODUCTION "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
+    - scp -P22 -r public/ dev@$IP_PRODUCTION:/var/www/cc
   environment:
     name: production
     url: https://cc.itzam.ec
