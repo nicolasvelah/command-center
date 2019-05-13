@@ -64,6 +64,7 @@ build-app:
   dependencies:
     - install-dependencies
   script:
+    - npm install
     - npm run build
   artifacts:
     expire_in: 1hr
