@@ -71,7 +71,6 @@ build-app:
       - public/
   except:
     - master
-    - staging
 
 code_quality:
   image: docker:stable
@@ -152,9 +151,11 @@ deploy-staging:
     ##
     - ssh-keyscan 167.99.173.145 >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - ls
   script:
-    ##- ssh dev@167.99.173.145
-    - ssh dev@167.99.173.145 "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
+    #- ssh dev@167.99.173.145
+    - scp -r ~/.ssh/id_rsa public/ dev@167.99.173.145:/var/www/cc
+    ##- ssh dev@167.99.173.145 "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
   environment:
     name: staging
     url: https://cc.it-zam.com
