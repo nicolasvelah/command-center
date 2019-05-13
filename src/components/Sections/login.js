@@ -20,17 +20,17 @@ class Login extends React.Component {
   handleSubmit = async event => {
     event.preventDefault()
     this.setState({
-      isLoadingLogin: true
+      isLoadingLogin: true,
     })
     if (!(await handleLogin(this.state))) {
       this.invalidUser()
       this.setState({
-        isLoadingLogin: false
+        isLoadingLogin: false,
       })
     } else {
       navigate(`/`)
       this.setState({
-        isLoadingLogin: false
+        isLoadingLogin: false,
       })
     }
   }
@@ -41,7 +41,7 @@ class Login extends React.Component {
     }
     return (
       <>
-        <h1>Log in</h1>
+        <h1>Log in XX</h1>
         <form
           method="post"
           onSubmit={event => {
@@ -64,15 +64,12 @@ class Login extends React.Component {
             />
           </label>
           <br />
-          {
-            this.state.isLoadingLogin ?(
-              <div className="loaderGif"></div>
-            ):(
-              <input type="submit" value="Log In" className="btn" />
-            )
-          } 
-          <div className=""></div>
-          
+          {this.state.isLoadingLogin ? (
+            <div className="loaderGif" />
+          ) : (
+            <input type="submit" value="Log In" className="btn" />
+          )}
+          <div className="" />
         </form>
         <ToastContainer />
       </>

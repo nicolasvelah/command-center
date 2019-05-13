@@ -34,8 +34,6 @@ install-dependencies:
       - node_modules/
   only:
     - branches
-  except:
-    - master
 
 test-apps:
   image: cypress/browsers:chrome67
@@ -59,26 +57,15 @@ build-app:
   image: node:10.14.2
   stage: build
   variables:
-    BUILD_CONFIGURATION: 'staging'
+    BUILD_CONFIGURATION: 'production'
   dependencies:
     - install-dependencies
   script:
     - npm run build
-    - npm install
   artifacts:
     expire_in: 1hr
     paths:
-      - node_modules/
-      - npm ci
-      - $(npm bin)/print-env CI
-      - npm run cy:verify
       - public/
-  cache:
-    paths:
-      - node_modules/
-      - public/
-  except:
-    - master
 
 code_quality:
   image: docker:stable
