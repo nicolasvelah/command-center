@@ -1,14 +1,14 @@
 import React from 'react'
 import { Router } from '@reach/router'
 import Layout from '../components/layout'
-import PrivateRoute from '../components/privateRoute'
-import Board from '../components/board'
-import Board911 from '../components/board911'
-import Reports from '../components/reports'
-import Deliveries from '../components/deliveries'
-import Operators from '../components/operators'
-import Login from '../components/login'
-import Wiki from '../components/Wiki'
+import PrivateRoute from '../components/Tools/privateRoute'
+import Board from '../components/Board/board'
+import Board911 from '../components/Board/board911'
+import Reports from '../components/Sections/reports'
+import Deliveries from '../components/Sections/deliveries'
+import Operators from '../components/Sections/operators'
+import Login from '../components/Sections/login'
+import Wiki from '../components/Sections/Wiki'
 
 const App = () => (
   <Layout>

@@ -6,6 +6,7 @@ html {
 body {
   margin: 0;
   font-family: 'Yanone Kaffeesatz', sans-serif;
+  overflow-x: hidden;
 }
 article,
 aside,
@@ -680,6 +681,29 @@ label {
   animation: spin 2s linear infinite;
   position: absolute;
 }
+
+/*SCROLL BAR*/
+/* width */
+::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .b-verde {
   background: #28b954c9;
 }

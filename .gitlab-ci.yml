@@ -33,7 +33,9 @@ install-dependencies:
     paths:
       - node_modules/
   only:
-    - branches
+    - develop
+    - master
+    - staging
 
 test-apps:
   image: cypress/browsers:chrome67
@@ -48,7 +50,9 @@ test-apps:
       - cypress/screenshots
       - cypress/videos
   only:
-    - branches
+    - develop
+    - master
+    - staging
 
 build-app:
   image: node:10.14.2
@@ -63,6 +67,29 @@ build-app:
     expire_in: 1hr
     paths:
       - public/
+  only:
+    - master
+    - staging
+
+code_quality:
+  image: docker:stable
+  variables:
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  script:
+    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+    - docker run
+      --env SOURCE_CODE="$PWD"
+      --volume "$PWD":/code
+      --volume /var/run/docker.sock:/var/run/docker.sock
+      "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+  only:
+    - branches
 
 review:
   stage: review
@@ -73,7 +100,7 @@ review:
     url: https://$CI_ENVIRONMENT_SLUG.$KUBE_DOMAIN
     on_stop: stop_review
   only:
-    - branches
+    - develop
   except:
     - master
     - staging
@@ -89,18 +116,29 @@ stop_review:
     action: stop
   when: manual
   only:
-    - branches
+    - develop
   except:
     - master
     - staging
 
 deploy-staging:
-  image: node:10.14.2
+  image: ubuntu:16.04
   stage: staging
   dependencies:
     - build-app
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_STAGING" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $IP_STAGING >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
   script:
-    - rsync -avuz -e 'ssh -i ~/.ssh/id_rsa' $CI_PROJECT_DIR/public/ dev@167.99.173.145:/var/www/cc
+    #- ssh dev@$IP_STAGING
+    #- scp -r ~/.ssh/id_rsa public/ dev@$IP_STAGING:/var/www/cc
+    ##- ssh dev@$IP_STAGING "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
+    - scp -P22 -r public/ dev@$IP_STAGING:/var/www/cc
   environment:
     name: staging
     url: https://cc.it-zam.com
@@ -108,12 +146,24 @@ deploy-staging:
     - staging
 
 deploy-production:
-  image: node:10.14.2
+  image: ubuntu:16.04
   stage: production
   dependencies:
     - build-app
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_PRODUCTION" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $IP_PRODUCTION >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ls
   script:
-    - rsync -avuz -e 'ssh -i ~/.ssh/id_rsa' $CI_PROJECT_DIR/public/ dev@167.99.173.145:/var/www/cc
+    #- ssh dev@$IP_PRODUCTION
+    #- scp -r ~/.ssh/id_rsa public/ dev@$IP_PRODUCTION:/var/www/cc
+    ##- ssh dev@$IP_PRODUCTION "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
+    - scp -P22 -r public/ dev@$IP_PRODUCTION:/var/www/cc
   environment:
     name: production
     url: https://cc.itzam.ec

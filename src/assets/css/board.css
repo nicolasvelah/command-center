@@ -1,11 +1,12 @@
 .board {
   width: 100%;
-  display: flex;
+  display: block;
   flex-direction: row;
   font-family: Arial, Helvetica, sans-serif;
+  padding-bottom: 40px;
 }
 .b-column {
-  width: 23%;
+  width: 33%;
   margin: 10px 1%;
   padding: 10px;
   background-color: #eaeaea;
@@ -36,12 +37,31 @@
   padding: 0px 3px;
   font-size: 11px;
 }
+.taskVisualTraking {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  color: #fff;
+  text-align: center;
+  font-size: 11px;
+  margin-right: 5px;
+}
+.ChatHeader .taskVisualTraking {
+  margin-bottom: 5px;
+}
 .task {
   margin: 5px 0 0;
   background: #fff;
   border-radius: 5px;
   padding: 5px 10px;
   cursor: pointer;
+}
+.taskHead div {
+  display: inline-block;
+}
+.taskHead .clientName {
+  font-size: 12px;
 }
 .asigned .task {
   background: #fff;
@@ -61,9 +81,14 @@
 }
 
 .task-header {
-  display: flex;
-  flex-direction: row;
   height: 25px;
+  position: relative;
+}
+.task-header.complete .timerState {
+  display: none;
+}
+.task-header.complete div {
+  color: #999;
 }
 .task h3 {
   font-weight: normal;
@@ -82,14 +107,44 @@
   max-width: 22px;
   width: 100%;
 }
+.task.SOS {
+  border: 1px solid red;
+}
+.task.SOS .serviceTitle {
+  color: red;
+}
+.task.SOS.complete {
+  border: none;
+}
+.task.SOS .serviceTitle {
+  color: inherit;
+}
 .task-data {
   font-size: 11px;
   line-height: normal;
-  margin-bottom: 5px;
+  margin: 5px 0px;
+  border-top: 1px solid #dedede;
+  padding-top: 5px;
+  display: flex;
+}
+.service img {
+  max-width: 30px;
+  margin: 10px 5px 0px;
+  vertical-align: middle;
+}
+.serviceTitle {
+  font-size: 13px;
+}
+.service {
+  font-size: 10px;
+  text-align: center;
+  line-height: 11px;
+  width: 18%;
+  margin-right: 5px;
 }
 .operator {
-  position: absolute;
-  right: 27px;
+  float: right;
+  margin-top: -30px;
 }
 .operator span {
   text-transform: uppercase;
@@ -167,7 +222,7 @@
   margin-bottom: 0px;
   float: right;
   position: relative;
-  bottom: 25px;
+  bottom: 0px;
   display: none;
 }
 .haveNotification.not_provider .notProvider {
@@ -180,12 +235,13 @@
   display: none;
   font-size: 8px;
   height: 23px;
-  right: 42px;
+  right: 0px;
   position: relative;
   top: 3px;
   border-radius: 5px;
   color: #fff;
   padding: 0 5px;
+  float: right;
 }
 .going #ProviderState {
   background: rgba(0, 204, 255, 0.767);
@@ -211,11 +267,311 @@
   margin-right: -27px;
   float: right;
   position: relative;
-  bottom: 29px;
+  bottom: 4px;
 
   -webkit-border-radius: 20px 20px 20px 20px;
   display: none;
 }
+.chatsBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: transparent;
+  z-index: 1;
+  padding-left: 0px;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  visibility: hidden;
+  scrollbar-width: none;
+}
+.chatsBar::-webkit-scrollbar {
+  visibility: visible;
+  display: none;
+}
+.absoluteChatBottom {
+  visibility: hidden;
+}
+.chat-container {
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  background: #333;
+  color: #fff;
+  font-size: 10px;
+  margin: 0px 0.1%;
+  display: inline-block;
+  vertical-align: bottom;
+  position: relative;
+  width: 420px;
+  visibility: visible;
+}
+.chat-container .subcontainer {
+  padding: 5px 0px 0px;
+}
+.chat-container .live {
+  background: #53a93f;
+}
+.chat-container .standby {
+  background: #fdc509;
+}
+.chat-container .notresponse {
+  background: #c62b20;
+}
+.chat-container.notresponse .NotAswere {
+  display: none;
+}
+.ChatHeader {
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0px 10px;
+}
+.ChatHeader .clientDataName {
+  display: flex;
+}
+.chat-container .ChatNotificationsCounter {
+  position: relative;
+}
+.chat-container .ChatNotificationsCounter img {
+  display: none !important;
+}
+.chat-container .ChatNotificationsCounter .notificationNumber {
+  top: -10px;
+  right: 10px;
+}
+.chat-container .category-icon {
+  margin-right: 5px;
+  width: 26px;
+  height: 26px;
+  background: #fff;
+  border-radius: 50%;
+  text-align: center;
+  padding-top: 2px;
+}
+.chat-container .category-icon img {
+  margin: 0px;
+}
+.serviceNameChat {
+  font-weight: bold;
+  font-size: 14px;
+}
+.ChatContainerTools {
+  float: right;
+  margin-left: 10px;
+  font-size: 15px;
+  display: inline-flex;
+}
+.chat-container .closeChat {
+  margin-left: 10px;
+  cursor: pointer;
+}
+.openChat {
+  margin-top: 10px;
+  cursor: pointer;
+}
+.openBar {
+  background: #fff;
+  height: 3px;
+  width: 15px;
+}
+.chat-container.haveNotification {
+  background-color: #53a93f;
+  border-bottom-color: #53a93f;
+  -webkit-animation: title_widget_alert 1.5s 3;
+  animation: title_widget_alert 1.5s 3;
+}
+.chatTool {
+  width: 100%;
+  background: #f5f5f5;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  height: 391px;
+  display: flex;
+}
+.chatFocus .chatTool {
+  height: 455px;
+}
+.chatGeneric {
+  width: 50%;
+  height: 100%;
+  color: #37474f;
+  display: inline-block;
+  padding: 0px;
+}
+.ChatInfoMain {
+  padding: 0px 10px;
+  margin-bottom: 10px;
+}
+.ChatClient {
+  border-right: 1px solid #ddd;
+}
+.NotAswere {
+  cursor: pointer;
+
+  margin: 3px 0px 0px 5px;
+}
+.NotAswere img {
+  width: 20px;
+  border-left: 1px solid #fff;
+  margin: 1px 0px 0px 5px;
+}
+.live .chatFocusBoard {
+  -webkit-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
+  -moz-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
+  box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
+  border: 2px solid #53a93f !important;
+}
+.live .timerState {
+  display: none;
+}
+.live .timerTask {
+  color: #333 !important;
+}
+.backlog {
+  display: none;
+}
+.asignetOverflow {
+  overflow: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 2;
+  margin: 0px;
+  padding: 0px;
+  border-radius: 0;
+  min-height: 80px;
+  border-bottom: 1px solid #b4b4b4;
+  text-align: right;
+  background: #fdfdfd;
+}
+
+.asigned.b-column {
+  margin: 0px;
+  padding: 5px 0px 10px 30px;
+  border-radius: 0;
+  min-height: 80px;
+  display: inline-flex;
+  width: 180px;
+  background: #fdfdfd;
+  min-width: 100%;
+}
+.incurse.b-column .operator {
+  float: none;
+  margin: 0px;
+}
+.messageAssignetEmpty {
+  text-align: center;
+  width: 100%;
+}
+.asigned.b-column .clientName,
+.asigned.b-column .task-data {
+  display: none;
+}
+.asigned.b-column .task {
+  display: inline-block;
+  margin: 0px 10px 0px 0px;
+  text-align: left;
+  background: #eee;
+  border: 1px solid #ddd;
+}
+.asigned.b-column .task.SOS {
+  border: 1px solid #c62b20;
+}
+.asigned.b-column .column-header {
+  display: inline-block;
+  font-size: 10px;
+  margin: 0px;
+  transform: rotate(-90deg);
+  position: absolute;
+  left: -10px;
+  top: 25px;
+}
+.incurse.b-column {
+  width: 100%;
+  margin: 80px 0 0;
+  background: none;
+}
+.incurse.b-column .b-row {
+  display: inline-block;
+  vertical-align: top;
+  width: 32.6%;
+  margin: 0px 0.3%;
+  padding: 10px;
+  background-color: #eaeaea;
+  min-height: 230px;
+  border-radius: 5px;
+  position: relative;
+}
+.incurse.b-column .column-header {
+  display: none;
+  font-size: 11px;
+  text-align: right;
+  padding-right: 40px;
+}
+.incurse.b-column .b-row .column-header {
+  font-size: 11px;
+  padding-right: 0px;
+  display: block;
+}
+.b-row .task {
+  float: left;
+  width: 48%;
+  min-height: 160px;
+}
+.b-row .task:nth-child(1n + 1) {
+  margin-right: 2%;
+}
+.complete.b-column {
+  width: 97.5%;
+  padding-left: 35px;
+}
+
+.complete.b-column .clientName,
+.complete.b-column .task-data {
+  display: none;
+}
+.complete.b-column .task {
+  display: inline-block;
+  margin: 0px 5px 5px 0px;
+  text-align: left;
+  background: #eee;
+  border: 1px solid #ddd;
+  width: 175px;
+}
+
+.complete.b-column .column-header {
+  display: inline-block;
+  font-size: 10px;
+  margin: 0px;
+  transform: rotate(-90deg);
+  position: absolute;
+  left: -10px;
+  top: 25px;
+}
+.complete.b-column .taskVisualTraking {
+  background: #999 !important;
+}
+.complete.b-column #ProviderState {
+  display: none !important;
+}
+.ProviderAsignsV2 {
+  color: #37474f;
+  padding: 10px;
+}
+.ProviderAsignsV2 h1 {
+  font-size: 15px;
+  margin: 0px;
+}
+.ProviderAsignsV2 .input {
+  margin-bottom: 5px;
+  max-width: 210px;
+}
+
 @media (max-width: 767px) {
   .board {
     display: block;
