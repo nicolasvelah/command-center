@@ -88,7 +88,7 @@ code_quality:
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
-  only:
+  except:
     - branches
 
 review:
