@@ -6,10 +6,13 @@ import { sendMessage } from '../../services/helpers'
 export default class Chat extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { message: '' }
+    this.state = { message: '', diviciones: null }
   }
   componentDidMount() {
     this.props.goBottom('scroll_' + this.props.sid)
+    if (typeof this.props.providerDivicion !== undefined) {
+      this.setState({ diviciones: this.props.providerDivicion })
+    }
   }
   setMessage(e) {
     console.log(e.target.value)

@@ -5,6 +5,7 @@ import Chat from './ChatV2'
 import MapServiceTacking from '../Maps/MapServiceTacking'
 import star from '../../images/star-full.svg'
 import AsignProvider from './AsignProvider'
+import plus from '../../images/plus.svg'
 
 export default class ChatContainer extends React.Component {
   constructor(props) {
@@ -17,10 +18,27 @@ export default class ChatContainer extends React.Component {
       id911: null,
       openChat: false,
       status: '',
+      chageProviderVal: false,
     }
   }
   componentDidMount() {
+    console.log('init task contaner')
     this.haveToOpenChat(this.props.item.status.name, 'init')
+
+    if (this.props.item.provider !== null) {
+      if (
+        this.props.item.provider.user.name === 'N/A' &&
+        this.props.item.provider.user.name === 'SIN' &&
+        this.props.item.provider.user.name === '911'
+      ) {
+        this.setState({
+          chageProviderVal: true,
+        })
+      }
+    }
+  }
+  updatechageProviderVal() {
+    this.setState({ chageProviderVal: false })
   }
 
   haveToOpenChat = async (statusInit, from) => {
@@ -140,8 +158,15 @@ export default class ChatContainer extends React.Component {
                 {item.client.name.charAt(0) + item.client.lastName.charAt(0)}
               </div>
               <div className="clientName">
-                {item.client.name + ' ' + item.client.lastName + ' / '}
-                <span className="serviceNameChat">{item.service.name}</span>
+                <p>
+                  {item.client.name.substring(0, 15) +
+                    ' ' +
+                    item.client.lastName.substring(0, 15) +
+                    '...'}
+                  <span className="serviceNameChat">
+                    {item.service.name.substring(0, 25) + '...'}
+                  </span>
+                </p>
               </div>
             </div>
             <div className="ChatContainerTools">
@@ -190,7 +215,7 @@ export default class ChatContainer extends React.Component {
                   <div className="ExtraData ExtraDataClient">
                     <b>Email:</b> {item.client.email}
                     <br />
-                    <b>Telf:</b> {item.provider.user.phone}
+                    <b>Telf:</b> {item.client.phone}
                     <br />
                     <b>Tipo de Sangre:</b> {item.client.bloodType}
                     <br />
@@ -201,6 +226,7 @@ export default class ChatContainer extends React.Component {
                 </div>
                 <Chat
                   messagesTask={item.messagesAll.client}
+                  divicion={null}
                   sid={item.id}
                   goBottom={this.goBottom}
                   orderId={item.id}
@@ -209,10 +235,19 @@ export default class ChatContainer extends React.Component {
                   addNewMessage={this.props.addNewMessage}
                 />
               </div>
-              {item.provider.user.name !== 'N/A' &&
-              item.provider.user.name !== 'SIN PROVEEDOR' &&
-              item.provider.user.name !== '911' ? (
+              {!this.state.chageProviderVal ? (
                 <div className="ChatProvider chatGeneric">
+                  <button
+                    onClick={e => {
+                      e.preventDefault()
+                      console.log(this.state.chageProviderVal)
+                      this.setState({ chageProviderVal: true })
+                      console.log(this.state.chageProviderVal)
+                    }}
+                    className="ChangeProviderButton"
+                  >
+                    <img src={plus} alt="cambiar de proveedor" />
+                  </button>
                   <div className="ChatInfoMain">
                     <b>Proveedor:</b>
                     {' ' +
@@ -241,6 +276,7 @@ export default class ChatContainer extends React.Component {
                   </div>
                   <Chat
                     messagesTask={item.messagesAll.provider}
+                    divicion={item.messagesAll.providerDivicion}
                     sid={'prov_' + item.id}
                     goBottom={this.goBottom}
                     orderId={item.id}
@@ -250,7 +286,10 @@ export default class ChatContainer extends React.Component {
                   />
                 </div>
               ) : (
-                <AsignProvider orderId={item.id} />
+                <AsignProvider
+                  orderId={item.id}
+                  updateActivateTask={this.props.updateActivateTask}
+                />
               )}
             </div>
           ) : (

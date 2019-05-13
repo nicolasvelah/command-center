@@ -83,7 +83,7 @@ export default class Board extends Component {
       'focus',
       function(event) {
         if (isLoggedIn()) {
-          context.getMyTasks(context.state.curTask)
+          context.getMyTasks()
           if (typeof context.state.curTask[0] !== 'undefined') {
             //console.log('entro para traer mensajes')
             context.chatNotifications(context.state.curTask[0].id)
@@ -321,17 +321,51 @@ export default class Board extends Component {
 
   //ORDERS TRIGERS
   updateActivateTask = async (column, id) => {
-    let activetask = get('activeTasks')
+    let activetask = get('activeTasks', column)
+    let task = null
+    if (column === 'provider') {
+      await this.getMyTasks()
+      await this.state.tasks.map(item => {
+        if (item.id === id) {
+          task = item
+        }
+        return item
+      })
+    }
     activetask = await activetask.filter(item => {
       if (item.task.id === id) {
         item.task.status.name = column
+        if (task !== null) {
+          const messagesAll = item.task.messagesAll
+          item.task = task
+          item.task.messagesAll = messagesAll
+          item.task.messagesAll.providerDivicion = {
+            idLastMSM:
+              item.task.messagesAll.provider[
+                item.task.messagesAll.provider.length - 1
+              ],
+            user: item.task.provider,
+          }
+        }
       }
       return item
     })
-    save('activeTasks', activetask)
+    await save('activeTasks', activetask)
 
     await this.setState({ activeTasks: activetask })
-    console.log('updateActivateTask', activetask)
+    //console.log('PreARRAY')
+    if (task !== null) {
+      Array.from(this.RefChatContainer.values())
+        .filter(node => node != null)
+        .forEach(node => {
+          //console.log('In ARRAY node.props.item.id', node.props.item.id)
+          //console.log('In ARRAY id', id)
+          if (node.props.item.id === id) {
+            //console.log('Entro', id)
+            node.updatechageProviderVal()
+          }
+        })
+    }
   }
   activateTask = async (id, icon) => {
     try {
@@ -341,7 +375,7 @@ export default class Board extends Component {
       let statusS = null
       let task = null
       let execute = false
-      //let index = null
+
       activeTasks = activeTasks.filter((item, i) => {
         if (item.task.id === id) {
           includesThis = true
@@ -386,17 +420,17 @@ export default class Board extends Component {
       }
 
       if (execute) {
-        console.log('execute', execute)
+        //console.log('execute', execute)
         await this.openChat(id, 'live')
 
-        save('activeTasks', activeTasks)
+        await save('activeTasks', activeTasks)
 
-        this.setState({
+        await this.setState({
           activeTasks,
         })
 
-        console.log('this.RefChatContainer--------', this.RefChatContainer)
-        Array.from(this.RefChatContainer.values())
+        //console.log('this.RefChatContainer--------', this.RefChatContainer)
+        await Array.from(this.RefChatContainer.values())
           .filter(node => node != null)
           .forEach(node => {
             if (node.props.item.id === id) {
@@ -406,9 +440,6 @@ export default class Board extends Component {
 
         console.log('activeTasks ------------', activeTasks)
         //const scrollWidthValue = (index - 1) * 420
-        //console.log('scrollWidthValue', scrollWidthValue)
-        //const chatsBar = document.getElementById('chatsBar')
-        //chatsBar.scrollTo(scrollWidthValue, 0)
       }
       this.notificationOff(id, 'provider')
     } catch (err) {
@@ -748,7 +779,17 @@ export default class Board extends Component {
               style={{ width: tasks.asigned.length * 180 + 'px' }}
             >
               <span className="column-header">Asignados</span>
-              {tasks.asigned}
+              {tasks.asigned.length > 0 ? (
+                tasks.asigned
+              ) : (
+                <div className="messageAssignetEmpty">
+                  <p>
+                    Atento!!! en cualquier momento entra una nueva taréa...
+                    Podrás verla en esta barra... <br />
+                    Suerte :)
+                  </p>
+                </div>
+              )}
             </div>
           </div>
           <div
@@ -843,11 +884,12 @@ export default class Board extends Component {
                   whoFocus={this.whoFocus}
                   whoFocusItem={this.state.whoFocusItem}
                   addNewMessage={this.addNewMessage}
+                  updateActivateTask={this.updateActivateTask}
                 />
               ))}
           </div>
         </div>
-        <ToastContainer />
+        <ToastContainer position="bottom-right" />
         {this.state.isLoading === true ? <Loading /> : ''}
       </div>
     )

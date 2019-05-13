@@ -77,3 +77,24 @@
   padding: 0px 10px;
   border-radius: 5px;
 }
+.ChatHeader .clientName {
+  word-break: break-all;
+  max-width: 289px;
+  white-space: nowrap;
+}
+.ChatHeader .clientName p {
+  margin-bottom: 0px;
+}
+.ChangeProviderButton {
+  background: #0047b3;
+  border: 0px;
+  color: #fff;
+  padding-block-end: 3px;
+  height: 23px;
+  float: right;
+  cursor: pointer;
+}
+.ChangeProviderButton img {
+  width: 15px;
+  margin: 0px;
+}

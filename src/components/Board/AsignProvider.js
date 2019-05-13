@@ -4,6 +4,7 @@ import { getUser } from '../../services/auth'
 import Select from 'react-select'
 import styled from 'styled-components'
 import star from '../../images/star-full.svg'
+import { changeOrderProvider } from '../../services/helpers'
 
 const Error = styled.div`
   color: red;
@@ -192,21 +193,9 @@ export default class AsignProvider extends Component {
       return
     }
     try {
-      //console.log('this.props.orderId', this.props.orderId)
-      //console.log('providerId', providerId)
-      await axios.post(
-        `${process.env.API_URL}/orders/changeOrderProvider`,
-        {
-          orderId: this.props.orderId,
-          providerId: providerId,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
-          },
-        }
-      )
+      await changeOrderProvider(this.props.orderId, providerId)
+      await this.props.updateActivateTask('provider', this.props.orderId)
+
       this.setState({
         isSending: false,
         errorSending: false,
@@ -228,11 +217,6 @@ export default class AsignProvider extends Component {
       newState[field].error = ''
     })
     await this.setState(newState)
-  }
-  setComment = e => {
-    this.setState({
-      comment: { value: e.target.value },
-    })
   }
 
   render() {
@@ -318,10 +302,13 @@ export default class AsignProvider extends Component {
                           : 'Sin definir'}
                       </div>
                       <div className="text-left">
-                        <button className="btn ma-right-5">Mapa</button>
-                        <button className="btn ma-right-5">Contactar</button>
+                        {/*<button className="btn ma-right-5">Mapa</button>
+                        <button className="btn ma-right-5">Contactar</button>*/}
                         <button
-                          onClick={e => this.sendTask(e, provider.providerId)}
+                          onClick={e => {
+                            e.preventDefault()
+                            this.sendTask(e, provider.providerId)
+                          }}
                           className="btn b-verde"
                         >
                           Asignar

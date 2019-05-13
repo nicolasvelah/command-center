@@ -165,3 +165,25 @@ export const updateStatus = async (id, cat) => {
     }
   )
 }
+
+export const changeOrderProvider = async (orderId, providerId) => {
+  try {
+    await axios.post(
+      `${process.env.API_URL}/orders/changeOrderProvider`,
+      {
+        orderId,
+        providerId,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': getUser().token,
+        },
+      }
+    )
+    return true
+  } catch (err) {
+    console.error(err.message)
+    return false
+  }
+}

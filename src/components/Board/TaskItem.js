@@ -72,11 +72,15 @@ export default class TaskItem extends React.Component {
             className={'taskVisualTraking'}
             style={{ background: this.props.t.color }}
           >
-            {this.props.t.client.name.charAt(0) +
-              this.props.t.client.lastName.charAt(0)}
+            {this.props.t.client !== null
+              ? this.props.t.client.name.charAt(0) +
+                this.props.t.client.lastName.charAt(0)
+              : ''}
           </div>
           <div className="clientName">
-            {this.props.t.client.name + ' ' + this.props.t.client.lastName}
+            {this.props.t.client !== null
+              ? this.props.t.client.name + ' ' + this.props.t.client.lastName
+              : ''}
           </div>
         </div>
         <div className="task-data">

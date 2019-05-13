@@ -458,10 +458,15 @@
   display: inline-flex;
   width: 180px;
   background: #fdfdfd;
+  min-width: 100%;
 }
 .incurse.b-column .operator {
   float: none;
   margin: 0px;
+}
+.messageAssignetEmpty {
+  text-align: center;
+  width: 100%;
 }
 .asigned.b-column .clientName,
 .asigned.b-column .task-data {

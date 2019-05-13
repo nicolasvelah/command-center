@@ -61,10 +61,10 @@ class MapServiceTacking extends Component {
         },
       })
       const { country } = response.data
-      console.log('geoapi', response.data)
+      //console.log('geoapi', response.data)
       return country
     } catch (error) {
-      console.log('no se pudo desde el backend')
+      //console.log('no se pudo desde el backend')
       //alert(error.message);
     }
   }
@@ -134,7 +134,7 @@ class MapServiceTacking extends Component {
   }
   //GEOLOCALIZATION
   async findUser(userId, isClient) {
-    console.log('find userId-------------------', userId)
+    //console.log('find userId-------------------', userId)
     try {
       const user = await axios({
         method: 'POST',
@@ -147,7 +147,7 @@ class MapServiceTacking extends Component {
           isClient,
         },
       })
-      console.log('find user-------------------', user)
+      //console.log('find user-------------------', user)
       return user
     } catch (error) {
       console.error(error)
@@ -156,7 +156,7 @@ class MapServiceTacking extends Component {
   async getClients() {
     try {
       const user = await this.findUser(this.props.userId, true)
-      console.log('Cliente-------------------', user.data)
+      //console.log('Cliente-------------------', user.data)
       await this.setState({
         clients: [user.data],
         center: {
@@ -170,13 +170,13 @@ class MapServiceTacking extends Component {
   }
 
   onSockedId = id => {
-    console.log('connected with socketID', id)
+    //console.log('connected with socketID', id)
   }
   async getProviders() {
     if (this.props.providerId !== 0) {
       try {
         const user = await this.findUser(this.props.providerId, false)
-        console.log('Provider-------------------', user.data)
+        //console.log('Provider-------------------', user.data)
         if (
           user.data !== null &&
           typeof user.data !== undefined &&
@@ -251,7 +251,7 @@ class MapServiceTacking extends Component {
   onProviderDisconnected = async data => {
     // id : provider id
     const { id } = data
-    console.log('client disconnected', id)
+    //console.log('client disconnected', id)
     //update the providers arrays
     var tmp = this.state.providers
     const index = tmp.findIndex(o => o.id === id)
@@ -304,7 +304,7 @@ class MapServiceTacking extends Component {
           lng: client.lng,
         },
       })
-      console.log('this.state.center: ', this.state.center)
+      //console.log('this.state.center: ', this.state.center)
       return
     }
     this.state.clients.forEach(p => {
@@ -351,7 +351,7 @@ class MapServiceTacking extends Component {
     ) {
       if (status === 'OK') {
         if (results[0]) {
-          console.log('result', results[0].formatted_address)
+          //console.log('result', results[0].formatted_address)
           context.setState({
             address: results[0].formatted_address,
           })
@@ -369,9 +369,9 @@ class MapServiceTacking extends Component {
 
   render() {
     const { clients, providers, center, zoom } = this.state
-    console.log('providers to print', providers)
-    console.log('center---------------', center)
-    console.log('clientes---------------', clients)
+    //console.log('providers to print', providers)
+    //console.log('center---------------', center)
+    //console.log('clientes---------------', clients)
     return (
       <div className="map-container-traking">
         <Autocomplete
