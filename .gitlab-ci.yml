@@ -175,7 +175,7 @@ deploy-production:
     - chmod 700 ~/.ssh
     - ssh-keyscan $IP_PRODUCTION >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - apt install dnsutils
+    - apt-get install -y dnsutils
     - myip="$(dig +short myip.opendns.com @resolver1.opendns.com)"
     - echo "My WAN/Public IP address ${myip}"
     - myip2="dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | awk -F'"' '{ print $2}'"
