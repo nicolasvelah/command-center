@@ -113,7 +113,7 @@ build-app-staging:
     paths:
       - public/
   only:
-    - master
+    - staging
 
 deploy-staging:
   image: ubuntu:16.04
