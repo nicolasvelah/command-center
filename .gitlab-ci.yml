@@ -1,7 +1,8 @@
 stages:
   - buildForTest
   - test
-  - build
+  - build-app-staging
+  - build-app-production
   - review
   - staging
   - production
@@ -49,25 +50,6 @@ test-apps:
       - cypress/videos
   only:
     - develop
-
-build-app:
-  image: node:10.14.2
-  stage: build
-  variables:
-    BUILD_CONFIGURATION: 'production'
-  script:
-    - npm install
-    - npm run build
-  artifacts:
-    expire_in: 1hr
-    paths:
-      - public/
-  cache:
-    paths:
-      - public/
-  only:
-    - master
-    - staging
 
 code_quality:
   image: docker:stable
@@ -117,11 +99,27 @@ stop_review:
     - master
     - staging
 
+build-app-staging:
+  image: node:10.14.2
+  stage: build-app-staging
+  script:
+    - npm install
+    - npm run build:staging
+  artifacts:
+    expire_in: 1hr
+    paths:
+      - public/
+  cache:
+    paths:
+      - public/
+  only:
+    - master
+
 deploy-staging:
   image: ubuntu:16.04
   stage: staging
   dependencies:
-    - build-app
+    - build-app-staging
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
     - eval $(ssh-agent -s)
@@ -147,11 +145,27 @@ deploy-staging:
   only:
     - staging
 
+build-app-production:
+  image: node:10.14.2
+  stage: build-app-production
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    expire_in: 1hr
+    paths:
+      - public/
+  cache:
+    paths:
+      - public/
+  only:
+    - master
+
 deploy-production:
   image: ubuntu:16.04
   stage: production
   dependencies:
-    - build-app
+    - build-app-production
   before_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
     - eval $(ssh-agent -s)
