@@ -132,6 +132,7 @@ deploy-staging:
     - chmod 700 ~/.ssh
     - ssh-keyscan $IP_STAGING >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - apt install net-tools
     - ifconfig
   script:
     #- ssh dev@$IP_STAGING
