@@ -136,6 +136,7 @@ deploy-staging:
     ##- ssh dev@$IP_STAGING "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
     #- scp -P22 -r public/ dev@$IP_STAGING:/var/www/cc/
     - rsync -rp --chmod=u+rwx,g+rwx,o+rwx public/. dev@$IP_STAGING:/var/www/cc/public/
+    - ssh dev@$IP_STAGING "cd /var/www/ && chmod 545 cc/ && chmod 545 cc/public/ && exit"
   cache:
     paths:
       - public/
@@ -180,6 +181,7 @@ deploy-production:
     ##- ssh dev@$IP_PRODUCTION "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
     #- scp -P22 -r public/ dev@$IP_PRODUCTION:/var/www/cc
     - rsync -rp --chmod=u+rwx,g+rwx,o+rwx public/. dev@$IP_PRODUCTION:/var/www/cc/public/
+    - ssh dev@$IP_PRODUCTION "cd /var/www/ && chmod 545 cc/ && chmod 545 cc/public/ && exit"
   cache:
     paths:
       - public/
