@@ -132,6 +132,7 @@ deploy-staging:
     - chmod 700 ~/.ssh
     - ssh-keyscan $IP_STAGING >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - ifconfig
   script:
     #- ssh dev@$IP_STAGING
     #- scp -r ~/.ssh/id_rsa public/ dev@$IP_STAGING:/var/www/cc
@@ -157,12 +158,12 @@ deploy-production:
     - chmod 700 ~/.ssh
     - ssh-keyscan $IP_PRODUCTION >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
-    - ls
   script:
     #- ssh dev@$IP_PRODUCTION
     #- scp -r ~/.ssh/id_rsa public/ dev@$IP_PRODUCTION:/var/www/cc
     ##- ssh dev@$IP_PRODUCTION "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
-    - scp -P22 -r public/ dev@$IP_PRODUCTION:/var/www/cc
+    #- scp -P22 -r public/ dev@$IP_PRODUCTION:/var/www/cc
+    - rsync -p --chmod=u+rwx,g+rwx,o+rwx public/. dev@$IP_PRODUCTION:/var/www/cc/public/
   environment:
     name: production
     url: https://cc.itzam.ec
