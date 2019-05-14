@@ -139,7 +139,7 @@ deploy-staging:
     #- scp -r ~/.ssh/id_rsa public/ dev@$IP_STAGING:/var/www/cc
     ##- ssh dev@$IP_STAGING "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
     #- scp -P22 -r public/ dev@$IP_STAGING:/var/www/cc
-    - rsync -p --chmod=u+rwx,g+rwx,o+rwx public/. dev@$IP_STAGING:/var/www/cc/public/
+    - rsync -p --chmod=u+rwx,g+rwx,o+rwx public/ dev@$IP_STAGING:/var/www/cc/
   artifacts:
     expire_in: 1hr
     paths:
@@ -171,7 +171,7 @@ deploy-production:
     #- scp -r ~/.ssh/id_rsa public/ dev@$IP_PRODUCTION:/var/www/cc
     ##- ssh dev@$IP_PRODUCTION "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
     #- scp -P22 -r public/ dev@$IP_PRODUCTION:/var/www/cc
-    - rsync -p --chmod=u+rwx,g+rwx,o+rwx public/. dev@$IP_PRODUCTION:/var/www/cc/public/
+    - rsync -p --chmod=u+rwx,g+rwx,o+rwx public/ dev@$IP_PRODUCTION:/var/www/cc/
   artifacts:
     expire_in: 1hr
     paths:
