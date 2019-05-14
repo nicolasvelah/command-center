@@ -34,8 +34,6 @@ install-dependencies:
       - node_modules/
   only:
     - develop
-    - master
-    - staging
 
 test-apps:
   image: cypress/browsers:chrome67
@@ -51,21 +49,23 @@ test-apps:
       - cypress/videos
   only:
     - develop
-    - master
-    - staging
 
 build-app:
   image: node:10.14.2
   stage: build
   variables:
     BUILD_CONFIGURATION: 'production'
-  dependencies:
-    - install-dependencies
   script:
+    - npm install
     - npm run build
   artifacts:
     expire_in: 1hr
     paths:
+      - public/
+      - node_modules/
+  cache:
+    paths:
+      - node_modules/
       - public/
   only:
     - master
@@ -99,9 +99,8 @@ review:
     name: review/$CI_BUILD_REF_NAME
     url: https://$CI_ENVIRONMENT_SLUG.$KUBE_DOMAIN
     on_stop: stop_review
-  only:
-    - develop
   except:
+    - branches
     - master
     - staging
 
@@ -115,9 +114,8 @@ stop_review:
     name: review/$CI_BUILD_REF_NAME
     action: stop
   when: manual
-  only:
-    - develop
   except:
+    - branches
     - master
     - staging
 
@@ -138,7 +136,8 @@ deploy-staging:
     #- ssh dev@$IP_STAGING
     #- scp -r ~/.ssh/id_rsa public/ dev@$IP_STAGING:/var/www/cc
     ##- ssh dev@$IP_STAGING "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
-    - scp -P22 -r public/ dev@$IP_STAGING:/var/www/cc
+    #- scp -P22 -r public/ dev@$IP_STAGING:/var/www/cc
+    - rsync -p --chmod=u+rwx,g+rwx,o+rwx public/ dev@$IP_STAGING:/var/www/cc
   environment:
     name: staging
     url: https://cc.it-zam.com
