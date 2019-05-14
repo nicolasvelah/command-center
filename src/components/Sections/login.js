@@ -41,7 +41,7 @@ class Login extends React.Component {
     }
     return (
       <>
-        <h1>Ingreso</h1>
+        <h1>Ingresa aqui</h1>
         <form
           method="post"
           onSubmit={event => {
