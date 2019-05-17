@@ -9,21 +9,25 @@ import Deliveries from '../components/Sections/deliveries'
 import Operators from '../components/Sections/operators'
 import Login from '../components/Sections/login'
 import Wiki from '../components/Sections/Wiki'
+import { Provider } from 'mobx-react'
+import stores from '../mobx/'
 
 export default class App extends Component {
   render() {
     return (
-      <Layout>
-        <Router>
-          <PrivateRoute path="/app/board" component={Board} />
-          <PrivateRoute path="/app/911" component={Board911} />
-          <PrivateRoute path="/app/reports" component={Reports} />
-          <PrivateRoute path="/app/deliveries" component={Deliveries} />
-          <PrivateRoute path="/app/operators" component={Operators} />
-          <PrivateRoute path="/app/wiki" component={Wiki} />
-          <Login path="/app/login" />
-        </Router>
-      </Layout>
+      <Provider mapStore={stores.mapStore}>
+        <Layout>
+          <Router>
+            <PrivateRoute path="/app/board" component={Board} />
+            <PrivateRoute path="/app/911" component={Board911} />
+            <PrivateRoute path="/app/reports" component={Reports} />
+            <PrivateRoute path="/app/deliveries" component={Deliveries} />
+            <PrivateRoute path="/app/operators" component={Operators} />
+            <PrivateRoute path="/app/wiki" component={Wiki} />
+            <Login path="/app/login" />
+          </Router>
+        </Layout>
+      </Provider>
     )
   }
 }

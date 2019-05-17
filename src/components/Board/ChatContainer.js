@@ -2,10 +2,12 @@ import React from 'react'
 //import ChatNotificationsCounter from './ChatNotificationsCounter'
 //import { save, get } from '../../services/Storage'
 import Chat from './ChatV2'
-import MapServiceTacking from '../Maps/MapServiceTacking'
+import MapServiceTacking from '../Maps/MapServiceTackingV2'
 import star from '../../images/star-full.svg'
 import AsignProvider from './AsignProvider'
 import plus from '../../images/plus.svg'
+import { conectSocket } from '../../services/wsConect'
+import { getUser } from '../../services/auth'
 
 export default class ChatContainer extends React.Component {
   constructor(props) {
@@ -19,10 +21,20 @@ export default class ChatContainer extends React.Component {
       openChat: false,
       status: '',
       chageProviderVal: false,
+      socket: null,
     }
   }
-  componentDidMount() {
-    console.log('init task contaner')
+  async componentDidMount() {
+    //SOKET CONECT
+    const token = await getUser().token
+    const userId = getUser().userId
+    let { socket } = this
+    socket = await conectSocket(token, userId)
+    await this.setState({
+      socket,
+    })
+
+    //
     this.haveToOpenChat(this.props.item.status.name, 'init')
 
     if (this.props.item.provider !== null) {
@@ -37,6 +49,7 @@ export default class ChatContainer extends React.Component {
       }
     }
   }
+
   updatechageProviderVal() {
     this.setState({ chageProviderVal: false })
   }
@@ -135,15 +148,22 @@ export default class ChatContainer extends React.Component {
       >
         {item.status.name === 'live' ? (
           <div className="ChatMap">
-            <MapServiceTacking
-              userId={item.clientId}
-              lat={item.lat}
-              len={item.len}
-              providerId={item.providerId}
-              latProvider={item.latProvider}
-              lenProvider={item.lenProvider}
-              setLocation={this.setLocation}
-            />
+            {this.state.socket !== null ? (
+              <MapServiceTacking
+                userId={item.clientId}
+                appId={item.client.aplicationId}
+                country={item.client.country}
+                lat={item.lat}
+                len={item.len}
+                providerId={item.providerId}
+                latProvider={item.latProvider}
+                lenProvider={item.lenProvider}
+                setLocation={this.setLocation}
+                socket={this.state.socket}
+              />
+            ) : (
+              ''
+            )}
           </div>
         ) : (
           ''

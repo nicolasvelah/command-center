@@ -16,7 +16,6 @@ import {
   updateStatus,
   updateChatState,
 } from '../../services/helpers'
-
 //import Filter from './Filter'
 import Loading from '../Tools/Loading'
 
