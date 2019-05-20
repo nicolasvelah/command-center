@@ -21,11 +21,11 @@ export const initializeFirebase = () => {
 export const askForPermissioToReceiveNotifications = async () => {
   try {
     const messaging = firebase.messaging()
-    console.log('paso 2 messaging', messaging)
+    //console.log('paso 2 messaging', messaging)
     await messaging.requestPermission()
-    console.log('solicito permiso')
+    //console.log('solicito permiso')
     const token = await messaging.getToken()
-    console.log('paso 4 ')
+    //console.log('paso 4 ')
 
     await axios.post(
       `${process.env.API_URL}/updateToken`,
@@ -38,7 +38,7 @@ export const askForPermissioToReceiveNotifications = async () => {
         },
       }
     )
-    console.log('token de usuário:', token)
+    //console.log('token de usuário:', token)
     return messaging
     //}
   } catch (error) {

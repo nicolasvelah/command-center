@@ -2,8 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { StaticQuery, graphql } from 'gatsby'
-import Header from './header'
-import NavBar from './navBar'
+import Header from './Tools/header'
+import NavBar from './Tools/navBar'
 import { isLoggedIn } from '../services/auth'
 import { initializeFirebase } from '../services/push-notification'
 
@@ -64,7 +64,7 @@ export default class Layout extends React.Component {
               {typeof window !== 'undefined' ? (
                 !window.google ? (
                   <script
-                    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCW_VtwnO2cCNOYEGkd3tigdoCxeRxAnU4&libraries=places"
+                    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCnynwND8x-o856iB4XQgsFR9Fr1vqIYGU&libraries=places"
                     async
                     defer
                   />

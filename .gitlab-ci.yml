@@ -1,7 +1,8 @@
 stages:
   - buildForTest
   - test
-  - build
+  - build-app-staging
+  - build-app-production
   - review
   - staging
   - production
@@ -32,7 +33,7 @@ install-dependencies:
   cache:
     paths:
       - node_modules/
-  only:
+  except:
     - branches
 
 test-apps:
@@ -47,22 +48,28 @@ test-apps:
     paths:
       - cypress/screenshots
       - cypress/videos
-  only:
+  except:
     - branches
 
-build-app:
-  image: node:10.14.2
-  stage: build
+code_quality:
+  image: docker:stable
   variables:
-    BUILD_CONFIGURATION: 'production'
-  dependencies:
-    - install-dependencies
+    DOCKER_DRIVER: overlay2
+  allow_failure: true
+  services:
+    - docker:stable-dind
   script:
-    - npm run build
+    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
+    - docker run
+      --env SOURCE_CODE="$PWD"
+      --volume "$PWD":/code
+      --volume /var/run/docker.sock:/var/run/docker.sock
+      "registry.gitlab.com/gitlab-org/security-products/codequality:$SP_VERSION" /code
   artifacts:
-    expire_in: 1hr
-    paths:
-      - public/
+    reports:
+      codequality: gl-code-quality-report.json
+  except:
+    - branches
 
 review:
   stage: review
@@ -72,9 +79,8 @@ review:
     name: review/$CI_BUILD_REF_NAME
     url: https://$CI_ENVIRONMENT_SLUG.$KUBE_DOMAIN
     on_stop: stop_review
-  only:
-    - branches
   except:
+    - branches
     - master
     - staging
 
@@ -88,32 +94,100 @@ stop_review:
     name: review/$CI_BUILD_REF_NAME
     action: stop
   when: manual
-  only:
-    - branches
   except:
+    - branches
     - master
     - staging
 
-deploy-staging:
+build-app-staging:
   image: node:10.14.2
+  stage: build-app-staging
+  script:
+    - npm install
+    - npm run build:staging
+  artifacts:
+    expire_in: 1hr
+    paths:
+      - public/
+  cache:
+    paths:
+      - public/
+  only:
+    - staging
+
+deploy-staging:
+  image: ubuntu:16.04
   stage: staging
   dependencies:
-    - build-app
+    - build-app-staging
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_STAGING" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $IP_STAGING >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    ##- apt install net-tools
+    ##- ifconfig
   script:
-    - rsync -avuz -e 'ssh -i ~/.ssh/id_rsa' $CI_PROJECT_DIR/public/ dev@167.99.173.145:/var/www/cc
+    #- ssh dev@$IP_STAGING
+    #- scp -r ~/.ssh/id_rsa public/ dev@$IP_STAGING:/var/www/cc
+    ##- ssh dev@$IP_STAGING "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
+    #- scp -P22 -r public/ dev@$IP_STAGING:/var/www/cc/
+    - rsync -rp --chmod=u+rwx,g+rwx,o+rwx public/. dev@$IP_STAGING:/var/www/cc/public/
+    - ssh dev@$IP_STAGING "cd /var/www/ && chmod 545 cc/ && chmod 545 cc/public/ && exit"
+  cache:
+    paths:
+      - public/
   environment:
     name: staging
     url: https://cc.it-zam.com
   only:
     - staging
 
-deploy-production:
+build-app-production:
   image: node:10.14.2
+  stage: build-app-production
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    expire_in: 1hr
+    paths:
+      - public/
+  cache:
+    paths:
+      - public/
+  only:
+    - master
+
+deploy-production:
+  image: ubuntu:16.04
   stage: production
   dependencies:
-    - build-app
+    - build-app-production
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY_PRODUCTION" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $IP_PRODUCTION >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - apt-get install -y dnsutils
+    - myip="$(dig +short myip.opendns.com @resolver1.opendns.com)"
+    - echo "My WAN/Public IP address ${myip}"
   script:
-    - rsync -avuz -e 'ssh -i ~/.ssh/id_rsa' $CI_PROJECT_DIR/public/ dev@167.99.173.145:/var/www/cc
+    #- ssh dev@$IP_PRODUCTION
+    #- scp -r ~/.ssh/id_rsa public/ dev@$IP_PRODUCTION:/var/www/cc
+    ##- ssh dev@$IP_PRODUCTION "cd /var/www/cc && git checkout master && git pull origin staging && npm install && npm run build && exit"
+    #- scp -P22 -r public/ dev@$IP_PRODUCTION:/var/www/cc
+    - rsync -rp --chmod=u+rwx,g+rwx,o+rwx public/. dev@$IP_PRODUCTION:/var/www/cc/public/
+    - ssh dev@$IP_PRODUCTION "cd /var/www/ && chmod 545 cc/ && chmod 545 cc/public/ && exit"
+  cache:
+    paths:
+      - public/
   environment:
     name: production
     url: https://cc.itzam.ec
