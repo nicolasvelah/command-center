@@ -1,5 +1,7 @@
 import axios from 'axios'
 import io from 'socket.io-client'
+import { getUser } from '../services/auth'
+import { get } from './Storage'
 
 export const conectSocket = async (token, userId) => {
   try {
@@ -23,19 +25,24 @@ export const conectSocket = async (token, userId) => {
     return false
   }
 }
+var mapStoreLocal = null
 export const updateMapData = (socket, APP_ID, country, mapStore) => {
-  console.log('updateMapData mapStore', mapStore)
-  console.log('updateMapData socket', socket)
+  //console.log('updateMapData mapStore', mapStore)
+  mapStoreLocal = mapStore
+  //console.log('updateMapData socket', socket)
+  //console.log('updateMapData APP_ID', APP_ID)
+  //console.log('updateMapData country', country)
   socket.on(`onClientLocation-app-${APP_ID}-${country}`, onClientLocation)
+  socket.on(
+    `onClientDisconnected-app-${APP_ID}-${country}`,
+    onClientDisconnected
+  )
+
   socket.on(`onProviderLocation-app-${APP_ID}-${country}`, onProviderLocation)
   socket.on(`onProviderInService-app-${APP_ID}-${country}`, onProviderInService)
   socket.on(
     `onProviderDisconnected-app-${APP_ID}-${country}`,
     onProviderDisconnected
-  )
-  socket.on(
-    `onClientDisconnected-app-${APP_ID}-${country}`,
-    onClientDisconnected
   )
 }
 //CONFIG DATA
@@ -78,75 +85,44 @@ const getWsAccessToken = async (userId, appId, isClient, country, token) => {
 }
 //ON EVENT
 //Client
-const onClientLocation = async (data, clients) => {
-  console.log('onClientLocation data', data)
-  if (data.id === clients[0].id) {
-    const client = {
-      id: data.id,
-      info: data.info,
-      lat: data.lat,
-      lng: data.lng,
+const onClientLocation = async data => {
+  const activeTasks = get('activeTasks')
+  let isAndActiveTask = false
+  activeTasks.map(item => {
+    if (item.task.clientId === data.id) {
+      isAndActiveTask = true
     }
-    var tmpClients = clients
-    const index = tmpClients.findIndex(o => o.id === client.id)
-    if (index !== -1) {
-      //if the user is already on the list
-      //just only udate the user by index
-      tmpClients[index] = client
-    } else {
-      //add the client to the list
-      tmpClients.push(client)
-    }
-    //update tne state
-
-    tmpClients = await this.filterClient(tmpClients, data.id)
-
-    return tmpClients.user
+    return item
+  })
+  if (isAndActiveTask) {
+    await mapStoreLocal.setClients(data)
   }
 }
-const onClientDisconnected = (data, clients) => {
+const onClientDisconnected = async data => {
   const { id } = data
-  var tmp = clients
-  const index = tmp.findIndex(o => o.id === id)
-  if (index !== -1) {
-    tmp[index].connected = false
-  }
-  return tmp
+  await mapStoreLocal.disconectClient(id)
 }
 
 //Provider
-const onProviderLocation = async (data, providers) => {
-  if (data.id === this.state.providers[0].id) {
-    const provider = {
-      id: data.id,
-      info: data.info,
-      lat: data.lat,
-      lng: data.lng,
+const onProviderLocation = async data => {
+  const activeTasks = get('activeTasks')
+  let isAndActiveTask = false
+  activeTasks.map(item => {
+    if (item.task.providerId === data.id) {
+      isAndActiveTask = true
     }
-    var tmp = providers
-    const index = tmp.findIndex(o => o.id === provider.id)
-    if (index !== -1) {
-      tmp[index] = provider
-    } else {
-      tmp.push(provider)
-    }
-    tmp = await this.filterProviders(tmp, this.props.providerId)
-    return tmp
+    return item
+  })
+  if (isAndActiveTask) {
+    await mapStoreLocal.setProvider(data)
   }
 }
-const onProviderDisconnected = async (data, providers) => {
+const onProviderDisconnected = async data => {
   const { id } = data
-  var tmp = providers
-  const index = tmp.findIndex(o => o.id === id)
-  if (index !== -1) {
-    tmp[index].connected = false
-  }
-  tmp = await this.filterProviders(tmp, this.props.providerId)
-
-  return tmp
+  await mapStoreLocal.disconectProvider(id)
 }
 const onProviderInService = async (data, providers) => {
-  const { id, inService } = data
+  /*const { id, inService } = data
 
   var tmp = providers
   const index = tmp.findIndex(o => o.id === id)
@@ -154,5 +130,27 @@ const onProviderInService = async (data, providers) => {
     tmp[index].inService = inService
   }
   tmp = await this.filterProviders(tmp, this.props.providerId)
-  return tmp
+  return tmp*/
+}
+
+export const findUserById = async (userId, isClient) => {
+  try {
+    const result = await axios.post(
+      `${process.env.WS_URL}/api/v1/find-user`,
+      {
+        userId,
+        isClient,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          jwt: getUser().token,
+        },
+      }
+    )
+    return result
+  } catch (err) {
+    console.log(err.message)
+    return ['Error']
+  }
 }

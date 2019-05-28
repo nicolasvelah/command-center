@@ -1,3 +1,3 @@
-import Map from './map'
+import MapVars from './mapVars'
 
-export default { mapStore: new Map() }
+export default { mapStore: new MapVars() }

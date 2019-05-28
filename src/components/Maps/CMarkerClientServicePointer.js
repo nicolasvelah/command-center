@@ -34,6 +34,9 @@ const Wrapper = styled.div`
     align-items: center;
     justify-content: center;
     cursor: default;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
   }
 `
 

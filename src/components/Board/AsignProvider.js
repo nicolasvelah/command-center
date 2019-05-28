@@ -67,17 +67,10 @@ export default class AsignProvider extends Component {
   }
 
   getCategories = async () => {
-    const data = await axios
-      .get(
-        `${process.env.API_URL}/categories`,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
-          },
-        }
-      )
+    const data = await axios({
+      url: `${process.env.API_URL}/categories/app-id/` + this.props.appId,
+      method: 'get',
+    })
       .then(async result => {
         const options = await result.data.categories.map(category => {
           return { id: category.id, label: category.name, value: category.id }

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getUser } from './auth'
+import { getUser, logoutLocal } from './auth'
 import { toast } from 'react-toastify'
 
 export const sendMessage = async (to, content, orderId, isClientTo) => {
@@ -22,6 +22,7 @@ export const sendMessage = async (to, content, orderId, isClientTo) => {
     return result
   } catch (err) {
     console.log(err.message)
+    logoutLocal()
     return []
   }
 }
@@ -186,4 +187,30 @@ export const changeOrderProvider = async (orderId, providerId) => {
     console.error(err.message)
     return false
   }
+}
+
+export const geocodeLatLng = async (lat, lng, callback) => {
+  const google = (window.google = window.google ? window.google : {})
+  var latlng = { lat: parseFloat(lat), lng: parseFloat(lng) }
+  let geocoder = await new google.maps.Geocoder()
+
+  const address = await geocoder.geocode(
+    { location: latlng },
+    async (results, status) => {
+      let response = null
+      if (status === 'OK') {
+        if (results[0]) {
+          response = results
+          //return await results[0].formatted_address
+        } else {
+          response = 'Geocoder: No results found'
+        }
+      } else {
+        response = 'Geocoder failed due to: ' + status
+      }
+      callback(response)
+    }
+  )
+
+  return address
 }
