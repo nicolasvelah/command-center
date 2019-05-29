@@ -6,10 +6,14 @@ import MapServiceTacking from '../Maps/MapServiceTackingV2'
 import star from '../../images/star-full.svg'
 import AsignProvider from './AsignProvider'
 import plus from '../../images/plus.svg'
-import { conectSocket } from '../../services/wsConect'
-import { getUser } from '../../services/auth'
+import { findUserById } from '../../services/wsConect'
+import { geocodeLatLng } from '../../services/helpers'
+import { inject, observer } from 'mobx-react'
+import { intercept } from 'mobx'
 
-export default class ChatContainer extends React.Component {
+@observer
+@inject('mapStore')
+class ChatContainer extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -21,33 +25,141 @@ export default class ChatContainer extends React.Component {
       openChat: false,
       status: '',
       chageProviderVal: false,
-      socket: null,
+      clientData: null,
+      providerData: null,
+      address: null,
+      country: null,
+      city: null,
     }
+    this.updateClient = this.updateClient.bind(this)
   }
   async componentDidMount() {
-    //SOKET CONECT
-    const token = await getUser().token
-    const userId = getUser().userId
-    let { socket } = this
-    socket = await conectSocket(token, userId)
-    await this.setState({
-      socket,
-    })
-
+    //GET USER GEOLOCALIZATION DATA
+    const clientGLData = await findUserById(this.props.item.clientId, true)
+    const providerGLData = await findUserById(
+      this.props.item.provider.id,
+      false
+    )
+    console.log('clientGLData', clientGLData)
+    /*console.log('this.props.item.provider.id', this.props.item.provider.id)
+    console.log('providerGLData', providerGLData)*/
     //
-    this.haveToOpenChat(this.props.item.status.name, 'init')
+    await this.haveToOpenChat(this.props.item.status.name, 'init')
 
+    let { chageProviderVal } = this.state
     if (this.props.item.provider !== null) {
       if (
         this.props.item.provider.user.name === 'N/A' &&
         this.props.item.provider.user.name === 'SIN' &&
         this.props.item.provider.user.name === '911'
       ) {
-        this.setState({
-          chageProviderVal: true,
-        })
+        chageProviderVal = true
       }
     }
+    const context = this
+    //console.log('this.props.item =++++++++++++', this.props.item)
+    await geocodeLatLng(this.props.item.lat, this.props.item.len, function(
+      data
+    ) {
+      //console.log('Data de rertorno de google', data)
+      if (Array.isArray(data)) {
+        const location = data[3].formatted_address.split(',')
+        const country = location[1]
+        const city = location[0]
+        context.setState({
+          address: data[0].formatted_address,
+          country,
+          city,
+        })
+      } else {
+        context.setState({
+          address: data,
+        })
+      }
+    })
+    await this.setState({
+      chageProviderVal,
+      clientData: clientGLData.data,
+      providerData: providerGLData.data,
+    })
+    await intercept(this.props.mapStore, 'clientIdWS', change => {
+      if (context.props.item.clientId === change.newValue.id) {
+        console.log(
+          'este actor se esta moviendo:',
+          change.newValue.id +
+            ' / ' +
+            this.props.item.client.name +
+            ' ' +
+            this.props.item.client.lastName
+        )
+        let { clientData } = this.state
+        clientData.lat = change.newValue.lat
+        clientData.lng = change.newValue.lng
+        clientData.connected = true
+        context.updateClient(clientData)
+      }
+      return change
+    }).bind(this)
+
+    await intercept(this.props.mapStore, 'clientsDsWS', change => {
+      if (context.props.item.clientId === change.newValue) {
+        console.log(
+          'este actorXX se Desconecto:',
+          change.newValue.id +
+            ' / ' +
+            this.props.item.client.name +
+            ' ' +
+            this.props.item.client.lastName
+        )
+        let { clientData } = this.state
+        clientData.connected = false
+        context.updateClient(clientData)
+      }
+      return change
+    }).bind(this)
+
+    await intercept(this.props.mapStore, 'providerWS', change => {
+      if (context.props.item.providerId === change.newValue.id) {
+        console.log(
+          'este proveedor se esta moviendo:',
+          change.newValue.id +
+            ' / ' +
+            this.props.item.provider.user.name +
+            ' ' +
+            this.props.item.provider.user.lastName
+        )
+        let { providerData } = this.state
+        providerData.lat = change.newValue.lat
+        providerData.lng = change.newValue.lng
+        providerData.connected = true
+        context.updateProvider(providerData)
+      }
+      return change
+    }).bind(this)
+
+    await intercept(this.props.mapStore, 'providerDsWS', change => {
+      if (context.props.item.providerId === change.newValue) {
+        console.log(
+          'este actor se Desconecto:',
+          change.newValue.id +
+            ' / ' +
+            this.props.item.provider.user.name +
+            ' ' +
+            this.props.item.provider.user.lastName
+        )
+        let { providerData } = this.state
+        providerData.connected = false
+        context.updateProvider(providerData)
+      }
+      return change
+    }).bind(this)
+  }
+
+  updateClient(clientData) {
+    this.setState({ clientData })
+  }
+  updateProvider(providerData) {
+    this.setState({ providerData })
   }
 
   updatechageProviderVal() {
@@ -123,6 +235,8 @@ export default class ChatContainer extends React.Component {
       this.props.whoFocus(id)
       this.goBottom('scroll_' + id)
       this.goBottom('scroll_prov_' + id)
+
+      this.props.updateGlobalMapVars(this.props.appID, this.state.country)
     }
   }
 
@@ -148,18 +262,45 @@ export default class ChatContainer extends React.Component {
       >
         {item.status.name === 'live' ? (
           <div className="ChatMap">
-            {this.state.socket !== null ? (
+            {this.props.socket !== null ? (
               <MapServiceTacking
                 userId={item.clientId}
                 appId={item.client.aplicationId}
-                country={item.client.country}
                 lat={item.lat}
                 len={item.len}
-                providerId={item.providerId}
-                latProvider={item.latProvider}
-                lenProvider={item.lenProvider}
-                setLocation={this.setLocation}
-                socket={this.state.socket}
+                socket={this.props.socket}
+                clientGLData={this.state.clientData}
+                clientDataLat={
+                  this.state.clientData !== null ? this.state.clientData.lat : 0
+                }
+                clientDataLng={
+                  this.state.clientData !== null ? this.state.clientData.lng : 0
+                }
+                clientDataState={
+                  this.state.clientData !== null
+                    ? this.state.clientData.connected
+                    : null
+                }
+                providerDataLat={
+                  this.state.providerData !== null
+                    ? this.state.providerData.lat
+                    : 0
+                }
+                providerDataLng={
+                  this.state.providerData !== null
+                    ? this.state.providerData.lng
+                    : 0
+                }
+                providerDataState={
+                  this.state.clientData !== null
+                    ? this.state.providerData.connected
+                    : null
+                }
+                providerData={this.state.providerData}
+                color={this.props.color}
+                address={this.state.address}
+                country={this.state.country}
+                city={this.state.city}
               />
             ) : (
               ''
@@ -309,6 +450,7 @@ export default class ChatContainer extends React.Component {
                 <AsignProvider
                   orderId={item.id}
                   updateActivateTask={this.props.updateActivateTask}
+                  appId={item.client.aplicationId}
                 />
               )}
             </div>
@@ -322,3 +464,5 @@ export default class ChatContainer extends React.Component {
     )
   }
 }
+
+export default ChatContainer

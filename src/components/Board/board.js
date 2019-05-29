@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify'
 import TaskItem from './TaskItem'
 import ChatContainer from './ChatContainer'
 import { save, get } from '../../services/Storage'
+import { inject, observer } from 'mobx-react'
 import {
   operatorsAll,
   MsmNewTask,
@@ -17,13 +18,15 @@ import {
   updateChatState,
 } from '../../services/helpers'
 //import Filter from './Filter'
+import { conectSocket, updateMapData } from '../../services/wsConect'
 import Loading from '../Tools/Loading'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
 import Masonry from 'react-masonry-css'
-
-export default class Board extends Component {
+@observer
+@inject('mapStore')
+class Board extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -45,6 +48,9 @@ export default class Board extends Component {
       isLoading: false,
       chatTopPosition: '-37px',
       whoFocusItem: null,
+      socket: null,
+      globalMapAppID: null,
+      globalMapCountry: null,
     }
     this.getNotes = this.getNotes.bind(this)
     this.chageProvider = this.chageProvider.bind(this)
@@ -55,17 +61,25 @@ export default class Board extends Component {
     this.updateLocalTask = this.updateLocalTask.bind(this)
     this.onDragStart = this.onDragStart.bind(this)
     this.activateTask = this.activateTask.bind(this)
+    this.updateGlobalMapVars = this.updateGlobalMapVars.bind(this)
 
     this.RefChatContainer = new Map()
   }
 
   async componentDidMount() {
-    this._ismounted = true
     if (getUser().type === '911') {
       navigate(`/app/911`)
     } else if (getUser().type === 'provider') {
       logout()
     }
+    const token = await getUser().token
+    const userId = await getUser().userId
+    let { socket } = this
+    socket = await conectSocket(token, userId)
+
+    await this.setState({
+      socket,
+    })
     //Tasks
     //console.log('init traer ordenes en did mount ')
     await this.getMyTasks()
@@ -101,10 +115,31 @@ export default class Board extends Component {
       activeTasks: get('activeTasks'),
     })
   }
-  componentWillUnmount() {
-    this._ismounted = false
-  }
 
+  updateGlobalMapVars = async (globalMapAppID, globalMapCountry) => {
+    if (globalMapCountry === null && this.state.globalMapCountry !== null) {
+      //Este caso se da cuando alguien pone el punto del servicio en lugares remotos como el oceano o la amazonia....
+      //Por lo que determino un pais para mantener la coneccion a los web sockets...
+      globalMapCountry = this.state.globalMapCountry
+    } else if (this.state.globalMapCountry === null) {
+      globalMapCountry = 'Ecuador'
+    }
+    if (
+      globalMapCountry !== this.state.globalMapCountry ||
+      globalMapAppID !== this.state.globalMapAppID
+    ) {
+      await this.setState({
+        globalMapAppID,
+        globalMapCountry,
+      })
+      await updateMapData(
+        this.state.socket,
+        this.state.globalMapAppID,
+        this.state.globalMapCountry,
+        this.props.mapStore
+      )
+    }
+  }
   //FIREBASE NOTIFICATIONS TRIEGER
   startNotifications(messaging) {
     const context = this
@@ -481,8 +516,8 @@ export default class Board extends Component {
   //COLUMN OR STATUS TRIGER
   trigerColumn = async (col, id) => {
     try {
-      console.log('col', col)
-      console.log('id', id)
+      /*console.log('col', col)
+      console.log('id', id)*/
       await this.updateActivateTask(col, id)
       await updateStatus(id, col)
 
@@ -524,11 +559,10 @@ export default class Board extends Component {
     try {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
-      if (this._ismounted) {
-        this.setState({
-          tasks: decryptedData.tasks,
-        })
-      }
+
+      this.setState({
+        tasks: decryptedData.tasks,
+      })
     } catch (err) {
       console.log(err)
       logoutLocal()
@@ -810,7 +844,15 @@ export default class Board extends Component {
                   style={{ width: '20px', margin: '0px 0px 0px 0px' }}
                 />
               </span>
-              {tasks.notresponse}
+              {
+              <Masonry
+                  breakpointCols={2}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {tasks.notresponse}
+                </Masonry>
+              }
             </div>
             <div
               className="standby b-row"
@@ -820,7 +862,7 @@ export default class Board extends Component {
               <span className="column-header">En Espera</span>
               {
                 <Masonry
-                  breakpointCols={1}
+                  breakpointCols={2}
                   className="my-masonry-grid"
                   columnClassName="my-masonry-grid_column"
                 >
@@ -834,7 +876,16 @@ export default class Board extends Component {
               onDrop={e => this.onDrop(e, 'live')}
             >
               <span className="column-header">En Vivo</span>
-              {tasks.live}
+              {
+              <Masonry
+                  breakpointCols={2}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {tasks.live}
+                </Masonry>
+              }
+              
             </div>
           </div>
           <div
@@ -845,7 +896,6 @@ export default class Board extends Component {
           >
             <span className="column-header">Resueltos</span>
             {tasks.complete}
-
             {getUser().type !== 'operator' ? (
               <div className="column-footer">
                 <button
@@ -893,6 +943,10 @@ export default class Board extends Component {
                   whoFocusItem={this.state.whoFocusItem}
                   addNewMessage={this.addNewMessage}
                   updateActivateTask={this.updateActivateTask}
+                  socket={this.state.socket}
+                  color={item.task.color}
+                  appID={item.task.client.aplicationId}
+                  updateGlobalMapVars={this.updateGlobalMapVars}
                 />
               ))}
           </div>
@@ -903,3 +957,5 @@ export default class Board extends Component {
     )
   }
 }
+
+export default Board

@@ -25,10 +25,12 @@ const Wrapper = styled.div`
     bottom: 38px;
     width: 200px;
     padding: 10px;
-
     border-radius: 3px;
-    color: #fff;
+    color: #333;
     left: -95px;
+    -webkit-box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.3);
   }
   &.active .info:before {
     content: '';
@@ -40,7 +42,12 @@ const Wrapper = styled.div`
     height: 0;
     border-style: solid;
     border-width: 7px 7px 0 8px;
-    border-color: #2979ff transparent transparent transparent;
+    border-color: #fff transparent transparent transparent;
+  }
+  &.conect {
+  }
+  &.disconect {
+    border-color: red;
   }
 `
 
@@ -50,26 +57,26 @@ export default class CMarker extends React.Component {
   }
 
   //improve performance
-  shouldComponentUpdate(nextProps, nextState) {
+  /*shouldComponentUpdate(nextProps, nextState) {
     return nextState !== this.state
-  }
+  }*/
 
   render() {
-    const { id, info, isProvider } = this.props
+    const { id, info } = this.props
     const { active } = this.state
-    console.log('INFO', info)
+
     return typeof info !== undefined ? (
       <Wrapper
-        className={`${active ? 'active' : ''}`}
-        style={{ backgroundColor: isProvider ? '#ffa97a' : '#2abbdd' }}
+        className={
+          `${active ? 'active ' : ''}` +
+          (this.props.clientDataState ? 'conect' : 'disconect')
+        }
+        style={{ backgroundColor: this.props.color }}
         onClick={() => this.setState({ active: !active })}
       >
         {`${info.name.charAt(0)}${info.lastName.charAt(0)}`}
 
-        <div
-          className="info"
-          style={{ backgroundColor: isProvider ? '#ffa97a' : '#6bcbef' }}
-        >
+        <div className="info" style={{ backgroundColor: '#fff' }}>
           <p style={{ margin: 0, padding: 0 }}>
             <b>ID: {id}</b>
           </p>
