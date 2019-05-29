@@ -6,7 +6,7 @@ import MapServiceTacking from '../Maps/MapServiceTackingV2'
 import star from '../../images/star-full.svg'
 import AsignProvider from './AsignProvider'
 import plus from '../../images/plus.svg'
-import { findUserById } from '../../services/wsConect'
+import { findUserById, getProviders } from '../../services/wsConect'
 import { geocodeLatLng } from '../../services/helpers'
 import { inject, observer } from 'mobx-react'
 import { intercept } from 'mobx'
@@ -26,24 +26,17 @@ class ChatContainer extends React.Component {
       status: '',
       chageProviderVal: false,
       clientData: null,
-      providerData: null,
       address: null,
       country: null,
       city: null,
+      providers: [],
     }
     this.updateClient = this.updateClient.bind(this)
+    this.haveToOpenChat = this.haveToOpenChat.bind(this)
   }
   async componentDidMount() {
     //GET USER GEOLOCALIZATION DATA
     const clientGLData = await findUserById(this.props.item.clientId, true)
-    const providerGLData = await findUserById(
-      this.props.item.provider.id,
-      false
-    )
-    console.log('clientGLData', clientGLData)
-    /*console.log('this.props.item.provider.id', this.props.item.provider.id)
-    console.log('providerGLData', providerGLData)*/
-    //
     await this.haveToOpenChat(this.props.item.status.name, 'init')
 
     let { chageProviderVal } = this.state
@@ -77,11 +70,23 @@ class ChatContainer extends React.Component {
         })
       }
     })
+    let { providers } = this.state
+    await this.props.mapStore.WSData.map(item => {
+      if (item.APP_ID === this.props.appID) {
+        providers = item.providers
+      }
+      return item
+    })
+    if (providers.length <= 0) {
+      providers = await getProviders(this.props.appID, 'Ecuador')
+      providers = providers.data
+    }
     await this.setState({
       chageProviderVal,
       clientData: clientGLData.data,
-      providerData: providerGLData.data,
+      providers,
     })
+    //console.log('providers del etsa camada', providers)
     await intercept(this.props.mapStore, 'clientIdWS', change => {
       if (context.props.item.clientId === change.newValue.id) {
         console.log(
@@ -104,7 +109,7 @@ class ChatContainer extends React.Component {
     await intercept(this.props.mapStore, 'clientsDsWS', change => {
       if (context.props.item.clientId === change.newValue) {
         console.log(
-          'este actorXX se Desconecto:',
+          'este cliente se Desconecto:',
           change.newValue.id +
             ' / ' +
             this.props.item.client.name +
@@ -118,39 +123,24 @@ class ChatContainer extends React.Component {
       return change
     }).bind(this)
 
-    await intercept(this.props.mapStore, 'providerWS', change => {
-      if (context.props.item.providerId === change.newValue.id) {
-        console.log(
-          'este proveedor se esta moviendo:',
-          change.newValue.id +
-            ' / ' +
-            this.props.item.provider.user.name +
-            ' ' +
-            this.props.item.provider.user.lastName
-        )
-        let { providerData } = this.state
-        providerData.lat = change.newValue.lat
-        providerData.lng = change.newValue.lng
-        providerData.connected = true
-        context.updateProvider(providerData)
-      }
-      return change
+    await intercept(this.props.mapStore, 'providerDsWS', change => {
+      let providers = context.state.providers.map(item => {
+        if (item.id === change.newValue) {
+          item.connected = false
+        }
+        return item
+      })
+      context.updateProvidersDS(providers)
     }).bind(this)
 
-    await intercept(this.props.mapStore, 'providerDsWS', change => {
-      if (context.props.item.providerId === change.newValue) {
-        console.log(
-          'este actor se Desconecto:',
-          change.newValue.id +
-            ' / ' +
-            this.props.item.provider.user.name +
-            ' ' +
-            this.props.item.provider.user.lastName
-        )
-        let { providerData } = this.state
-        providerData.connected = false
-        context.updateProvider(providerData)
-      }
+    await intercept(this.props.mapStore, 'WSData', change => {
+      change.newValue.map(item => {
+        if (item.APP_ID === context.props.appID) {
+          context.updateProviders(item.providers)
+        }
+        return item
+      })
+
       return change
     }).bind(this)
   }
@@ -158,8 +148,27 @@ class ChatContainer extends React.Component {
   updateClient(clientData) {
     this.setState({ clientData })
   }
-  updateProvider(providerData) {
-    this.setState({ providerData })
+  updateProvidersDS(providers) {
+    this.setState({ providers })
+  }
+  updateProviders(providers) {
+    //console.log('WSDATA a cambiado updfate providers', providers)
+    let probresp = this.state.providers.map(item => {
+      providers.map(inProb => {
+        if (inProb.id === item.id) {
+          if (inProb.connected) {
+            item.connected = inProb.connected
+          }
+          item.info = inProb.info
+          item.lat = inProb.lat
+          item.lng = inProb.lng
+        }
+        return inProb
+      })
+
+      return item
+    })
+    this.setState({ providers: probresp })
   }
 
   updatechageProviderVal() {
@@ -260,7 +269,7 @@ class ChatContainer extends React.Component {
         id={'chatTask_' + item.id}
         onClick={e => this.focusChat(item.id)}
       >
-        {item.status.name === 'live' ? (
+        {item.status.name === 'live' && this.state.providers.length > 0 ? (
           <div className="ChatMap">
             {this.props.socket !== null ? (
               <MapServiceTacking
@@ -281,26 +290,11 @@ class ChatContainer extends React.Component {
                     ? this.state.clientData.connected
                     : null
                 }
-                providerDataLat={
-                  this.state.providerData !== null
-                    ? this.state.providerData.lat
-                    : 0
-                }
-                providerDataLng={
-                  this.state.providerData !== null
-                    ? this.state.providerData.lng
-                    : 0
-                }
-                providerDataState={
-                  this.state.clientData !== null
-                    ? this.state.providerData.connected
-                    : null
-                }
-                providerData={this.state.providerData}
                 color={this.props.color}
                 address={this.state.address}
                 country={this.state.country}
                 city={this.state.city}
+                providers={this.state.providers}
               />
             ) : (
               ''

@@ -468,7 +468,8 @@ class Board extends Component {
           .filter(node => node != null)
           .forEach(node => {
             if (node.props.item.id === id) {
-              node.haveToOpenChat('live', 'board')
+              console.log('Nodooo ', node)
+              node.wrappedInstance.haveToOpenChat('live', 'board')
             }
           })
 
@@ -644,7 +645,8 @@ class Board extends Component {
         .filter(node => node != null)
         .forEach(node => {
           if (node.props.item.id === id) {
-            node.haveToOpenChat(cat, 'board')
+            console.log('Nodooo ', node)
+            node.wrappedInstance.haveToOpenChat(cat, 'board')
           }
         })
     }

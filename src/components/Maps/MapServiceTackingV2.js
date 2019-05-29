@@ -6,10 +6,9 @@ import CMarkerClientServicePointer from './CMarkerClientServicePointer'
 import Autocomplete from 'react-google-autocomplete'
 //import io from 'socket.io-client'
 import styled from 'styled-components'
-import { inject, observer } from 'mobx-react'
 //import axios from 'axios'
 //import { getUser } from '../../services/auth'
-//import { updateMapData } from '../../services/wsConect'
+import { getDistanceInMeters } from '../../services/helpers'
 
 import '../../assets/css/map.css'
 
@@ -40,6 +39,7 @@ const Button = styled.button`
 `
 const StateContainer = styled.div`
   position: absolute;
+  display: none;
   top: 0px;
   left: 0px;
   z-index: 1;
@@ -54,8 +54,6 @@ const StateContainer = styled.div`
   }
 `
 
-@observer
-@inject('mapStore')
 class MapServiceTacking extends Component {
   constructor(props) {
     super(props)
@@ -66,6 +64,7 @@ class MapServiceTacking extends Component {
         lng: -78.4480523,
       },
       zoom: 14,
+      m: 5000,
     }
   }
 
@@ -78,7 +77,9 @@ class MapServiceTacking extends Component {
     } else {
       country = 'Ecuador'
     }
-    this.setState({ unmount: false })
+    this.setState({
+      unmount: false,
+    })
   }
 
   componentWillUnmount() {
@@ -100,11 +101,61 @@ class MapServiceTacking extends Component {
     })
   }
 
+  providerFiltering = provider => {
+    const distance = getDistanceInMeters(
+      {
+        latitude: this.props.lat,
+        longitude: this.props.len,
+      },
+      {
+        latitude: provider.lat,
+        longitude: provider.lng,
+      }
+    )
+    let response = false
+    if (distance <= this.state.m) {
+      response = true
+    }
+    return response
+  }
+  setM = async m => {
+    await this.setState({ m })
+    this.setState({ state: this.state })
+  }
+
   render() {
     const { center, zoom } = this.state
-
+    console.log('this.props.providers en map V2', this.props.providers)
     return !this.state.unmount ? (
       <div className="map-container-traking">
+        <div className="avalibleProviders">
+          {this.props.providers
+            .filter(item => {
+              return this.providerFiltering(item)
+            })
+            .map(item => {
+              return (
+                <div style={{ color: '#333' }} key={item.id}>
+                  {item.id} <br />
+                  {item.connected ? 'conectado' : 'desconectado'}
+                </div>
+              )
+            })}
+        </div>
+        <input
+          id={'metrage_' + this.props.userId}
+          placeholder="Metros a la redonda para buscar proveedores"
+        />
+        <button
+          onClick={e => {
+            e.preventDefault()
+            this.setM(
+              document.getElementById('metrage_' + this.props.userId).value
+            )
+          }}
+        >
+          Set metros de búsqueda
+        </button>
         <Autocomplete
           onPlaceSelected={this.handlerLocalization}
           types={[]}
@@ -126,17 +177,6 @@ class MapServiceTacking extends Component {
               : 'desconectado'}
           </span>
           {' / '}
-          <span
-            className={
-              this.props.providerDataState ||
-              this.props.providerDataState === null
-                ? 'conected'
-                : 'diconected'
-            }
-          >
-            <b>Proveedor:</b>{' '}
-            {this.props.providerDataState ? 'conectado' : 'desconectado'}
-          </span>
         </StateContainer>
         <GoogleMapReact
           center={center}
@@ -174,22 +214,24 @@ class MapServiceTacking extends Component {
             ''
           )}
 
-          {/*Proveedor en vivo con WS*/}
-          {this.props.providerData !== null &&
-          this.props.providerData !== '' ? (
-            <CMarker
-              lat={this.props.providerDataLat}
-              lng={this.props.providerDataLng}
-              clientDataState={this.props.providerDataState}
-              isProvider={true}
-              id={this.props.providerData.id}
-              info={this.props.providerData.info}
-              donde={'tacker poroviders'}
-              color={'#000'}
-            />
-          ) : (
-            ''
-          )}
+          {/*Proveedores en vivo*/}
+          {this.props.providers
+            .filter(item => {
+              return this.providerFiltering(item)
+            })
+            .map(provider => (
+              <CMarker
+                key={provider.id}
+                lat={provider.lat}
+                lng={provider.lng}
+                clientDataState={true}
+                isProvider={true}
+                id={provider.id}
+                info={provider.info}
+                donde={'tacker poroviders'}
+                color={'#000'}
+              />
+            ))}
 
           {/*Aqui va Destino Modificable desde CC*/}
         </GoogleMapReact>
@@ -210,7 +252,7 @@ class MapServiceTacking extends Component {
           ) : (
             ''
           )}
-          {this.props.providerData !== null &&
+          {/*this.props.providerData !== null &&
           this.props.providerData !== '' ? (
             <Button
               onClick={e => {
@@ -225,7 +267,7 @@ class MapServiceTacking extends Component {
             </Button>
           ) : (
             ''
-          )}
+          )*/}
           <Button
             onClick={e => {
               e.preventDefault()
