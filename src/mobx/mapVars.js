@@ -29,6 +29,7 @@ export default class MapVars {
     let WSActive = false
     let providerExistGlobal = false
     data.connected = true
+    let ProvidersActiveServices = []
     const WSData = this.WSData.map(item => {
       if (item.APP_ID === APP_ID && item.country === country) {
         WSActive = true
@@ -37,8 +38,19 @@ export default class MapVars {
             providerExistGlobal = true
             provider = data
           }
+
+          provider.info.services.map(service => {
+            ProvidersActiveServices.indexOf(service.servicio) === -1
+              ? ProvidersActiveServices.push(service.servicio)
+              : console.log(
+                  'Ya existe en la lista ProvidersActiveServices',
+                  service.servicio
+                )
+            return service
+          })
           return provider
         })
+        item.ProvidersActiveServices = ProvidersActiveServices
         if (!providerExistGlobal) {
           item.providers.push(data)
         }

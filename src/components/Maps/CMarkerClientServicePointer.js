@@ -12,8 +12,8 @@ const Wrapper = styled.div`
   }
   .cord-0-0 {
     position: absolute;
-    bottom: -30px;
-    left: -80px;
+    bottom: -0px;
+    left: -76px;
   }
   .line {
     width: 2px;

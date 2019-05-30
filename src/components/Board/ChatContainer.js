@@ -30,6 +30,7 @@ class ChatContainer extends React.Component {
       country: null,
       city: null,
       providers: [],
+      ProvidersActiveServices: [],
     }
     this.updateClient = this.updateClient.bind(this)
     this.haveToOpenChat = this.haveToOpenChat.bind(this)
@@ -70,21 +71,36 @@ class ChatContainer extends React.Component {
         })
       }
     })
-    let { providers } = this.state
-    await this.props.mapStore.WSData.map(item => {
+    let { providers, ProvidersActiveServices } = this.state
+    await this.props.mapStore.WSData.map(async item => {
       if (item.APP_ID === this.props.appID) {
         providers = item.providers
+        ProvidersActiveServices = item.ProvidersActiveServices
       }
       return item
     })
     if (providers.length <= 0) {
       providers = await getProviders(this.props.appID, 'Ecuador')
       providers = providers.data
+      await providers.map(provider => {
+        provider.info.services.map(service => {
+          ProvidersActiveServices.indexOf(service.servicio) === -1
+            ? ProvidersActiveServices.push(service.servicio)
+            : console.log(
+                'Ya existe en la lista ProvidersActiveServices',
+                service.servicio
+              )
+          return service
+        })
+        return provider
+      })
     }
+
     await this.setState({
       chageProviderVal,
       clientData: clientGLData.data,
       providers,
+      ProvidersActiveServices,
     })
     //console.log('providers del etsa camada', providers)
     await intercept(this.props.mapStore, 'clientIdWS', change => {
@@ -124,19 +140,15 @@ class ChatContainer extends React.Component {
     }).bind(this)
 
     await intercept(this.props.mapStore, 'providerDsWS', change => {
-      let providers = context.state.providers.map(item => {
-        if (item.id === change.newValue) {
-          item.connected = false
-        }
-        return item
-      })
-      context.updateProvidersDS(providers)
+      context.updateProvidersDS(change)
+      return change
     }).bind(this)
 
     await intercept(this.props.mapStore, 'WSData', change => {
-      change.newValue.map(item => {
+      change.newValue.map(async item => {
         if (item.APP_ID === context.props.appID) {
           context.updateProviders(item.providers)
+          context.updateProvidersActiveServices(item.ProvidersActiveServices)
         }
         return item
       })
@@ -148,11 +160,19 @@ class ChatContainer extends React.Component {
   updateClient(clientData) {
     this.setState({ clientData })
   }
-  updateProvidersDS(providers) {
-    this.setState({ providers })
+  updateProvidersDS(change) {
+    let probresp = this.state.providers.map(item => {
+      if (item.id === change.newValue) {
+        item.connected = false
+      }
+      return item
+    })
+    this.setState({ providers: probresp })
+  }
+  updateProvidersActiveServices(ProvidersActiveServices) {
+    this.setState({ ProvidersActiveServices })
   }
   updateProviders(providers) {
-    //console.log('WSDATA a cambiado updfate providers', providers)
     let probresp = this.state.providers.map(item => {
       providers.map(inProb => {
         if (inProb.id === item.id) {
@@ -239,6 +259,11 @@ class ChatContainer extends React.Component {
       this.props.item.status.name === 'live' &&
       this.props.whoFocusItem !== id
     ) {
+      if (this.props.whoFocusItem !== null) {
+        document.getElementById(
+          'chatTask_' + this.props.whoFocusItem
+        ).style.zIndex = '0'
+      }
       //console.log(this.props.whoFocusItem)
       //console.log(id)
       this.props.whoFocus(id)
@@ -246,6 +271,8 @@ class ChatContainer extends React.Component {
       this.goBottom('scroll_prov_' + id)
 
       this.props.updateGlobalMapVars(this.props.appID, this.state.country)
+
+      document.getElementById('chatTask_' + id).style.zIndex = '2'
     }
   }
 
@@ -295,6 +322,8 @@ class ChatContainer extends React.Component {
                 country={this.state.country}
                 city={this.state.city}
                 providers={this.state.providers}
+                ProvidersActiveServices={this.state.ProvidersActiveServices}
+                service={item.service.name}
               />
             ) : (
               ''

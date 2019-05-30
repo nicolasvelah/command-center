@@ -49,9 +49,24 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
     mapStoreLocal = mapStore
     const providers = await getProviders(APP_ID, country)
     const clients = await getClients(APP_ID, country)
+    let ProvidersActiveServices = []
+    await providers.data.map(provider => {
+      provider.info.services.map(service => {
+        ProvidersActiveServices.indexOf(service.servicio) === -1
+          ? ProvidersActiveServices.push(service.servicio)
+          : console.log(
+              'Ya existe en la lista ProvidersActiveServices',
+              service.servicio
+            )
+        return service
+      })
+      return provider
+    })
+
     let listenerData = {
       APP_ID,
       country,
+      ProvidersActiveServices,
       providers: providers.data,
       clients: clients.data,
     }

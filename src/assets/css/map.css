@@ -47,3 +47,73 @@
 .trakingMapIcon {
   transform: rotate(180deg);
 }
+/*PROVIDERS SEARCHS*/
+.providersList {
+  position: absolute;
+  right: -200px;
+  width: 200px;
+  top: 0px;
+  background: #ffffff;
+  border: 1px solid #dedede;
+  padding: 10px;
+  border-left: none;
+  color: #333;
+}
+.meterSeter {
+  max-width: 35px;
+  text-align: center;
+  background: none;
+  border: none;
+  border-bottom: 1px solid blue;
+  font-weight: bold;
+}
+.meterSeter:focus {
+  outline-width: 0;
+}
+.providerItem {
+  word-break: break-all;
+  white-space: normal;
+  border-top: 1px solid #dedede;
+  margin-top: 5px;
+  padding-bottom: 5px;
+  cursor: pointer;
+}
+.cateoryImageProviderItem {
+  max-width: 20px;
+  margin: 0px 2px 0px 0px;
+  vertical-align: middle;
+}
+.activeserviceInput {
+  color: #333 !important;
+  margin-top: 5px;
+}
+.activeserviceInput .activeservice__menu {
+  color: #333 !important;
+}
+#activeDir {
+  position: absolute;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.5);
+  color: #333;
+  width: 100%;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+.dropDown {
+  display: none;
+}
+.conectIcon {
+  max-width: 18px;
+  margin: 0px 2px 0px 0px;
+  vertical-align: middle;
+}
+.ocupyIcon {
+  max-width: 15px;
+  margin: 0px 2px 0px 0px;
+  vertical-align: middle;
+}
+.startIcon {
+  max-width: 12px;
+  margin: 0px 2px 0px 0px;
+  vertical-align: middle;
+}
