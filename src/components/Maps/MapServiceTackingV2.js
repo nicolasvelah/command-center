@@ -335,6 +335,9 @@ class MapServiceTacking extends Component {
                 } else {
                   item.favorite = false
                 }
+                if (item.localFavorite) {
+                  item.favorite = item.localFavorite
+                }
                 return resp.response
               })
               .sort((a, b) => {

@@ -192,16 +192,14 @@ class ChatContainer extends React.Component {
     this.setState({ providers: probresp })
   }
   updateProvidersFavorite = async (id, fav) => {
-    let probresp = await this.state.providers.map(item => {
+    let { providers } = this.state
+    providers = providers.map(item => {
       if (item.id === id) {
-        console.log('---------- Ingresa', fav)
-        item.favorite = fav
-        console.log('---------- salida item.favorite', item.favorite)
+        item.localFavorite = fav
       }
       return item
     })
-    this.setState({ providers: probresp })
-    console.log('updateProvidersFavorite state probresp', probresp)
+    this.setState({ providers })
   }
 
   updatechageProviderVal() {
