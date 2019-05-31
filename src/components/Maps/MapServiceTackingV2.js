@@ -3,13 +3,14 @@ import GoogleMapReact from 'google-map-react'
 //import { fitBounds } from 'google-map-react/utils'
 import CMarker from './CMarker'
 import CMarkerClientServicePointer from './CMarkerClientServicePointer'
-import Autocomplete from 'react-google-autocomplete'
+//import Autocomplete from 'react-google-autocomplete'
 //import io from 'socket.io-client'
 import styled from 'styled-components'
 //import axios from 'axios'
 //import { getUser } from '../../services/auth'
 import { getDistanceInMeters } from '../../services/helpers'
-import Select from 'react-select'
+import ProviderSearchFilter from '../Tools/ProviderSearchFilter'
+import ProviderItemSearchFilter from '../Tools/ProviderItemSearchFilter'
 
 import '../../assets/css/map.css'
 
@@ -70,7 +71,11 @@ class MapServiceTacking extends Component {
       m: 5000,
       ProvidersActiveServices: [],
       service: null,
+      ActiveSortProv: 'distance',
     }
+    this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
+    this.centerActor = this.centerActor.bind(this)
+    this.updateActiveSortProv = this.updateActiveSortProv.bind(this)
   }
 
   async componentDidMount() {
@@ -82,6 +87,7 @@ class MapServiceTacking extends Component {
     } else {
       country = 'Ecuador'
     }
+
     this.setState({
       unmount: false,
       ProvidersActiveServices: this.selectConstructor(
@@ -181,7 +187,7 @@ class MapServiceTacking extends Component {
         lat: Number(this.props.lat),
         lng: Number(this.props.len),
       },
-      radius: this.state.m * 2,
+      radius: Number(this.state.m),
     })
   }
   selectConstructor = options => {
@@ -201,9 +207,9 @@ class MapServiceTacking extends Component {
   directionsDisplay = null
   calculateAndDisplayRoute(lat, lng, id) {
     const google = (window.google = window.google ? window.google : {})
-    if (this.directionsDisplay !== null) {
+    /*if (this.directionsDisplay !== null) {
       this.directionsDisplay.setMap(null)
-    }
+    }*/
     const directionsService = new google.maps.DirectionsService()
     this.directionsDisplay = new google.maps.DirectionsRenderer()
     this.directionsDisplay.setMap(this.state.map)
@@ -247,19 +253,35 @@ class MapServiceTacking extends Component {
   computeTotalDistance(result, id) {
     var total = 0
     var time = 0
+    var sec = 0
     var from = 0
     var to = 0
     var myroute = result.routes[0]
     for (var i = 0; i < myroute.legs.length; i++) {
       total += myroute.legs[i].distance.value
       time += myroute.legs[i].duration.text
+      sec += myroute.legs[i].duration.value
       from = myroute.legs[i].start_address
       to = myroute.legs[i].end_address
     }
+
     time = time.replace('hours', 'H')
     time = time.replace('mins', 'M')
     total = total / 1000
 
+    let classNameEl = 'semVerde'
+    if (Number(sec) > 3600) {
+      //1 hora
+      classNameEl = 'semRojo'
+    } else if (Number(sec) > 1800) {
+      //1/2 hora
+      classNameEl = 'semAmarillo'
+    }
+    document
+      .getElementById('ProviderRouteData_' + id)
+      .classList.add(classNameEl)
+    document.getElementById('ProviderRouteDataButton_' + id).style.display =
+      'none'
     document
       .getElementById('providerItem_' + id)
       .getElementsByClassName('time')[0].innerHTML = time
@@ -269,172 +291,95 @@ class MapServiceTacking extends Component {
       .getElementsByClassName('km')[0].innerHTML = Math.round(total) + 'KM'
 
     document.getElementById('activeDir').innerHTML =
-      'Desde: ' + from + '/ Hasta: ' + to
+      '<b>Desde:</b> ' + from + ' <br/><b>Hasta:</b> ' + to
 
     document
       .getElementById('providerItem_' + id)
       .getElementsByClassName('ProviderRouteData')[0].style.display = 'block'
   }
+  updateActiveSortProv = ActiveSortProv => {
+    this.setState({ ActiveSortProv })
+  }
+
   render() {
     const { center, zoom } = this.state
     console.log('+++++++++++++++++++++props.providers', this.props.providers)
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">
         <div className="providersList">
-          <div className="providersSearchFilters">
-            <div>
-              {'Proveedores a '}
-              <input
-                id={'metrage_' + this.props.userId}
-                className="meterSeter"
-                defaultValue={this.state.m}
-                onChange={this.handleChange}
-                onKeyDown={this.handleKeyDown}
-              />
-              {'m a la redonda'}
-            </div>
-            <Select
-              className="activeserviceInput"
-              classNamePrefix="activeservice"
-              placeholder="Servicios activos"
-              isClearable={false}
-              isSearchable={true}
-              name="servicios"
-              options={this.state.ProvidersActiveServices}
-              onChange={this.handleServiceChange}
-              defaultValue={{
-                value: this.props.service,
-                label: this.props.service,
-              }}
-            />
-          </div>
+          <ProviderSearchFilter
+            userId={this.props.userId}
+            m={this.state.m}
+            ProvidersActiveServices={this.state.ProvidersActiveServices}
+            handleChange={this.handleChange}
+            handleKeyDown={this.handleKeyDown}
+            handleServiceChange={this.handleServiceChange}
+            SelectDefaultValue={{
+              value: this.props.service,
+              label: this.props.service,
+            }}
+            updateActiveSortProv={this.updateActiveSortProv}
+          />
+
           <div className="avalibleProviders">
             {this.props.providers
               .filter(item => {
                 const resp = this.providerFiltering(item)
                 item.distance = resp.distance
+                if (this.props.favoritesProviders !== null) {
+                  if (this.props.favoritesProviders.includes(item.id)) {
+                    item.favorite = true
+                  } else {
+                    item.favorite = false
+                  }
+                } else {
+                  item.favorite = false
+                }
                 return resp.response
+              })
+              .sort((a, b) => {
+                console.log(
+                  '~~~~~~~~~~~~~~~~~~this.state.ActiveSortProv',
+                  this.state.ActiveSortProv
+                )
+                if (this.state.ActiveSortProv === 'coneccion') {
+                  return a.connected === b.connected ? 0 : a.connected ? -1 : 1
+                } else if (this.state.ActiveSortProv === 'inService') {
+                  return b.inService === a.inService ? 0 : b.inService ? -1 : 1
+                } else if (this.state.ActiveSortProv === 'rate') {
+                  return b.info.rate - a.info.rate
+                } else if (this.state.ActiveSortProv === 'favorite') {
+                  return a.favorite === b.favorite ? 0 : a.favorite ? -1 : 1
+                } else if (this.state.ActiveSortProv === 'distance') {
+                  return a.distance - b.distance
+                } else {
+                  return b.id - a.id
+                }
               })
               .map(item => {
                 return (
-                  <div
-                    style={{ color: '#333' }}
+                  <ProviderItemSearchFilter
                     key={item.id}
-                    id={'providerItem_' + item.id}
-                    className="providerItem"
-                    onClick={e => {
-                      this.centerActor(item.lat, item.lng)
-                      this.calculateAndDisplayRoute(item.lat, item.lng, item.id)
-                    }}
-                  >
-                    {item.info.name + ' ' + item.info.lastName} <br />
-                    <div
-                      className="ProviderRouteData"
-                      style={{ display: 'none' }}
-                    >
-                      <span className="time" />
-                      {' / '}
-                      <span className="km" />
-                    </div>
-                    <span>
-                      <svg
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                        className="conectIcon"
-                      >
-                        <title />
-                        <g id="icomoon-ignore" />
-                        <path
-                          fill={item.connected ? '#53a93f' : '#c62b20'}
-                          d="M416 368h-96v80h-128v-80h-96v-192h64v-128h64v128h64v-128h64v128h64v192z"
-                        />
-                      </svg>
-                      <div className="dropDown">
-                        {item.connected ? 'conectado' : 'desconectado'}
-                      </div>
-                    </span>
-                    {' / '}
-                    {item.inService ? (
-                      <svg
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                        className="ocupyIcon"
-                      >
-                        <title />
-                        <g id="icomoon-ignore" />
-                        <path
-                          fill="#c62b20"
-                          d="M256 0c-141.385 0-256 114.615-256 256s114.615 256 256 256 256-114.615 256-256-114.615-256-256-256zM329.372 374.628l-105.372-105.373v-141.255h64v114.745l86.628 86.627-45.256 45.256z"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                        className="ocupyIcon"
-                      >
-                        <title />
-                        <g id="icomoon-ignore" />
-                        <path
-                          fill="#53a93f"
-                          d="M432 64l-240 240-112-112-80 80 192 192 320-320z"
-                        />
-                      </svg>
-                    )}
-                    {' / '}
-                    {item.info.rate + ' x '}
-                    <svg
-                      version="1.1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                      className="startIcon"
-                    >
-                      <title />
-                      <g id="icomoon-ignore" />
-                      <path
-                        fill="#ffc200"
-                        d="M512 198.525l-176.89-25.704-79.11-160.291-79.108 160.291-176.892 25.704 128 124.769-30.216 176.176 158.216-83.179 158.216 83.179-30.217-176.176 128.001-124.769z"
-                      />
-                    </svg>
-                    {' / '}
-                    {item.distance + 'm'}
-                    <br />
-                    {' ( '}
-                    {item.info.services.map(service => (
-                      <span key={service.serviceId}>
-                        <img
-                          src={service.icon}
-                          alt={service.category}
-                          className="cateoryImageProviderItem"
-                        />
-                        {service.servicio + ', '}
-                      </span>
-                    ))}
-                    {' ) '}
-                    <button
-                      onClick={e => {
-                        e.preventDefault()
-                      }}
-                      className="btn b-verde"
-                    >
-                      Asignar
-                    </button>
-                  </div>
+                    item={item}
+                    centerActor={this.centerActor}
+                    calculateAndDisplayRoute={this.calculateAndDisplayRoute}
+                    addRemoveFavorite={this.props.addRemoveFavorite}
+                    orderId={this.props.orderId}
+                    favorite={item.favorite}
+                    updateProvidersFavorite={this.props.updateProvidersFavorite}
+                  />
                 )
               })}
           </div>
         </div>
         <div className="map-container-traking">
-          <Autocomplete
+          {/*<Autocomplete
             onPlaceSelected={this.handlerLocalization}
             types={[]}
             componentRestrictions={{ country: 'ec' }}
             className="mapSearch"
             placeholder="Introduce una ubicación (Opcional)"
-          />
+          />*/}
           <StateContainer>
             <span
               className={
@@ -533,22 +478,6 @@ class MapServiceTacking extends Component {
             ) : (
               ''
             )}
-            {/*this.props.providerData !== null &&
-          this.props.providerData !== '' ? (
-            <Button
-              onClick={e => {
-                e.preventDefault()
-                this.centerActor(
-                  this.props.providerData.lat,
-                  this.props.providerData.lng
-                )
-              }}
-            >
-              <b>Proveedor</b>
-            </Button>
-          ) : (
-            ''
-          )*/}
             <Button
               onClick={e => {
                 e.preventDefault()
@@ -575,5 +504,4 @@ class MapServiceTacking extends Component {
     ) : null
   }
 }
-
 export default MapServiceTacking

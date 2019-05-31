@@ -34,6 +34,7 @@ class ChatContainer extends React.Component {
     }
     this.updateClient = this.updateClient.bind(this)
     this.haveToOpenChat = this.haveToOpenChat.bind(this)
+    this.updateProvidersFavorite = this.updateProvidersFavorite.bind(this)
   }
   async componentDidMount() {
     //GET USER GEOLOCALIZATION DATA
@@ -190,6 +191,18 @@ class ChatContainer extends React.Component {
     })
     this.setState({ providers: probresp })
   }
+  updateProvidersFavorite = async (id, fav) => {
+    let probresp = await this.state.providers.map(item => {
+      if (item.id === id) {
+        console.log('---------- Ingresa', fav)
+        item.favorite = fav
+        console.log('---------- salida item.favorite', item.favorite)
+      }
+      return item
+    })
+    this.setState({ providers: probresp })
+    console.log('updateProvidersFavorite state probresp', probresp)
+  }
 
   updatechageProviderVal() {
     this.setState({ chageProviderVal: false })
@@ -324,6 +337,10 @@ class ChatContainer extends React.Component {
                 providers={this.state.providers}
                 ProvidersActiveServices={this.state.ProvidersActiveServices}
                 service={item.service.name}
+                orderId={item.id}
+                addRemoveFavorite={this.props.addRemoveFavorite}
+                favoritesProviders={this.props.favoritesProviders}
+                updateProvidersFavorite={this.updateProvidersFavorite}
               />
             ) : (
               ''

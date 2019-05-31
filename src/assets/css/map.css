@@ -54,7 +54,7 @@
   width: 200px;
   top: 0px;
   background: #ffffff;
-  border: 1px solid #dedede;
+  border: 2px solid #53a93f;
   padding: 10px;
   border-left: none;
   color: #333;
@@ -73,8 +73,9 @@
 .providerItem {
   word-break: break-all;
   white-space: normal;
-  border-top: 1px solid #dedede;
-  margin-top: 5px;
+  border-top: 1px solid #d5d5d5;
+  margin-top: 0px;
+  padding-top: 5px;
   padding-bottom: 5px;
   cursor: pointer;
 }
@@ -116,4 +117,62 @@
   max-width: 12px;
   margin: 0px 2px 0px 0px;
   vertical-align: middle;
+}
+.btnicon {
+  padding: 0px;
+  width: auto;
+  border: none;
+  padding-left: 5px;
+}
+.btnicon .svgIcon {
+  width: 18px;
+  margin: 0px 2px 0px 0px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.ProviderItemTools {
+  text-align: right;
+}
+.ProviderItemTools .svgIcon {
+  max-width: 14px;
+}
+.btnassign {
+  border-left: 1px solid #999;
+  margin-left: 5px;
+}
+.btnFavorito {
+  float: right;
+  margin-top: -4px;
+}
+.ProviderRouteData {
+  font-weight: bold;
+  font-size: 13px;
+}
+.semVerde {
+  color: #53a93f;
+}
+.semAmarillo {
+  color: #ffce00;
+}
+.semRojo {
+  color: #c62b20;
+}
+.providersSearchFilters .orderBY {
+  padding: 5px 0px 3px;
+  text-align: center;
+}
+.providersSearchFilters .orderBY svg,
+.providersSearchFilters .orderBY b {
+  cursor: pointer;
+}
+.providersSearchFilters .orderBY .ocupyIcon {
+  max-width: 13px;
+}
+.GetTheRoute {
+  margin: 3px 0px;
+}
+.GetTheRoute span {
+  cursor: pointer;
+  background: #d5d5d5;
+  padding: 1px 3px;
 }

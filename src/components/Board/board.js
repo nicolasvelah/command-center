@@ -61,6 +61,7 @@ class Board extends Component {
     this.onDragStart = this.onDragStart.bind(this)
     this.activateTask = this.activateTask.bind(this)
     this.updateGlobalMapVars = this.updateGlobalMapVars.bind(this)
+    this.addRemoveFavorite = this.addRemoveFavorite.bind(this)
 
     this.RefChatContainer = new Map()
   }
@@ -354,6 +355,34 @@ class Board extends Component {
   }
 
   //ORDERS TRIGERS
+  addRemoveFavorite = async (orderID, providerId, favorite) => {
+    let activetask = get('activeTasks')
+    activetask = activetask.map(item => {
+      if (item.task.id === orderID) {
+        if (!item.task.favorites) {
+          item.task.favorites = []
+        }
+        if (item.task.favorites.length < 0 && favorite) {
+          item.task.favorites.push(providerId)
+        } else {
+          if (!item.task.favorites.includes(providerId) && favorite) {
+            item.task.favorites.push(providerId)
+          } else if (item.task.favorites.includes(providerId) && !favorite) {
+            item.task.favorites = item.task.favorites.filter(fav => {
+              let resp = true
+              if (fav === providerId) {
+                resp = false
+              }
+              return resp
+            })
+            //console.log('item.task.favorites', item.task.favorites)
+          }
+        }
+      }
+      return item
+    })
+    await save('activeTasks', activetask)
+  }
   updateActivateTask = async (column, id) => {
     let activetask = get('activeTasks', column)
     let task = null
@@ -645,7 +674,7 @@ class Board extends Component {
         .filter(node => node != null)
         .forEach(node => {
           if (node.props.item.id === id) {
-            console.log('Nodooo ', node)
+            //console.log('Nodooo ', node)
             node.wrappedInstance.haveToOpenChat(cat, 'board')
           }
         })
@@ -924,6 +953,10 @@ class Board extends Component {
                   color={item.task.color}
                   appID={item.task.client.aplicationId}
                   updateGlobalMapVars={this.updateGlobalMapVars}
+                  addRemoveFavorite={this.addRemoveFavorite}
+                  favoritesProviders={
+                    item.task.favorites ? item.task.favorites : null
+                  }
                 />
               ))}
           </div>
