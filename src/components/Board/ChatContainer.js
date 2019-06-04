@@ -4,10 +4,8 @@ import React from 'react'
 import Chat from './ChatV2'
 import MapServiceTacking from '../Maps/MapServiceTackingV2'
 import star from '../../images/star-full.svg'
-import AsignProvider from './AsignProvider'
-import plus from '../../images/plus.svg'
 import { findUserById, getProviders } from '../../services/wsConect'
-import { geocodeLatLng } from '../../services/helpers'
+import { geocodeLatLng, changeOrderProvider } from '../../services/helpers'
 import { inject, observer } from 'mobx-react'
 import { intercept } from 'mobx'
 
@@ -24,7 +22,8 @@ class ChatContainer extends React.Component {
       id911: null,
       openChat: false,
       status: '',
-      chageProviderVal: false,
+      searchProviderMode: true,
+      providerInChat: null,
       clientData: null,
       address: null,
       country: null,
@@ -41,14 +40,10 @@ class ChatContainer extends React.Component {
     const clientGLData = await findUserById(this.props.item.clientId, true)
     await this.haveToOpenChat(this.props.item.status.name, 'init')
 
-    let { chageProviderVal } = this.state
+    let { searchProviderMode } = this.state
     if (this.props.item.provider !== null) {
-      if (
-        this.props.item.provider.user.name === 'N/A' &&
-        this.props.item.provider.user.name === 'SIN' &&
-        this.props.item.provider.user.name === '911'
-      ) {
-        chageProviderVal = true
+      if (this.props.item.providerId !== 0) {
+        searchProviderMode = false
       }
     }
     const context = this
@@ -100,12 +95,12 @@ class ChatContainer extends React.Component {
     }
 
     await this.setState({
-      chageProviderVal,
+      searchProviderMode,
       clientData: clientGLData.data,
       providers,
       ProvidersActiveServices,
     })
-    console.log('providers del etsa camada', providers)
+    //console.log('providers del etsa camada', providers)
     await intercept(this.props.mapStore, 'clientIdWS', change => {
       if (context.props.item.clientId === change.newValue.id) {
         console.log(
@@ -204,10 +199,6 @@ class ChatContainer extends React.Component {
     this.setState({ providers })
   }
 
-  updatechageProviderVal() {
-    this.setState({ chageProviderVal: false })
-  }
-
   haveToOpenChat = async (statusInit, from) => {
     let haveToOpen = false
 
@@ -298,6 +289,59 @@ class ChatContainer extends React.Component {
     }
   }
 
+  asignProvider = async providerId => {
+    console.log(
+      'LLego y asigno a ' +
+        providerId +
+        '  la tarea con id ' +
+        this.props.item.id
+    )
+    try {
+      await changeOrderProvider(this.props.item.id, providerId)
+    } catch (err) {
+      console.error(err.message)
+    }
+  }
+
+  activeProviderChat = async providerId => {
+    try {
+      let { providerInChat } = this.state
+      this.state.providers.map(provider => {
+        if (provider.id === providerId) {
+          providerInChat = provider
+        }
+        return provider
+      })
+      this.setState({ providerInChat })
+    } catch (err) {
+      console.error(err.message)
+    }
+  }
+  activeProviderCall = async providerId => {
+    try {
+      await console.log(
+        'LLego y llamo a ' +
+          providerId +
+          '  la tarea con id ' +
+          this.props.item.id
+      )
+    } catch (err) {
+      console.error(err.message)
+    }
+  }
+  activeProviderNotification = async providerId => {
+    try {
+      await console.log(
+        'LLego y notifico a ' +
+          providerId +
+          '  la tarea con id ' +
+          this.props.item.id
+      )
+    } catch (err) {
+      console.error(err.message)
+    }
+  }
+
   render() {
     const { item } = this.props
     return item.status.name !== 'complete' ? (
@@ -344,6 +388,10 @@ class ChatContainer extends React.Component {
                 addRemoveFavorite={this.props.addRemoveFavorite}
                 favoritesProviders={this.props.favoritesProviders}
                 updateProvidersFavorite={this.updateProvidersFavorite}
+                asignProvider={this.asignProvider}
+                activeProviderNotification={this.activeProviderNotification}
+                activeProviderChat={this.activeProviderChat}
+                activeProviderCall={this.activeProviderCall}
               />
             ) : (
               ''
@@ -402,7 +450,7 @@ class ChatContainer extends React.Component {
                 }}
                 className="closeChat"
               >
-                X
+                Cerrar
               </div>
 
               <div className="ChatNotificationsCounter">
@@ -430,7 +478,6 @@ class ChatContainer extends React.Component {
                 </div>
                 <Chat
                   messagesTask={item.messagesAll.client}
-                  divicion={null}
                   sid={item.id}
                   goBottom={this.goBottom}
                   orderId={item.id}
@@ -439,31 +486,21 @@ class ChatContainer extends React.Component {
                   addNewMessage={this.props.addNewMessage}
                 />
               </div>
-              {!this.state.chageProviderVal ? (
+              {this.state.providerInChat !== null ? (
                 <div className="ChatProvider chatGeneric">
-                  <button
-                    onClick={e => {
-                      e.preventDefault()
-                      console.log(this.state.chageProviderVal)
-                      this.setState({ chageProviderVal: true })
-                      console.log(this.state.chageProviderVal)
-                    }}
-                    className="ChangeProviderButton"
-                  >
-                    <img src={plus} alt="cambiar de proveedor" />
-                  </button>
                   <div className="ChatInfoMain">
                     <b>Proveedor:</b>
                     {' ' +
-                      item.provider.user.name +
+                      this.state.providerInChat.info.name +
                       ' ' +
-                      item.provider.user.lastName}
+                      this.state.providerInChat.info.lastName}
                     <div className="ExtraData ExtraDataProvider">
-                      <b>Negocio:</b> {item.provider.busnessName}
+                      <b>Negocio:</b>{' '}
+                      {this.state.providerInChat.info.busnessName}
                       <br />
                       <b>Rate:</b>{' '}
                       {((rows, i) => {
-                        while (++i <= item.provider.rate - 1) {
+                        while (++i <= this.state.providerInChat.info.rate) {
                           rows.push(
                             <div className="stars" key={i}>
                               <img src={star} alt="rate" />
@@ -473,28 +510,25 @@ class ChatContainer extends React.Component {
                         return rows
                       })([], 0, 10)}
                       <br />
-                      <b>Email:</b> {item.provider.user.email}
+                      <b>Email:</b> {this.state.providerInChat.info.email}
                       <br />
-                      <b>Telf:</b> {item.provider.user.phone}
+                      <b>Telf:</b> {this.state.providerInChat.info.phone}
                     </div>
                   </div>
                   <Chat
                     messagesTask={item.messagesAll.provider}
-                    divicion={item.messagesAll.providerDivicion}
                     sid={'prov_' + item.id}
                     goBottom={this.goBottom}
                     orderId={item.id}
                     isClientTo={false}
-                    to={item.provider.user.id}
+                    to={this.state.providerInChat.id}
                     addNewMessage={this.props.addNewMessage}
                   />
                 </div>
               ) : (
-                <AsignProvider
-                  orderId={item.id}
-                  updateActivateTask={this.props.updateActivateTask}
-                  appId={item.client.aplicationId}
-                />
+                <div className="ProviderNotSelected">
+                  Busca a tu proveedor <br /> en las cartas a la derecha.
+                </div>
               )}
             </div>
           ) : (

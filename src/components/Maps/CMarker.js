@@ -115,7 +115,7 @@ export default class CMarker extends React.Component {
         </div>
         <div
           className={'info'}
-          style={{ borderColor: this.props.color, borderWidth: '2px' }}
+          style={{ borderColor: this.props.color, borderWidth: '1px' }}
         >
           <div style={{ margin: 0, padding: 0 }}>
             {info.services && isProvider ? (

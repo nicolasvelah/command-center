@@ -21,6 +21,7 @@ export default class ProviderItemSearchFilter extends React.Component {
       calculateAndDisplayRoute,
       setActiveProvider,
       activeProvider,
+      activeProviderChat,
     } = this.props
 
     if (!item.inService) {
@@ -37,6 +38,7 @@ export default class ProviderItemSearchFilter extends React.Component {
         onClick={e => {
           setActiveProvider(item.id)
           centerActor(item.lat, item.lng)
+          activeProviderChat(item.id)
         }}
       >
         <div>
@@ -99,16 +101,18 @@ export default class ProviderItemSearchFilter extends React.Component {
           }
         />
         {' / '}
-        {item.info.rate + ' x '}
-        <Svg
-          title={'Rate'}
-          svgClass="ocupyIcon"
-          svgFill={'#ffc200'}
-          viewBox="0 0 512 512"
-          svgPathOne_d={
-            'M512 198.525l-176.89-25.704-79.11-160.291-79.108 160.291-176.892 25.704 128 124.769-30.216 176.176 158.216-83.179 158.216 83.179-30.217-176.176 128.001-124.769z'
-          }
-        />
+        <span className="rateStart">
+          <span className="rateNumber">{item.info.rate}</span>
+          <Svg
+            title={'Rate'}
+            svgClass="ocupyIcon"
+            svgFill={'#ffc200'}
+            viewBox="0 0 512 512"
+            svgPathOne_d={
+              'M512 198.525l-176.89-25.704-79.11-160.291-79.108 160.291-176.892 25.704 128 124.769-30.216 176.176 158.216-83.179 158.216 83.179-30.217-176.176 128.001-124.769z'
+            }
+          />
+        </span>
         {' / '}
         <b>{item.distance} m de dist.</b>
         <div>
@@ -127,13 +131,14 @@ export default class ProviderItemSearchFilter extends React.Component {
           <button
             onClick={e => {
               e.preventDefault()
+              activeProviderChat(item.id)
             }}
             className="btnicon"
           >
             <Svg
               title={'Chat'}
               svgClass="svgIcon"
-              svgFill={'#333'}
+              svgFill={activeProvider === item.id ? '#53a93f' : '#333'}
               viewBox="0 0 512 512"
               svgPathOne_d={
                 'M256 32c141.385 0 256 93.125 256 208s-114.615 208-256 208c-13.578 0-26.905-0.867-39.912-2.522-54.989 54.989-120.625 64.85-184.088 66.298v-13.458c34.268-16.789 64-47.37 64-82.318 0-4.877-0.379-9.665-1.082-14.348-57.898-38.132-94.918-96.377-94.918-161.652 0-114.875 114.615-208 256-208z'
@@ -143,6 +148,7 @@ export default class ProviderItemSearchFilter extends React.Component {
           <button
             onClick={e => {
               e.preventDefault()
+              this.props.activeProviderCall(item.id)
             }}
             className="btnicon"
           >
@@ -159,6 +165,7 @@ export default class ProviderItemSearchFilter extends React.Component {
           <button
             onClick={e => {
               e.preventDefault()
+              this.props.activeProviderNotification(item.id)
             }}
             className="btnicon"
           >
@@ -175,6 +182,7 @@ export default class ProviderItemSearchFilter extends React.Component {
           <button
             onClick={e => {
               e.preventDefault()
+              this.props.asignProvider(item.id)
             }}
             className="btnicon btnassign"
           >

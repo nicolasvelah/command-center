@@ -438,6 +438,12 @@ class MapServiceTacking extends Component {
                     updateProvidersFavorite={this.props.updateProvidersFavorite}
                     setActiveProvider={this.setActiveProvider}
                     activeProvider={this.state.activeProvider}
+                    asignProvider={this.props.asignProvider}
+                    activeProviderNotification={
+                      this.props.activeProviderNotification
+                    }
+                    activeProviderChat={this.props.activeProviderChat}
+                    activeProviderCall={this.props.activeProviderCall}
                   />
                 )
               })}
@@ -598,6 +604,7 @@ class MapServiceTacking extends Component {
                 e.preventDefault()
                 this.centerActor(this.props.lat, this.props.len)
               }}
+              style={{ background: '#53a93f' }}
             >
               <b>Origen</b>
             </Button>

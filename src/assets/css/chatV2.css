@@ -99,3 +99,18 @@
   width: 15px;
   margin: 0px;
 }
+
+.ChangeProviderButton .svgIcon {
+  width: 18px;
+  margin: 0px 2px 0px 0px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.ProviderNotSelected {
+  padding: 10px;
+  color: #333;
+  font-size: 15px;
+  word-wrap: break-word;
+  white-space: normal;
+  text-align: center;
+}

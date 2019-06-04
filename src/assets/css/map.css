@@ -194,3 +194,12 @@
 .mapActiveProvider {
   background: #53a93f !important;
 }
+.rateStart {
+  position: relative;
+}
+.rateNumber {
+  position: absolute;
+  text-align: center;
+  margin: 3px 0px 0px 5px;
+  font-weight: bold;
+}

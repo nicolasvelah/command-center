@@ -70,12 +70,20 @@ export default class CMarkerClientServicePointer extends React.Component {
             >
               {this.props.destinyData ? (
                 <RouteData>
-                  <div className="timeAdressData">
-                    {this.props.destinyData.time} aprox.
-                  </div>
-                  <div className="kmAdressData">
-                    {this.props.destinyData.km} km
-                  </div>
+                  {this.props.destinyData.time !== null ? (
+                    <div className="timeAdressData">
+                      {this.props.destinyData.time} aprox.
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {this.props.destinyData.km !== null ? (
+                    <div className="kmAdressData">
+                      {this.props.destinyData.km} km
+                    </div>
+                  ) : (
+                    ''
+                  )}
                 </RouteData>
               ) : null}
               {this.props.address !== '' ? (

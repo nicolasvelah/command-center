@@ -29,6 +29,7 @@
     "rc-datepicker": "^5.0.13",
     "react": "^16.6.3",
     "react-compound-timer": "^1.0.13",
+    "react-confirm-alert": "^2.4.1",
     "react-data-export": "^0.5.0",
     "react-date": "^2.0.0",
     "react-dom": "^16.6.3",
