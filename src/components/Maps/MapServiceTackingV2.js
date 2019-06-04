@@ -8,7 +8,7 @@ import CMarkerClientServicePointer from './CMarkerClientServicePointer'
 import styled from 'styled-components'
 //import axios from 'axios'
 //import { getUser } from '../../services/auth'
-import { getDistanceInMeters } from '../../services/helpers'
+import { getDistanceInMeters, colorGenerator } from '../../services/helpers'
 import ProviderSearchFilter from '../Tools/ProviderSearchFilter'
 import ProviderItemSearchFilter from '../Tools/ProviderItemSearchFilter'
 
@@ -68,10 +68,16 @@ class MapServiceTacking extends Component {
         lng: -78.4480523,
       },
       zoom: 14,
-      m: 5000,
+      m: 35000,
       ProvidersActiveServices: [],
       service: null,
       ActiveSortProv: 'distance',
+      activeProvider: null,
+      destinyData: {
+        time: null,
+        km: null,
+      },
+      providersOrigins: [],
     }
     this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
     this.centerActor = this.centerActor.bind(this)
@@ -80,6 +86,7 @@ class MapServiceTacking extends Component {
 
   async componentDidMount() {
     let country = this.props.country
+
     if (country !== null) {
       country = country.replace(/\w\S*/g, function(txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
@@ -113,6 +120,7 @@ class MapServiceTacking extends Component {
         lat: Number(lat),
         lng: Number(lng),
       },
+      zoom: 16,
     })
   }
 
@@ -205,26 +213,60 @@ class MapServiceTacking extends Component {
     })
   }
   directionsDisplay = null
-  calculateAndDisplayRoute(lat, lng, id) {
+  calculateAndDisplayRoute = async (lat, lng, id, destiny) => {
     const google = (window.google = window.google ? window.google : {})
+
     /*if (this.directionsDisplay !== null) {
       this.directionsDisplay.setMap(null)
     }*/
     const directionsService = new google.maps.DirectionsService()
-    this.directionsDisplay = new google.maps.DirectionsRenderer()
+    let colorLine = '#00aeef'
+    let strokeWeight = 4
+    if (!destiny) {
+      colorLine = colorGenerator()
+      strokeWeight = 6
+    }
+
+    var polylineOptionsActual = new google.maps.Polyline({
+      strokeColor: colorLine,
+      strokeOpacity: 0.8,
+      strokeWeight: strokeWeight,
+    })
+    this.directionsDisplay = new google.maps.DirectionsRenderer({
+      suppressMarkers: true,
+      polylineOptions: polylineOptionsActual,
+    })
     this.directionsDisplay.setMap(this.state.map)
+
     const context = this
-    google.maps.event.addListener(
+    await google.maps.event.addListener(
       this.directionsDisplay,
       'directions_changed',
       function() {
         context.computeTotalDistance(context.directionsDisplay.directions, id)
+        if (!destiny) {
+          context.setProviderOriginAdress(
+            context.directionsDisplay.directions,
+            colorLine,
+            lat,
+            lng,
+            id
+          )
+        }
       }
     )
-    const data = [
-      { lat: Number(lat), lng: Number(lng) },
-      { lat: Number(this.props.lat), lng: Number(this.props.len) },
-    ]
+
+    let destinyCords = {
+      lat: Number(this.props.lat),
+      lng: Number(this.props.len),
+    }
+    if (destiny) {
+      destinyCords = {
+        lat: Number(this.props.serviceDestination.position.latitude),
+        lng: Number(this.props.serviceDestination.position.longitude),
+      }
+    }
+    const data = [{ lat: Number(lat), lng: Number(lng) }, destinyCords]
     const waypoints = data.map(item => {
       return {
         location: { lat: item.lat, lng: item.lng },
@@ -250,19 +292,38 @@ class MapServiceTacking extends Component {
       }
     )
   }
+  setProviderOriginAdress = async (result, colorLine, lat, lng, id) => {
+    let { providersOrigins } = this.state
+    const destinyData = await this.computeTotalDistance(result, 'prov')
+    let from = 0
+    var myroute = result.routes[0]
+    for (var i = 0; i < myroute.legs.length; i++) {
+      from = myroute.legs[i].start_address
+    }
+
+    providersOrigins.push({
+      color: colorLine,
+      address: from,
+      lat,
+      lng,
+      id,
+      destinyData,
+    })
+    this.setState({ providersOrigins })
+  }
   computeTotalDistance(result, id) {
     var total = 0
     var time = 0
     var sec = 0
-    var from = 0
-    var to = 0
+    //var from = 0
+    //var to = 0
     var myroute = result.routes[0]
     for (var i = 0; i < myroute.legs.length; i++) {
       total += myroute.legs[i].distance.value
       time += myroute.legs[i].duration.text
       sec += myroute.legs[i].duration.value
-      from = myroute.legs[i].start_address
-      to = myroute.legs[i].end_address
+      //from = myroute.legs[i].start_address
+      //to = myroute.legs[i].end_address
     }
 
     time = time.replace('hours', 'H')
@@ -277,33 +338,41 @@ class MapServiceTacking extends Component {
       //1/2 hora
       classNameEl = 'semAmarillo'
     }
-    document
-      .getElementById('ProviderRouteData_' + id)
-      .classList.add(classNameEl)
-    document.getElementById('ProviderRouteDataButton_' + id).style.display =
-      'none'
-    document
-      .getElementById('providerItem_' + id)
-      .getElementsByClassName('time')[0].innerHTML = time
+    if (id === 'prov') {
+      return { time: time, km: Math.round(total) }
+    } else if (id !== null) {
+      document
+        .getElementById('ProviderRouteData_' + id)
+        .classList.add(classNameEl)
+      document.getElementById('ProviderRouteDataButton_' + id).style.display =
+        'none'
+      document
+        .getElementById('providerItem_' + id)
+        .getElementsByClassName('time')[0].innerHTML = time
 
-    document
-      .getElementById('providerItem_' + id)
-      .getElementsByClassName('km')[0].innerHTML = Math.round(total) + 'KM'
+      document
+        .getElementById('providerItem_' + id)
+        .getElementsByClassName('km')[0].innerHTML = Math.round(total) + 'KM'
 
-    document.getElementById('activeDir').innerHTML =
-      '<b>Desde:</b> ' + from + ' <br/><b>Hasta:</b> ' + to
+      /*document.getElementById('activeDir').innerHTML =
+        '<b>Desde:</b> ' + from + ' <br/><b>Hasta:</b> ' + to*/
 
-    document
-      .getElementById('providerItem_' + id)
-      .getElementsByClassName('ProviderRouteData')[0].style.display = 'block'
+      document
+        .getElementById('providerItem_' + id)
+        .getElementsByClassName('ProviderRouteData')[0].style.display = 'block'
+    } else {
+      this.setState({ destinyData: { time: time, km: Math.round(total) } })
+    }
   }
   updateActiveSortProv = ActiveSortProv => {
     this.setState({ ActiveSortProv })
   }
-
+  setActiveProvider = activeProvider => {
+    this.setState({ activeProvider })
+  }
   render() {
     const { center, zoom } = this.state
-    console.log('+++++++++++++++++++++props.providers', this.props.providers)
+    //console.log('+++++++++++++++++++++props.providers', this.props.providers)
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">
         <div className="providersList">
@@ -319,6 +388,7 @@ class MapServiceTacking extends Component {
               label: this.props.service,
             }}
             updateActiveSortProv={this.updateActiveSortProv}
+            ActiveSortProv={this.state.ActiveSortProv}
           />
 
           <div className="avalibleProviders">
@@ -341,10 +411,6 @@ class MapServiceTacking extends Component {
                 return resp.response
               })
               .sort((a, b) => {
-                console.log(
-                  '~~~~~~~~~~~~~~~~~~this.state.ActiveSortProv',
-                  this.state.ActiveSortProv
-                )
                 if (this.state.ActiveSortProv === 'coneccion') {
                   return a.connected === b.connected ? 0 : a.connected ? -1 : 1
                 } else if (this.state.ActiveSortProv === 'inService') {
@@ -370,6 +436,8 @@ class MapServiceTacking extends Component {
                     orderId={this.props.orderId}
                     favorite={item.favorite}
                     updateProvidersFavorite={this.props.updateProvidersFavorite}
+                    setActiveProvider={this.setActiveProvider}
+                    activeProvider={this.state.activeProvider}
                   />
                 )
               })}
@@ -399,7 +467,7 @@ class MapServiceTacking extends Component {
             </span>
             {' / '}
           </StateContainer>
-          <div id="activeDir" />
+
           <GoogleMapReact
             center={center}
             bootstrapURLKeys={{
@@ -412,8 +480,16 @@ class MapServiceTacking extends Component {
             onChildMouseDown={this.onCircleInteraction}
             onChildMouseUp={this.activeDraggable}
             onChildMouseMove={this.onCircleInteraction}
-            onGoogleApiLoaded={({ map, maps }) => {
-              this.setmap(map)
+            onGoogleApiLoaded={async ({ map, maps }) => {
+              await this.setmap(map)
+              if (this.props.serviceDestination) {
+                this.calculateAndDisplayRoute(
+                  this.props.lat,
+                  this.props.len,
+                  null,
+                  true
+                )
+              }
             }}
           >
             {/*Punto de Encuentro Modificable desde cc*/}
@@ -422,8 +498,24 @@ class MapServiceTacking extends Component {
               lng={this.props.len}
               id={'solicitud_' + this.props.userId}
               address={this.props.address}
+              color="#53a93f"
+              preText="Origen del servicio:"
+              destinyData={this.state.destinyData}
             />
-
+            {/*Punto de destino Modificable desde cc*/ this.props
+              .serviceDestination ? (
+              <CMarkerClientServicePointer
+                lat={this.props.serviceDestination.position.latitude}
+                lng={this.props.serviceDestination.position.longitude}
+                id={'solicitudDestino_' + this.props.userId}
+                address={this.props.serviceDestination.address}
+                color="#00aeef"
+                preText="Destino:"
+                destinyData={this.state.destinyData}
+              />
+            ) : (
+              ''
+            )}
             {/*Cliente en vivo con WS*/}
             {this.props.clientGLData !== '' &&
             this.props.clientGLData !== null ? (
@@ -440,29 +532,48 @@ class MapServiceTacking extends Component {
             ) : (
               ''
             )}
-
             {/*Proveedores en vivo*/}
             {this.props.providers
               .filter(item => {
                 const resp = this.providerFiltering(item)
                 item.distance = resp.distance
-                return resp.response
+                if (resp.response) {
+                  item.classNameLocation = 'inTheRadio'
+                } else {
+                  item.classNameLocation = 'outTheRadio'
+                }
+                return true
               })
               .map(provider => (
                 <CMarker
                   key={provider.id}
                   lat={provider.lat}
                   lng={provider.lng}
-                  clientDataState={true}
+                  clientDataState={provider.connected}
                   isProvider={true}
                   id={provider.id}
                   info={provider.info}
                   donde={'tacker poroviders'}
-                  color={'#000'}
+                  color={'#333'}
+                  classNameLocation={provider.classNameLocation}
+                  activeProvider={this.state.activeProvider}
                 />
               ))}
 
-            {/*Aqui va Destino Modificable desde CC*/}
+            {this.state.providersOrigins
+              ? this.state.providersOrigins.map(providerOriginAddress => (
+                  <CMarkerClientServicePointer
+                    key={providerOriginAddress.id}
+                    lat={providerOriginAddress.lat}
+                    lng={providerOriginAddress.lng}
+                    id={'OrigenProvider_' + this.props.userId}
+                    address={providerOriginAddress.address}
+                    color={providerOriginAddress.color}
+                    preText="Origen del Proveedor:"
+                    destinyData={providerOriginAddress.destinyData}
+                  />
+                ))
+              : ''}
           </GoogleMapReact>
           <ButtonContainer>
             {this.props.clientGLData !== null &&
@@ -475,6 +586,7 @@ class MapServiceTacking extends Component {
                     this.props.clientGLData.lng
                   )
                 }}
+                style={{ background: this.props.color }}
               >
                 <b>Cliente</b>
               </Button>
@@ -487,13 +599,16 @@ class MapServiceTacking extends Component {
                 this.centerActor(this.props.lat, this.props.len)
               }}
             >
-              <b>Punto de encuentro</b>
+              <b>Origen</b>
             </Button>
-            {typeof this.props.destinyLat !== 'undefined' ? (
+            {this.props.serviceDestination ? (
               <Button
                 onClick={e => {
                   e.preventDefault()
-                  this.centerActor(this.props.destinyLat, this.props.destinyLen)
+                  this.centerActor(
+                    this.props.serviceDestination.position.latitude,
+                    this.props.serviceDestination.position.longitude
+                  )
                 }}
               >
                 <b>Destino</b>

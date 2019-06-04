@@ -55,7 +55,7 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
         ProvidersActiveServices.indexOf(service.servicio) === -1
           ? ProvidersActiveServices.push(service.servicio)
           : console.log(
-              'Ya existe en la lista ProvidersActiveServices',
+              '3. Ya existe en la lista ProvidersActiveServices',
               service.servicio
             )
         return service
@@ -81,13 +81,11 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
     socket.on(`onProviderLocation-app-${APP_ID}-${country}`, data =>
       onProviderLocation(data, APP_ID, country)
     )
-    socket.on(
-      `onProviderInService-app-${APP_ID}-${country}`,
-      onProviderInService
+    socket.on(`onProviderInService-app-${APP_ID}-${country}`, data =>
+      onProviderInService(data, APP_ID, country)
     )
-    socket.on(
-      `onProviderDisconnected-app-${APP_ID}-${country}`,
-      onProviderDisconnected
+    socket.on(`onProviderDisconnected-app-${APP_ID}-${country}`, data =>
+      onProviderDisconnected(data, APP_ID, country)
     )
   }
 }
@@ -153,20 +151,12 @@ const onClientDisconnected = async data => {
 const onProviderLocation = async (data, APP_ID, country) => {
   mapStoreLocal.onProviderLocation(data, APP_ID, country)
 }
-const onProviderDisconnected = async data => {
+const onProviderDisconnected = async (data, APP_ID, country) => {
   const { id } = data
-  await mapStoreLocal.disconectProvider(id)
+  await mapStoreLocal.disconectProvider(id, APP_ID, country)
 }
-const onProviderInService = async (data, providers) => {
-  /*const { id, inService } = data
-
-  var tmp = providers
-  const index = tmp.findIndex(o => o.id === id)
-  if (index !== -1) {
-    tmp[index].inService = inService
-  }
-  tmp = await this.filterProviders(tmp, this.props.providerId)
-  return tmp*/
+const onProviderInService = async (data, APP_ID, country) => {
+  await mapStoreLocal.inServiceProvider(data, APP_ID, country)
 }
 
 export const findUserById = async (userId, isClient) => {
@@ -205,6 +195,7 @@ export const getProviders = async (appId, country) => {
         },
       }
     )
+    console.log(')))))))000000pppppppp result', result)
     return result
   } catch (err) {
     console.log(err.message)

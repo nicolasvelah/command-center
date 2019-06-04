@@ -7,6 +7,7 @@ const Wrapper = styled.div`
   text-align: center;
   width: 0px;
   height: 0px;
+
   .relative {
     position: relative;
   }
@@ -19,13 +20,11 @@ const Wrapper = styled.div`
     width: 2px;
     height: 10px;
     margin: auto;
-    background: #e52e4c;
   }
   .addressText {
     width: auto;
     max-width: 200px;
     min-width: 150px;
-    background: #e52e4c;
     border-radius: 5px;
     opacity: 0.8;
     padding: 5px;
@@ -36,7 +35,26 @@ const Wrapper = styled.div`
     cursor: default;
     word-break: break-all;
     white-space: pre-wrap;
-}
+    p {
+      margin-bottom: 0px;
+    }
+  }
+`
+
+const RouteData = styled.div`
+  position: absolute;
+  display: flex;
+  top: -18px;
+  div {
+    background: #fff;
+    color: #333;
+    font-weight: bold;
+    margin-right: 5px;
+    padding: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border: 1px solid #999;
+    border-bottom: none;
   }
 `
 
@@ -46,12 +64,29 @@ export default class CMarkerClientServicePointer extends React.Component {
       <Wrapper>
         <div className="relative">
           <div className="cord-0-0">
-            <div className="addressText">
-              {this.props.address !== ''
-                ? this.props.address
-                : 'No hay datos de direccion'}
+            <div
+              className="addressText"
+              style={{ background: this.props.color }}
+            >
+              {this.props.destinyData ? (
+                <RouteData>
+                  <div className="timeAdressData">
+                    {this.props.destinyData.time} aprox.
+                  </div>
+                  <div className="kmAdressData">
+                    {this.props.destinyData.km} km
+                  </div>
+                </RouteData>
+              ) : null}
+              {this.props.address !== '' ? (
+                <p>
+                  <b>{this.props.preText}</b> {this.props.address} <br />
+                </p>
+              ) : (
+                'No hay datos de direccion'
+              )}
             </div>
-            <div className="line" />
+            <div className="line" style={{ background: this.props.color }} />
           </div>
         </div>
       </Wrapper>

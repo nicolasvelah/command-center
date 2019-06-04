@@ -13,14 +13,29 @@ export default class ProviderItemSearchFilter extends React.Component {
     this.props.addRemoveFavorite(this.props.orderId, id, this.state.favorite)
     this.props.updateProvidersFavorite(id, this.state.favorite)
   }
+
   render() {
-    const { item, centerActor, calculateAndDisplayRoute } = this.props
+    const {
+      item,
+      centerActor,
+      calculateAndDisplayRoute,
+      setActiveProvider,
+      activeProvider,
+    } = this.props
+
+    if (!item.inService) {
+      item.inService = false
+    }
     return (
       <div
         style={{ color: '#333' }}
         id={'providerItem_' + item.id}
-        className="providerItem"
+        className={
+          (activeProvider === item.id ? 'activeProv' : 'inactiveProv') +
+          ' providerItem'
+        }
         onClick={e => {
+          setActiveProvider(item.id)
           centerActor(item.lat, item.lng)
         }}
       >
@@ -48,7 +63,9 @@ export default class ProviderItemSearchFilter extends React.Component {
         </div>
         <div id={'ProviderRouteDataButton_' + item.id} className="GetTheRoute">
           <span
-            onClick={e => calculateAndDisplayRoute(item.lat, item.lng, item.id)}
+            onClick={e =>
+              calculateAndDisplayRoute(item.lat, item.lng, item.id, false)
+            }
           >
             Solicitar datos de ruta
           </span>

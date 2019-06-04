@@ -53,25 +53,27 @@ class ChatContainer extends React.Component {
     }
     const context = this
     //console.log('this.props.item =++++++++++++', this.props.item)
-    await geocodeLatLng(this.props.item.lat, this.props.item.len, function(
-      data
-    ) {
-      //console.log('Data de rertorno de google', data)
-      if (Array.isArray(data)) {
-        const location = data[3].formatted_address.split(',')
-        const country = location[1]
-        const city = location[0]
-        context.setState({
-          address: data[0].formatted_address,
-          country,
-          city,
-        })
-      } else {
-        context.setState({
-          address: data,
-        })
+    await geocodeLatLng(
+      this.props.item.serviceOrigin.position.latitude,
+      this.props.item.serviceOrigin.position.longitude,
+      function(data) {
+        //console.log('Data de rertorno de google', data)
+        if (Array.isArray(data)) {
+          const location = data[3].formatted_address.split(',')
+          const country = location[1]
+          const city = location[0]
+          context.setState({
+            address: data[0].formatted_address,
+            country,
+            city,
+          })
+        } else {
+          context.setState({
+            address: data,
+          })
+        }
       }
-    })
+    )
     let { providers, ProvidersActiveServices } = this.state
     await this.props.mapStore.WSData.map(async item => {
       if (item.APP_ID === this.props.appID) {
@@ -88,7 +90,7 @@ class ChatContainer extends React.Component {
           ProvidersActiveServices.indexOf(service.servicio) === -1
             ? ProvidersActiveServices.push(service.servicio)
             : console.log(
-                'Ya existe en la lista ProvidersActiveServices',
+                '1.Ya existe en la lista ProvidersActiveServices',
                 service.servicio
               )
           return service
@@ -103,7 +105,7 @@ class ChatContainer extends React.Component {
       providers,
       ProvidersActiveServices,
     })
-    //console.log('providers del etsa camada', providers)
+    console.log('providers del etsa camada', providers)
     await intercept(this.props.mapStore, 'clientIdWS', change => {
       if (context.props.item.clientId === change.newValue.id) {
         console.log(
@@ -271,9 +273,11 @@ class ChatContainer extends React.Component {
       this.props.whoFocusItem !== id
     ) {
       if (this.props.whoFocusItem !== null) {
-        document.getElementById(
-          'chatTask_' + this.props.whoFocusItem
-        ).style.zIndex = '0'
+        if (document.getElementById('chatTask_' + this.props.whoFocusItem)) {
+          document.getElementById(
+            'chatTask_' + this.props.whoFocusItem
+          ).style.zIndex = '0'
+        }
       }
       //console.log(this.props.whoFocusItem)
       //console.log(id)
@@ -313,8 +317,9 @@ class ChatContainer extends React.Component {
               <MapServiceTacking
                 userId={item.clientId}
                 appId={item.client.aplicationId}
-                lat={item.lat}
-                len={item.len}
+                lat={item.serviceOrigin.position.latitude}
+                len={item.serviceOrigin.position.longitude}
+                serviceDestination={item.serviceDestination}
                 socket={this.props.socket}
                 clientGLData={this.state.clientData}
                 clientDataLat={

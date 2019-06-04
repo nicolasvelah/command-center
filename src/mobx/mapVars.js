@@ -28,7 +28,9 @@ export default class MapVars {
   @action.bound onProviderLocation = async (data, APP_ID, country) => {
     let WSActive = false
     let providerExistGlobal = false
+
     data.connected = true
+
     let ProvidersActiveServices = []
     const WSData = this.WSData.map(item => {
       if (item.APP_ID === APP_ID && item.country === country) {
@@ -43,7 +45,7 @@ export default class MapVars {
             ProvidersActiveServices.indexOf(service.servicio) === -1
               ? ProvidersActiveServices.push(service.servicio)
               : console.log(
-                  'Ya existe en la lista ProvidersActiveServices',
+                  '2. Ya existe en la lista ProvidersActiveServices',
                   service.servicio
                 )
             return service
@@ -64,10 +66,54 @@ export default class MapVars {
       this.WSData = WSData
     }
   }
-  @action.bound disconectProvider(providerId) {
+  @action.bound disconectProvider = async (providerId, APP_ID, country) => {
     if (providerId !== null) {
-      console.log('provider diconect', providerId)
-      this.providerDsWS = providerId
+      let WSActive = false
+      const WSData = this.WSData.map(item => {
+        if (item.APP_ID === APP_ID && item.country === country) {
+          WSActive = true
+          item.providers = item.providers.map(provider => {
+            if (provider.id === providerId) {
+              provider.connected = false
+            }
+            return provider
+          })
+        }
+        return item
+      })
+
+      await Promise.all(WSData)
+
+      if (WSActive) {
+        this.WSData = WSData
+        this.providerDsWS = providerId
+      }
+    }
+  }
+  @action.bound inServiceProvider = async (data, APP_ID, country) => {
+    const { id, inService } = data
+    const providerId = id
+    if (providerId !== null) {
+      let WSActive = false
+      const WSData = this.WSData.map(item => {
+        if (item.APP_ID === APP_ID && item.country === country) {
+          WSActive = true
+          item.providers = item.providers.map(provider => {
+            if (provider.id === providerId) {
+              provider.inService = inService
+            }
+            return provider
+          })
+        }
+        return item
+      })
+
+      await Promise.all(WSData)
+
+      if (WSActive) {
+        this.WSData = WSData
+        this.providerDsWS = providerId
+      }
     }
   }
   @action.bound setWSData(data) {
