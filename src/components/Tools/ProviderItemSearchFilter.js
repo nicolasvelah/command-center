@@ -7,11 +7,14 @@ export default class ProviderItemSearchFilter extends React.Component {
     this.state = {
       favorite: this.props.favorite,
     }
+    this.setFavorite = this.setFavorite.bind(this)
   }
+
   setFavorite = async id => {
-    await this.setState({ favorite: !this.state.favorite })
-    this.props.addRemoveFavorite(this.props.orderId, id, this.state.favorite)
-    this.props.updateProvidersFavorite(id, this.state.favorite)
+    const favorite = !this.state.favorite
+    this.props.addRemoveFavorite(this.props.orderId, id, favorite)
+    this.props.updateProvidersFavorite(id, favorite)
+    this.setState({ favorite })
   }
 
   render() {
@@ -42,6 +45,18 @@ export default class ProviderItemSearchFilter extends React.Component {
         }}
       >
         <div>
+          <span className="rateStart">
+            <span className="rateNumber">{item.info.rate}</span>
+            <Svg
+              title={'Rate'}
+              svgClass="ocupyIcon"
+              svgFill={'#ffc200'}
+              viewBox="0 0 512 512"
+              svgPathOne_d={
+                'M512 198.525l-176.89-25.704-79.11-160.291-79.108 160.291-176.892 25.704 128 124.769-30.216 176.176 158.216-83.179 158.216 83.179-30.217-176.176 128.001-124.769z'
+              }
+            />
+          </span>
           <b>{item.info.name + ' ' + item.info.lastName}</b>{' '}
           <button
             onClick={e => {
@@ -69,17 +84,32 @@ export default class ProviderItemSearchFilter extends React.Component {
               calculateAndDisplayRoute(item.lat, item.lng, item.id, false)
             }
           >
-            Solicitar datos de ruta
+            Datos de ruta
           </span>
         </div>
         <div
-          className="ProviderRouteData"
+          className={
+            (item.timeColorClass ? item.timeColorClass : '') +
+            ' ProviderRouteData'
+          }
           id={'ProviderRouteData_' + item.id}
           style={{ display: 'none' }}
         >
-          <span className="time" />
+          <span className="time">{item.time}</span>
           {' / '}
-          <span className="km" />
+          <span className="km">{item.km} km</span>
+          {' / '}
+          <span
+            style={{
+              background: item.colorRoute,
+              color: '#fff',
+              padding: '2px 5px',
+              fontSize: '9px',
+              fontWeight: 'normal',
+            }}
+          >
+            Ruta
+          </span>
         </div>
         <Svg
           title={item.connected ? 'conectado' : 'desconectado'}
@@ -88,7 +118,7 @@ export default class ProviderItemSearchFilter extends React.Component {
           svgFill={item.connected ? '#53a93f' : '#c62b20'}
           svgPathOne_d="M416 368h-96v80h-128v-80h-96v-192h64v-128h64v128h64v-128h64v128h64v192z"
         />
-        {' / '}
+        {'/ '}
         <Svg
           title={item.inService ? 'Ocupado' : 'Libre'}
           svgClass="ocupyIcon"
@@ -100,20 +130,8 @@ export default class ProviderItemSearchFilter extends React.Component {
               : 'M432 64l-240 240-112-112-80 80 192 192 320-320z'
           }
         />
-        {' / '}
-        <span className="rateStart">
-          <span className="rateNumber">{item.info.rate}</span>
-          <Svg
-            title={'Rate'}
-            svgClass="ocupyIcon"
-            svgFill={'#ffc200'}
-            viewBox="0 0 512 512"
-            svgPathOne_d={
-              'M512 198.525l-176.89-25.704-79.11-160.291-79.108 160.291-176.892 25.704 128 124.769-30.216 176.176 158.216-83.179 158.216 83.179-30.217-176.176 128.001-124.769z'
-            }
-          />
-        </span>
-        {' / '}
+
+        {'/  '}
         <b>{item.distance} m de dist.</b>
         <div>
           {item.info.services.map(service => (
@@ -148,7 +166,10 @@ export default class ProviderItemSearchFilter extends React.Component {
           <button
             onClick={e => {
               e.preventDefault()
-              this.props.activeProviderCall(item.id)
+              this.props.activeProviderCall(
+                item.info.name + ' ' + item.info.lastName,
+                item.info.phone
+              )
             }}
             className="btnicon"
           >

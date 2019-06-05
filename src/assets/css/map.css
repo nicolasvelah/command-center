@@ -140,6 +140,10 @@
   font-weight: bold;
   font-size: 13px;
 }
+.ProviderRouteDataMap {
+  font-weight: bold;
+  font-size: 13px;
+}
 .semVerde {
   color: #53a93f;
 }
@@ -164,13 +168,16 @@
   max-width: 13px;
 }
 .GetTheRoute {
-  margin: 3px 0px;
+  margin: 5px 0px;
 }
 .GetTheRoute span {
   cursor: pointer;
-  background: #d5d5d5;
-  padding: 1px 3px;
+  background: #6aa7ef;
+  padding: 3px 5px;
+  border-radius: 5px;
+  color: #fff;
 }
+
 .activeProv {
   background: #ecffe1;
 }
@@ -200,6 +207,6 @@
 .rateNumber {
   position: absolute;
   text-align: center;
-  margin: 3px 0px 0px 5px;
+  margin: 2px 0px 0px 5px;
   font-weight: bold;
 }

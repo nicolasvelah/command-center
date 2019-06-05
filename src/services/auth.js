@@ -84,10 +84,10 @@ export const logout = async callback => {
     }
   )
   setUser({})
-  window.localStorage.setItem('fbtk', '')
+  //window.localStorage.setItem('fbtk', '')
 }
 
 export const logoutLocal = async callback => {
   setUser({})
-  window.localStorage.setItem('fbtk', '')
+  //window.localStorage.setItem('fbtk', '')
 }

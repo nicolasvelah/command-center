@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import GoogleMapReact from 'google-map-react'
+import { inject, observer } from 'mobx-react'
 //import { fitBounds } from 'google-map-react/utils'
 import CMarker from './CMarker'
 import CMarkerClientServicePointer from './CMarkerClientServicePointer'
@@ -9,6 +10,7 @@ import styled from 'styled-components'
 //import axios from 'axios'
 //import { getUser } from '../../services/auth'
 import { getDistanceInMeters, colorGenerator } from '../../services/helpers'
+
 import ProviderSearchFilter from '../Tools/ProviderSearchFilter'
 import ProviderItemSearchFilter from '../Tools/ProviderItemSearchFilter'
 
@@ -28,7 +30,7 @@ const Button = styled.button`
   border-radius: 3px;
   border: none;
   font-size: 11px;
-  background-color: #4e86d8;
+  background-color: rgb(0, 174, 239);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,8 +57,11 @@ const StateContainer = styled.div`
     color: red;
   }
 `
+
 const WAIT_INTERVAL = 1000
 
+@inject('mapStore')
+@observer
 class MapServiceTacking extends Component {
   constructor(props) {
     super(props)
@@ -82,6 +87,8 @@ class MapServiceTacking extends Component {
     this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
     this.centerActor = this.centerActor.bind(this)
     this.updateActiveSortProv = this.updateActiveSortProv.bind(this)
+
+    this.RefItemSearchFilter = new Map()
   }
 
   async componentDidMount() {
@@ -153,6 +160,7 @@ class MapServiceTacking extends Component {
     if (this.state.service !== 'Todos' && !isService) {
       response = false
     }
+    this.props.updateProvider({ distance }, provider.id)
     return { response, distance }
   }
   setM = async m => {
@@ -243,7 +251,11 @@ class MapServiceTacking extends Component {
       this.directionsDisplay,
       'directions_changed',
       function() {
-        context.computeTotalDistance(context.directionsDisplay.directions, id)
+        context.computeTotalDistance(
+          context.directionsDisplay.directions,
+          id,
+          colorLine
+        )
         if (!destiny) {
           context.setProviderOriginAdress(
             context.directionsDisplay.directions,
@@ -294,7 +306,7 @@ class MapServiceTacking extends Component {
   }
   setProviderOriginAdress = async (result, colorLine, lat, lng, id) => {
     let { providersOrigins } = this.state
-    const destinyData = await this.computeTotalDistance(result, 'prov')
+    const destinyData = await this.computeTotalDistance(result, 'prov', null)
     let from = 0
     var myroute = result.routes[0]
     for (var i = 0; i < myroute.legs.length; i++) {
@@ -311,7 +323,7 @@ class MapServiceTacking extends Component {
     })
     this.setState({ providersOrigins })
   }
-  computeTotalDistance(result, id) {
+  computeTotalDistance(result, id, colorRoute) {
     var total = 0
     var time = 0
     var sec = 0
@@ -339,27 +351,29 @@ class MapServiceTacking extends Component {
       classNameEl = 'semAmarillo'
     }
     if (id === 'prov') {
+      this.props.updateProvider({ time: time, km: Math.round(total) }, id)
       return { time: time, km: Math.round(total) }
     } else if (id !== null) {
-      document
-        .getElementById('ProviderRouteData_' + id)
-        .classList.add(classNameEl)
-      document.getElementById('ProviderRouteDataButton_' + id).style.display =
-        'none'
-      document
-        .getElementById('providerItem_' + id)
-        .getElementsByClassName('time')[0].innerHTML = time
+      this.props.updateProvider(
+        {
+          time: time,
+          timeColorClass: classNameEl,
+          km: Math.round(total),
+          colorRoute,
+        },
+        id
+      )
+      if (document.getElementById('ProviderRouteDataButton_' + id)) {
+        document.getElementById('ProviderRouteDataButton_' + id).style.display =
+          'none'
+      }
 
-      document
-        .getElementById('providerItem_' + id)
-        .getElementsByClassName('km')[0].innerHTML = Math.round(total) + 'KM'
-
-      /*document.getElementById('activeDir').innerHTML =
-        '<b>Desde:</b> ' + from + ' <br/><b>Hasta:</b> ' + to*/
-
-      document
-        .getElementById('providerItem_' + id)
-        .getElementsByClassName('ProviderRouteData')[0].style.display = 'block'
+      if (document.getElementById('providerItem_' + id)) {
+        document
+          .getElementById('providerItem_' + id)
+          .getElementsByClassName('ProviderRouteData')[0].style.display =
+          'block'
+      }
     } else {
       this.setState({ destinyData: { time: time, km: Math.round(total) } })
     }
@@ -370,85 +384,110 @@ class MapServiceTacking extends Component {
   setActiveProvider = activeProvider => {
     this.setState({ activeProvider })
   }
+  favioriteInRef(id) {
+    Array.from(this.RefItemSearchFilter.values())
+      .filter(node => node != null)
+      .forEach(node => {
+        //console.log('In ARRAY node.props.item.id', node)
+        //console.log('In ARRAY id', id)
+        if (node.props.item.id === id) {
+          //console.log('Entro', id)
+          node.setFavorite(id)
+        }
+      })
+  }
   render() {
     const { center, zoom } = this.state
     //console.log('+++++++++++++++++++++props.providers', this.props.providers)
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">
-        <div className="providersList">
-          <ProviderSearchFilter
-            userId={this.props.userId}
-            m={this.state.m}
-            ProvidersActiveServices={this.state.ProvidersActiveServices}
-            handleChange={this.handleChange}
-            handleKeyDown={this.handleKeyDown}
-            handleServiceChange={this.handleServiceChange}
-            SelectDefaultValue={{
-              value: this.props.service,
-              label: this.props.service,
-            }}
-            updateActiveSortProv={this.updateActiveSortProv}
-            ActiveSortProv={this.state.ActiveSortProv}
-          />
+        {this.props.searchProviderMode ? (
+          <div className="providersList">
+            <ProviderSearchFilter
+              userId={this.props.userId}
+              m={this.state.m}
+              ProvidersActiveServices={this.state.ProvidersActiveServices}
+              handleChange={this.handleChange}
+              handleKeyDown={this.handleKeyDown}
+              handleServiceChange={this.handleServiceChange}
+              SelectDefaultValue={{
+                value: this.props.service,
+                label: this.props.service,
+              }}
+              updateActiveSortProv={this.updateActiveSortProv}
+              ActiveSortProv={this.state.ActiveSortProv}
+            />
 
-          <div className="avalibleProviders">
-            {this.props.providers
-              .filter(item => {
-                const resp = this.providerFiltering(item)
-                item.distance = resp.distance
-                if (this.props.favoritesProviders !== null) {
-                  if (this.props.favoritesProviders.includes(item.id)) {
-                    item.favorite = true
+            <div className="avalibleProviders">
+              {this.props.providers
+                .filter(item => {
+                  const resp = this.providerFiltering(item)
+                  item.distance = resp.distance
+                  if (this.props.favoritesProviders !== null) {
+                    if (this.props.favoritesProviders.includes(item.id)) {
+                      item.favorite = true
+                    } else {
+                      item.favorite = false
+                    }
                   } else {
                     item.favorite = false
                   }
-                } else {
-                  item.favorite = false
-                }
-                if (item.localFavorite) {
-                  item.favorite = item.localFavorite
-                }
-                return resp.response
-              })
-              .sort((a, b) => {
-                if (this.state.ActiveSortProv === 'coneccion') {
-                  return a.connected === b.connected ? 0 : a.connected ? -1 : 1
-                } else if (this.state.ActiveSortProv === 'inService') {
-                  return b.inService === a.inService ? 0 : b.inService ? -1 : 1
-                } else if (this.state.ActiveSortProv === 'rate') {
-                  return b.info.rate - a.info.rate
-                } else if (this.state.ActiveSortProv === 'favorite') {
-                  return a.favorite === b.favorite ? 0 : a.favorite ? -1 : 1
-                } else if (this.state.ActiveSortProv === 'distance') {
-                  return a.distance - b.distance
-                } else {
-                  return b.id - a.id
-                }
-              })
-              .map(item => {
-                return (
-                  <ProviderItemSearchFilter
-                    key={item.id}
-                    item={item}
-                    centerActor={this.centerActor}
-                    calculateAndDisplayRoute={this.calculateAndDisplayRoute}
-                    addRemoveFavorite={this.props.addRemoveFavorite}
-                    orderId={this.props.orderId}
-                    favorite={item.favorite}
-                    updateProvidersFavorite={this.props.updateProvidersFavorite}
-                    setActiveProvider={this.setActiveProvider}
-                    activeProvider={this.state.activeProvider}
-                    asignProvider={this.props.asignProvider}
-                    activeProviderNotification={
-                      this.props.activeProviderNotification
-                    }
-                    activeProviderChat={this.props.activeProviderChat}
-                    activeProviderCall={this.props.activeProviderCall}
-                  />
-                )
-              })}
+                  if (item.localFavorite) {
+                    item.favorite = item.localFavorite
+                  }
+                  return resp.response
+                })
+                .sort((a, b) => {
+                  if (this.state.ActiveSortProv === 'coneccion') {
+                    return a.connected === b.connected
+                      ? 0
+                      : a.connected
+                      ? -1
+                      : 1
+                  } else if (this.state.ActiveSortProv === 'inService') {
+                    return b.inService === a.inService
+                      ? 0
+                      : b.inService
+                      ? -1
+                      : 1
+                  } else if (this.state.ActiveSortProv === 'rate') {
+                    return b.info.rate - a.info.rate
+                  } else if (this.state.ActiveSortProv === 'favorite') {
+                    return a.favorite === b.favorite ? 0 : a.favorite ? -1 : 1
+                  } else if (this.state.ActiveSortProv === 'distance') {
+                    return a.distance - b.distance
+                  } else {
+                    return b.id - a.id
+                  }
+                })
+                .map(item => {
+                  return (
+                    <ProviderItemSearchFilter
+                      key={item.id}
+                      ref={c => this.RefItemSearchFilter.set(item.id, c)}
+                      item={item}
+                      centerActor={this.centerActor}
+                      calculateAndDisplayRoute={this.calculateAndDisplayRoute}
+                      addRemoveFavorite={this.props.addRemoveFavorite}
+                      orderId={this.props.orderId}
+                      favorite={item.favorite}
+                      updateProvidersFavorite={
+                        this.props.updateProvidersFavorite
+                      }
+                      setActiveProvider={this.setActiveProvider}
+                      activeProvider={this.state.activeProvider}
+                      asignProvider={this.props.asignProvider}
+                      activeProviderNotification={
+                        this.props.activeProviderNotification
+                      }
+                      activeProviderChat={this.props.activeProviderChat}
+                      activeProviderCall={this.props.activeProviderCall}
+                    />
+                  )
+                })}
+            </div>
           </div>
-        </div>
+        ) : null}
         <div className="map-container-traking">
           {/*<Autocomplete
             onPlaceSelected={this.handlerLocalization}

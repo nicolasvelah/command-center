@@ -11,11 +11,11 @@ export default class MapVars {
     if (client !== null) {
       this.clientIdWS = client
     }
-    console.log('client', client)
+    //console.log('client', client)
   }
   @action.bound disconectClient(clientId) {
     if (clientId !== null) {
-      console.log('client diconect', clientId)
+      //console.log('client diconect', clientId)
       this.clientsDsWS = clientId
     }
   }
@@ -23,7 +23,7 @@ export default class MapVars {
     if (provider !== null) {
       this.providerWS = provider
     }
-    console.log('provider', provider)
+    //console.log('provider', provider)
   }
   @action.bound onProviderLocation = async (data, APP_ID, country) => {
     let WSActive = false
@@ -42,12 +42,9 @@ export default class MapVars {
           }
 
           provider.info.services.map(service => {
-            ProvidersActiveServices.indexOf(service.servicio) === -1
-              ? ProvidersActiveServices.push(service.servicio)
-              : console.log(
-                  '2. Ya existe en la lista ProvidersActiveServices',
-                  service.servicio
-                )
+            if (ProvidersActiveServices.indexOf(service.servicio) === -1) {
+              ProvidersActiveServices.push(service.servicio)
+            }
             return service
           })
           return provider
@@ -120,6 +117,6 @@ export default class MapVars {
     if (data !== null) {
       this.WSData.push(data)
     }
-    console.log('WSData', data)
+    //console.log('WSData', data)
   }
 }

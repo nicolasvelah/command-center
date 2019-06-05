@@ -107,6 +107,7 @@ export const getAllTasks = async () => {
       {},
       {
         headers: {
+          'Content-Type': 'application/json',
           'x-access-token': getUser().token,
         },
       }

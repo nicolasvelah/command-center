@@ -65,8 +65,7 @@
 .chatFocus .ChatMap {
   max-height: initial;
   height: 300px;
-  border: 2px solid #53a93f;
-  border-right: none;
+  border-left: 2px solid #53a93f;
 }
 .messageItem {
   width: 100%;

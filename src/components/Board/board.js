@@ -23,8 +23,8 @@ import Loading from '../Tools/Loading'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
-@observer
 @inject('mapStore')
+@observer
 class Board extends Component {
   constructor(props) {
     super(props)
@@ -492,7 +492,6 @@ class Board extends Component {
           activeTasks,
         })
 
-        //console.log('this.RefChatContainer--------', this.RefChatContainer)
         await Array.from(this.RefChatContainer.values())
           .filter(node => node != null)
           .forEach(node => {
@@ -502,7 +501,7 @@ class Board extends Component {
             }
           })
 
-        console.log('activeTasks ------------', activeTasks)
+        //console.log('activeTasks ------------', activeTasks)
         //const scrollWidthValue = (index - 1) * 420
       }
       this.notificationOff(id, 'provider')
@@ -669,7 +668,7 @@ class Board extends Component {
             .replace(/-+$/, '') + '.svg'
         await this.activateTask(id, icon)
       }
-      //console.log('this.RefChatContainer--------', this.RefChatContainer)
+
       Array.from(this.RefChatContainer.values())
         .filter(node => node != null)
         .forEach(node => {

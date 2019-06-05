@@ -1,16 +1,67 @@
 import React from 'react'
 //import ChatNotificationsCounter from './ChatNotificationsCounter'
 //import { save, get } from '../../services/Storage'
-import Chat from './ChatV2'
-import MapServiceTacking from '../Maps/MapServiceTackingV2'
-import star from '../../images/star-full.svg'
-import { findUserById, getProviders } from '../../services/wsConect'
-import { geocodeLatLng, changeOrderProvider } from '../../services/helpers'
 import { inject, observer } from 'mobx-react'
 import { intercept } from 'mobx'
+import styled from 'styled-components'
+import { confirmAlert } from 'react-confirm-alert'
 
-@observer
+import Chat from './ChatV2'
+import MapServiceTacking from '../Maps/MapServiceTackingV2'
+import { findUserById, getProviders } from '../../services/wsConect'
+import { geocodeLatLng, changeOrderProvider } from '../../services/helpers'
+import Svg from '../Tools/svg'
+
+import 'react-confirm-alert/src/react-confirm-alert.css'
+
+const SearchProviderModeMarker = styled.div`
+  text-align: right;
+  padding: 0px;
+  .iconServiceState {
+    padding: 4px 4px 0px;
+    display: inline-block;
+    background: #fff;
+    border: 2px solid #53a93f;
+    border-bottom: none;
+    border-right: none;
+  }
+  svg {
+    width: 30px;
+  }
+`
+
+const ChatProviderHeader = styled.div`
+  line-height: 18px;
+  .NameRate {
+    display: flex;
+    line-height: 24px;
+    .stars {
+      position: relative;
+      .rateProvStart {
+        width: 20px;
+        height: 20px;
+        margin-right: 3px;
+      }
+      span {
+        position: absolute;
+        text-align: center;
+        margin: 0px 0px 0px 7px;
+        font-weight: bold;
+      }
+    }
+  }
+  .GetTheRoute {
+    margin: 0px;
+  }
+`
+const ComunicationTools = styled.div`
+  text-align: right;
+  svg {
+    max-width: 14px;
+  }
+`
 @inject('mapStore')
+@observer
 class ChatContainer extends React.Component {
   constructor(props) {
     super(props)
@@ -34,6 +85,7 @@ class ChatContainer extends React.Component {
     this.updateClient = this.updateClient.bind(this)
     this.haveToOpenChat = this.haveToOpenChat.bind(this)
     this.updateProvidersFavorite = this.updateProvidersFavorite.bind(this)
+    this.updateProvider = this.updateProvider.bind(this)
   }
   async componentDidMount() {
     //GET USER GEOLOCALIZATION DATA
@@ -69,7 +121,7 @@ class ChatContainer extends React.Component {
         }
       }
     )
-    let { providers, ProvidersActiveServices } = this.state
+    let { providers, ProvidersActiveServices, providerInChat } = this.state
     await this.props.mapStore.WSData.map(async item => {
       if (item.APP_ID === this.props.appID) {
         providers = item.providers
@@ -82,23 +134,28 @@ class ChatContainer extends React.Component {
       providers = providers.data
       await providers.map(provider => {
         provider.info.services.map(service => {
-          ProvidersActiveServices.indexOf(service.servicio) === -1
-            ? ProvidersActiveServices.push(service.servicio)
-            : console.log(
-                '1.Ya existe en la lista ProvidersActiveServices',
-                service.servicio
-              )
+          if (ProvidersActiveServices.indexOf(service.servicio) === -1) {
+            ProvidersActiveServices.push(service.servicio)
+          }
           return service
         })
         return provider
       })
     }
-
+    if (this.props.item.providerId !== 0) {
+      await providers.map(provider => {
+        if (provider.id === this.props.item.provider.id) {
+          providerInChat = provider
+        }
+        return provider
+      })
+    }
     await this.setState({
       searchProviderMode,
       clientData: clientGLData.data,
       providers,
       ProvidersActiveServices,
+      providerInChat,
     })
     //console.log('providers del etsa camada', providers)
     await intercept(this.props.mapStore, 'clientIdWS', change => {
@@ -190,13 +247,18 @@ class ChatContainer extends React.Component {
   }
   updateProvidersFavorite = async (id, fav) => {
     let { providers } = this.state
-    providers = providers.map(item => {
-      if (item.id === id) {
-        item.localFavorite = fav
+    providers.map(provider => {
+      if (provider.id === id) {
+        provider.localFavorite = fav
       }
-      return item
+      return provider
     })
     this.setState({ providers })
+    if (this.state.providerInChat) {
+      if (id === this.state.providerInChat.id) {
+        this.setChatFav(fav)
+      }
+    }
   }
 
   haveToOpenChat = async (statusInit, from) => {
@@ -290,23 +352,49 @@ class ChatContainer extends React.Component {
   }
 
   asignProvider = async providerId => {
-    console.log(
-      'LLego y asigno a ' +
-        providerId +
-        '  la tarea con id ' +
-        this.props.item.id
-    )
-    try {
-      await changeOrderProvider(this.props.item.id, providerId)
-    } catch (err) {
-      console.error(err.message)
+    let message = `¿Estás segur@ que quieres asignar al proveedor ${this.state
+      .providerInChat.info.name +
+      ' ' +
+      this.state.providerInChat.info.lastName}?`
+    if (this.props.item.providerId !== 0) {
+      message = `¿Estás segur@ que quieres cambiar de proveedor de ${this.props
+        .item.provider.user.name +
+        ' ' +
+        this.props.item.provider.user.lastName} a ${this.state.providerInChat
+        .info.name +
+        ' ' +
+        this.state.providerInChat.info.lastName}?`
     }
+    confirmAlert({
+      title: 'Asignara proveedor a esta Historia',
+      message,
+      buttons: [
+        {
+          label: 'Si',
+          onClick: async () => {
+            try {
+              await changeOrderProvider(this.props.item.id, providerId)
+              this.searchProviderMode(true)
+            } catch (err) {
+              console.error(err.message)
+            }
+          },
+        },
+        {
+          label: 'No',
+          onClick: () => null,
+        },
+      ],
+      childrenElement: () => <div className="confimationPopUp" />,
+      closeOnEscape: true,
+      closeOnClickOutside: true,
+    })
   }
 
   activeProviderChat = async providerId => {
     try {
-      let { providerInChat } = this.state
-      this.state.providers.map(provider => {
+      let { providerInChat, providers } = this.state
+      providers.map(provider => {
         if (provider.id === providerId) {
           providerInChat = provider
         }
@@ -317,17 +405,30 @@ class ChatContainer extends React.Component {
       console.error(err.message)
     }
   }
-  activeProviderCall = async providerId => {
-    try {
-      await console.log(
-        'LLego y llamo a ' +
-          providerId +
-          '  la tarea con id ' +
-          this.props.item.id
-      )
-    } catch (err) {
-      console.error(err.message)
-    }
+  activeProviderCall = (name, phone) => {
+    confirmAlert({
+      title: '',
+      message: `¿Deseas llamar al proveedor ${name} al número ${phone}?`,
+      buttons: [
+        {
+          label: 'No llamar',
+          onClick: () => null,
+        },
+        {
+          label: 'Llamar',
+          onClick: async () => {
+            try {
+              console.log('Ejecucion de API para llamada IP')
+            } catch (err) {
+              console.error(err.message)
+            }
+          },
+        },
+      ],
+      childrenElement: () => <div className="confimationPopUp" />,
+      closeOnEscape: true,
+      closeOnClickOutside: true,
+    })
   }
   activeProviderNotification = async providerId => {
     try {
@@ -341,9 +442,81 @@ class ChatContainer extends React.Component {
       console.error(err.message)
     }
   }
+  searchProviderMode = trigger => {
+    if (!trigger) {
+      confirmAlert({
+        title: 'Cambiar de proveedor para esta Historia',
+        message:
+          'Ya tienes un proveedor asignado a esta historia. ¿Estás seguro que quieres cambiar de proveedor?',
+        buttons: [
+          {
+            label: 'Si',
+            onClick: () =>
+              this.setState({
+                searchProviderMode: !this.state.searchProviderMode,
+              }),
+          },
+          {
+            label: 'No',
+            onClick: () => null,
+          },
+        ],
+      })
+    } else {
+      this.setState({
+        searchProviderMode: !this.state.searchProviderMode,
+      })
+    }
+  }
+  updateProvider = async (values, providerId) => {
+    console.log('updateProvider ' + providerId, values)
+    let { providers, providerInChat } = this.state
+    await providers.map(provider => {
+      if (provider.id === providerId) {
+        this.mergeObj(provider, values)
+      }
+      if (providerInChat) {
+        if (providerInChat.id === providerId) {
+          this.mergeObj(providerInChat, values)
+        }
+      }
+      return provider
+    })
+    console.log('updateProvider salida' + providerId, providers)
+    console.log(
+      'updateProvider salida providerInChat' + providerId,
+      providerInChat
+    )
+    this.setState({
+      providers,
+      providerInChat,
+    })
+  }
+  mergeObj = (obj, src) => {
+    for (var key in src) {
+      if (src.hasOwnProperty(key)) obj[key] = src[key]
+    }
+    return obj
+  }
+  setChatFav = async favorite => {
+    let { providerInChat, providers } = this.state
+    if (providerInChat) {
+      providers.map(provider => {
+        if (provider.id === providerInChat.id) {
+          provider.favorite = favorite
+        }
+        return provider
+      })
 
+      await this.updateProvider({ favorite }, providerInChat.id)
+      providerInChat.favorite = favorite
+      this.setState({ providerInChat, providers })
+      //console.log('setChatFav', providers)
+    }
+  }
   render() {
     const { item } = this.props
+    //console.log('item.providerId ', item)
     return item.status.name !== 'complete' ? (
       <div
         className={
@@ -355,51 +528,52 @@ class ChatContainer extends React.Component {
         id={'chatTask_' + item.id}
         onClick={e => this.focusChat(item.id)}
       >
-        {item.status.name === 'live' && this.state.providers.length > 0 ? (
-          <div className="ChatMap">
-            {this.props.socket !== null ? (
-              <MapServiceTacking
-                userId={item.clientId}
-                appId={item.client.aplicationId}
-                lat={item.serviceOrigin.position.latitude}
-                len={item.serviceOrigin.position.longitude}
-                serviceDestination={item.serviceDestination}
-                socket={this.props.socket}
-                clientGLData={this.state.clientData}
-                clientDataLat={
-                  this.state.clientData !== null ? this.state.clientData.lat : 0
+        <SearchProviderModeMarker>
+          <div
+            className="iconServiceState"
+            style={
+              this.state.searchProviderMode
+                ? null
+                : { borderRight: '2px solid  #53a93f' }
+            }
+          >
+            <button
+              onClick={e => {
+                e.preventDefault()
+                if (!(this.state.searchProviderMode && item.providerId === 0)) {
+                  var triger = true
+                  if (!this.state.searchProviderMode) {
+                    triger = false
+                  }
+                  this.searchProviderMode(triger)
                 }
-                clientDataLng={
-                  this.state.clientData !== null ? this.state.clientData.lng : 0
+              }}
+              className="btnicon"
+            >
+              <Svg
+                title={
+                  this.state.searchProviderMode
+                    ? 'Sin Proveedor'
+                    : 'Con Proveedor'
                 }
-                clientDataState={
-                  this.state.clientData !== null
-                    ? this.state.clientData.connected
-                    : null
+                svgClass="svgIcon"
+                svgFill={this.state.searchProviderMode ? '#c62b20' : '#53a93f'}
+                viewBox="0 0 512 512"
+                svgPathOne_d={
+                  this.state.searchProviderMode
+                    ? 'M192 368c0-75.617 47.937-140.243 115.016-165.1 8.14-18.269 12.984-38.582 12.984-58.9 0-79.529 0-144-96-144s-96 64.471-96 144c0 49.53 28.751 99.052 64 118.916v26.39c-108.551 8.874-192 62.21-192 126.694h198.653c-4.332-15.265-6.653-31.366-6.653-48z'
+                    : 'M480 304l-144 144-48-48-32 32 80 80 176-176z'
                 }
-                color={this.props.color}
-                address={this.state.address}
-                country={this.state.country}
-                city={this.state.city}
-                providers={this.state.providers}
-                ProvidersActiveServices={this.state.ProvidersActiveServices}
-                service={item.service.name}
-                orderId={item.id}
-                addRemoveFavorite={this.props.addRemoveFavorite}
-                favoritesProviders={this.props.favoritesProviders}
-                updateProvidersFavorite={this.updateProvidersFavorite}
-                asignProvider={this.asignProvider}
-                activeProviderNotification={this.activeProviderNotification}
-                activeProviderChat={this.activeProviderChat}
-                activeProviderCall={this.activeProviderCall}
+                svgPathTow_d={
+                  this.state.searchProviderMode
+                    ? 'M368 224c-79.529 0-144 64.471-144 144s64.471 144 144 144c79.528 0 144-64.471 144-144s-64.471-144-144-144zM448 384h-160v-32h160v32z'
+                    : 'M224 384h160v-57.564c-33.61-19.6-78.154-33.055-128-37.13v-26.39c35.249-19.864 64-69.386 64-118.916 0-79.529 0-144-96-144s-96 64.471-96 144c0 49.53 28.751 99.052 64 118.916v26.39c-108.551 8.874-192 62.21-192 126.694h224v-32'
+                }
               />
-            ) : (
-              ''
-            )}
+            </button>
           </div>
-        ) : (
-          ''
-        )}
+        </SearchProviderModeMarker>
+
         <div className={this.state.status + ' subcontainer '}>
           <div className="ChatHeader">
             <div className="clientDataName">
@@ -458,6 +632,65 @@ class ChatContainer extends React.Component {
               </div>
             </div>
           </div>
+          {item.status.name === 'live' && this.state.providers.length > 0 ? (
+            <div
+              className="ChatMap"
+              style={
+                this.state.searchProviderMode
+                  ? null
+                  : { borderRight: '3px solid  #53a93f' }
+              }
+            >
+              {this.props.socket !== null ? (
+                <MapServiceTacking
+                  userId={item.clientId}
+                  appId={item.client.aplicationId}
+                  lat={item.serviceOrigin.position.latitude}
+                  len={item.serviceOrigin.position.longitude}
+                  serviceDestination={item.serviceDestination}
+                  socket={this.props.socket}
+                  clientGLData={this.state.clientData}
+                  clientDataLat={
+                    this.state.clientData !== null
+                      ? this.state.clientData.lat
+                      : 0
+                  }
+                  clientDataLng={
+                    this.state.clientData !== null
+                      ? this.state.clientData.lng
+                      : 0
+                  }
+                  clientDataState={
+                    this.state.clientData !== null
+                      ? this.state.clientData.connected
+                      : null
+                  }
+                  color={this.props.color}
+                  address={this.state.address}
+                  country={this.state.country}
+                  city={this.state.city}
+                  providers={this.state.providers}
+                  ProvidersActiveServices={this.state.ProvidersActiveServices}
+                  service={item.service.name}
+                  orderId={item.id}
+                  addRemoveFavorite={this.props.addRemoveFavorite}
+                  favoritesProviders={this.props.favoritesProviders}
+                  updateProvidersFavorite={this.updateProvidersFavorite}
+                  asignProvider={this.asignProvider}
+                  activeProviderNotification={this.activeProviderNotification}
+                  activeProviderChat={this.activeProviderChat}
+                  activeProviderCall={this.activeProviderCall}
+                  searchProviderMode={this.state.searchProviderMode}
+                  updateProvider={this.updateProvider}
+                  ref="mapa"
+                />
+              ) : (
+                ''
+              )}
+            </div>
+          ) : (
+            ''
+          )}
           {this.state.openChat ? (
             <div className="chatTool">
               <div className="ChatClient chatGeneric">
@@ -487,33 +720,203 @@ class ChatContainer extends React.Component {
                 />
               </div>
               {this.state.providerInChat !== null ? (
-                <div className="ChatProvider chatGeneric">
+                <ChatProviderHeader className="ChatProvider chatGeneric">
                   <div className="ChatInfoMain">
-                    <b>Proveedor:</b>
-                    {' ' +
-                      this.state.providerInChat.info.name +
-                      ' ' +
-                      this.state.providerInChat.info.lastName}
-                    <div className="ExtraData ExtraDataProvider">
-                      <b>Negocio:</b>{' '}
-                      {this.state.providerInChat.info.busnessName}
-                      <br />
-                      <b>Rate:</b>{' '}
-                      {((rows, i) => {
-                        while (++i <= this.state.providerInChat.info.rate) {
-                          rows.push(
-                            <div className="stars" key={i}>
-                              <img src={star} alt="rate" />
-                            </div>
+                    <div className="NameRate">
+                      <div className="stars">
+                        <span>{this.state.providerInChat.info.rate}</span>
+                        <Svg
+                          title={'Rate'}
+                          svgClass="rateProvStart"
+                          svgFill={'#ffc200'}
+                          viewBox="0 0 512 512"
+                          svgPathOne_d={
+                            'M512 198.525l-176.89-25.704-79.11-160.291-79.108 160.291-176.892 25.704 128 124.769-30.216 176.176 158.216-83.179 158.216 83.179-30.217-176.176 128.001-124.769z'
+                          }
+                        />
+                      </div>
+                      <b>
+                        {this.state.providerInChat.info.name +
+                          ' ' +
+                          this.state.providerInChat.info.lastName}
+                      </b>
+                      <button
+                        onClick={e => {
+                          e.preventDefault()
+                          this.setChatFav(!this.state.providerInChat.favorite)
+                          this.refs.mapa.wrappedInstance.favioriteInRef(
+                            this.state.providerInChat.id
                           )
-                        }
-                        return rows
-                      })([], 0, 10)}
-                      <br />
-                      <b>Email:</b> {this.state.providerInChat.info.email}
-                      <br />
-                      <b>Telf:</b> {this.state.providerInChat.info.phone}
+                        }}
+                        className="btnicon btnFavorito"
+                      >
+                        <Svg
+                          title="Favorito"
+                          svgClass="svgIcon"
+                          viewBox="0 0 512 512"
+                          svgFill={
+                            !this.state.providerInChat.favorite
+                              ? '#333'
+                              : '#ed1848'
+                          }
+                          svgPathOne_d={
+                            !this.state.providerInChat.favorite
+                              ? 'M416 149c0-70.25-47.5-85-87.5-85-37.25 0-79.25 40.25-92.25 55.75-6 7.25-18.5 7.25-24.5 0-13-15.5-55-55.75-92.25-55.75-40 0-87.5 14.75-87.5 85 0 45.75 46.25 88.25 46.75 88.75l145.25 140 145-139.75c0.75-0.75 47-43.25 47-89zM448 149c0 60-55 110.25-57.25 112.5l-155.75 150c-3 3-7 4.5-11 4.5s-8-1.5-11-4.5l-156-150.5c-2-1.75-57-52-57-112 0-73.25 44.75-117 119.5-117 43.75 0 84.75 34.5 104.5 54 19.75-19.5 60.75-54 104.5-54 74.75 0 119.5 43.75 119.5 117z'
+                              : 'M224 416c-4 0-8-1.5-11-4.5l-156-150.5c-2-1.75-57-52-57-112 0-73.25 44.75-117 119.5-117 43.75 0 84.75 34.5 104.5 54 19.75-19.5 60.75-54 104.5-54 74.75 0 119.5 43.75 119.5 117 0 60-55 110.25-57.25 112.5l-155.75 150c-3 3-7 4.5-11 4.5z'
+                          }
+                        />
+                      </button>
                     </div>
+
+                    {!this.state.providerInChat.time ? (
+                      <div
+                        id={
+                          'ProviderRouteDataButtonChat_' +
+                          this.state.providerInChat.id
+                        }
+                        className="GetTheRoute"
+                      >
+                        <span
+                          onClick={e => {
+                            e.preventDefault()
+                            this.refs.mapa.wrappedInstance.calculateAndDisplayRoute(
+                              this.state.providerInChat.lat,
+                              this.state.providerInChat.lng,
+                              this.state.providerInChat.id,
+                              false
+                            )
+                          }}
+                        >
+                          Datos de ruta
+                        </span>
+                      </div>
+                    ) : (
+                      <div
+                        className={
+                          (this.state.providerInChat.timeColorClass
+                            ? this.state.providerInChat.timeColorClass
+                            : '') + ' ProviderRouteDataMap'
+                        }
+                        id={
+                          'ProviderRouteDataChat_' +
+                          this.state.providerInChat.id
+                        }
+                      >
+                        <span className="time">
+                          {this.state.providerInChat.time}
+                        </span>
+                        {' / '}
+                        <span className="km">
+                          {this.state.providerInChat.km} km
+                        </span>
+                        {' / '}
+                        <span
+                          style={{
+                            background: this.state.providerInChat.colorRoute,
+                            color: '#fff',
+                            padding: '2px 5px',
+                            fontSize: '9px',
+                            fontWeight: 'normal',
+                          }}
+                        >
+                          Ruta
+                        </span>
+                      </div>
+                    )}
+                    <div className="ProvMonitor">
+                      <Svg
+                        title={
+                          this.state.providerInChat.connected
+                            ? 'conectado'
+                            : 'desconectado'
+                        }
+                        svgClass="conectIcon"
+                        viewBox="0 0 512 512"
+                        svgFill={
+                          this.state.providerInChat.connected
+                            ? '#53a93f'
+                            : '#c62b20'
+                        }
+                        svgPathOne_d="M416 368h-96v80h-128v-80h-96v-192h64v-128h64v128h64v-128h64v128h64v192z"
+                      />
+                      {' / '}
+                      <Svg
+                        title={
+                          this.state.providerInChat.inService
+                            ? 'Ocupado'
+                            : 'Libre'
+                        }
+                        svgClass="ocupyIcon"
+                        svgFill={
+                          this.state.providerInChat.inService
+                            ? '#c62b20'
+                            : '#53a93f'
+                        }
+                        viewBox="0 0 512 512"
+                        svgPathOne_d={
+                          this.state.providerInChat.inService
+                            ? 'M256 0c-141.385 0-256 114.615-256 256s114.615 256 256 256 256-114.615 256-256-114.615-256-256-256zM329.372 374.628l-105.372-105.373v-141.255h64v114.745l86.628 86.627-45.256 45.256z'
+                            : 'M432 64l-240 240-112-112-80 80 192 192 320-320z'
+                        }
+                      />
+                      {' / '}
+                      <b>{this.state.providerInChat.distance} m de dist.</b>
+                    </div>
+                    <div>
+                      {this.state.providerInChat.info.services.map(service => (
+                        <span key={service.serviceId}>
+                          <img
+                            src={service.icon}
+                            alt={service.category}
+                            className="cateoryImageProviderItem"
+                          />
+                          {service.servicio + ', '}
+                        </span>
+                      ))}
+                    </div>
+                    <ComunicationTools>
+                      <button
+                        onClick={e => {
+                          e.preventDefault()
+                          this.activeProviderCall(
+                            this.state.providerInChat.info.name +
+                              ' ' +
+                              this.state.providerInChat.info.lastName,
+                            this.state.providerInChat.info.phone
+                          )
+                        }}
+                        className="btnicon"
+                      >
+                        <Svg
+                          title={'Llamada'}
+                          svgClass="svgIcon"
+                          svgFill={'#333'}
+                          viewBox="0 0 512 512"
+                          svgPathOne_d={
+                            'M352 320c-32 32-32 64-64 64s-64-32-96-64-64-64-64-96 32-32 64-64-64-128-96-128-96 96-96 96c0 64 65.75 193.75 128 256s192 128 256 128c0 0 96-64 96-96s-96-128-128-96z'
+                          }
+                        />
+                      </button>
+                      <button
+                        onClick={e => {
+                          e.preventDefault()
+                          this.activeProviderNotification(
+                            this.state.providerInChat.id
+                          )
+                        }}
+                        className="btnicon"
+                      >
+                        <Svg
+                          title={'Notificar'}
+                          svgClass="svgIcon"
+                          svgFill={'#333'}
+                          viewBox="0 0 512 512"
+                          svgPathOne_d={
+                            'M512.75 400c0-144-128-112-128-224 0-9.28-0.894-17.21-2.524-23.964-8.415-56.509-46.078-101.86-94.886-115.68 0.433-1.974 0.66-4.016 0.66-6.105 0-16.639-14.4-30.251-32-30.251s-32 13.612-32 30.25c0 2.090 0.228 4.132 0.66 6.105-54.735 15.499-95.457 70.649-96.627 136.721-0.020 0.96-0.033 1.932-0.033 2.923 0 112.001-128 80.001-128 224.001 0 38.113 85.295 69.998 199.485 78.040 10.762 20.202 32.028 33.96 56.515 33.96s45.754-13.758 56.515-33.96c114.19-8.042 199.485-39.927 199.485-78.040 0-0.114-0.013-0.228-0.014-0.341l0.764 0.341zM413.123 427.048c-27.115 7.235-59.079 12.438-93.384 15.324-2.852-32.709-30.291-58.372-63.739-58.372s-60.887 25.663-63.739 58.372c-34.304-2.886-66.269-8.089-93.384-15.324-37.315-9.957-55.155-21.095-61.684-27.048 6.529-5.953 24.369-17.091 61.684-27.048 43.386-11.576 99.186-17.952 157.123-17.952s113.737 6.376 157.123 17.952c37.315 9.957 55.155 21.095 61.684 27.048-6.529 5.953-24.369 17.091-61.684 27.048z'
+                          }
+                        />
+                      </button>
+                    </ComunicationTools>
                   </div>
                   <Chat
                     messagesTask={item.messagesAll.provider}
@@ -524,10 +927,11 @@ class ChatContainer extends React.Component {
                     to={this.state.providerInChat.id}
                     addNewMessage={this.props.addNewMessage}
                   />
-                </div>
+                </ChatProviderHeader>
               ) : (
                 <div className="ProviderNotSelected">
-                  Busca a tu proveedor <br /> en las cartas a la derecha.
+                  Busca el proveedor
+                  <br /> en las cartas a la derecha.
                 </div>
               )}
             </div>

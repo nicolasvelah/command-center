@@ -40,24 +40,21 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
     })
   }
   if (newListener) {
-    console.log(
+    /*console.log(
       '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nuevo listener APP_ID: ' +
         APP_ID +
         ' / pais: ' +
         country
-    )
+    )*/
     mapStoreLocal = mapStore
     const providers = await getProviders(APP_ID, country)
     const clients = await getClients(APP_ID, country)
     let ProvidersActiveServices = []
     await providers.data.map(provider => {
       provider.info.services.map(service => {
-        ProvidersActiveServices.indexOf(service.servicio) === -1
-          ? ProvidersActiveServices.push(service.servicio)
-          : console.log(
-              '3. Ya existe en la lista ProvidersActiveServices',
-              service.servicio
-            )
+        if (ProvidersActiveServices.indexOf(service.servicio) === -1) {
+          ProvidersActiveServices.push(service.servicio)
+        }
         return service
       })
       return provider
@@ -195,7 +192,7 @@ export const getProviders = async (appId, country) => {
         },
       }
     )
-    console.log(')))))))000000pppppppp result', result)
+    //console.log('getProviders Result', result)
     return result
   } catch (err) {
     console.log(err.message)

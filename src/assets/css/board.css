@@ -298,7 +298,6 @@
 }
 .chat-container {
   font-family: 'Yanone Kaffeesatz', sans-serif;
-  background: #333;
   color: #fff;
   font-size: 10px;
   margin: 0px 0.1%;
@@ -571,7 +570,16 @@
   margin-bottom: 5px;
   max-width: 210px;
 }
-
+.react-confirm-alert-body {
+  font-size: 14px;
+  line-height: 16px;
+}
+.react-confirm-alert-body h1 {
+  font-size: 22px;
+}
+.react-confirm-alert-button-group button {
+  background: #0047b3;
+}
 @media (max-width: 767px) {
   .board {
     display: block;
