@@ -2,8 +2,15 @@ import axios from 'axios'
 import { getUser, logoutLocal } from './auth'
 import { toast } from 'react-toastify'
 
-export const sendMessage = async (to, content, orderId, isClientTo) => {
+export const sendMessage = async (
+  to,
+  content,
+  orderId,
+  isClientTo,
+  assistanceMode
+) => {
   try {
+    console.log('Enviando REST... ')
     const result = await axios.post(
       `${process.env.API_URL}/sendMessage`,
       {
@@ -11,6 +18,7 @@ export const sendMessage = async (to, content, orderId, isClientTo) => {
         content,
         orderId,
         isClientTo,
+        assistanceMode,
       },
       {
         headers: {

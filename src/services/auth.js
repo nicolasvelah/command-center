@@ -32,7 +32,7 @@ export const handleLogin = async ({ username, password }) => {
       process.env.CRYPTO_SECRET
     ).toString()
 
-    console.log('loginEncryptedData:', loginEncryptedData)
+    //console.log('loginEncryptedData:', loginEncryptedData)
 
     const response = await axios.post(`${process.env.API_URL}/login`, {
       data: loginEncryptedData,

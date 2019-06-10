@@ -67,6 +67,9 @@ class Board extends Component {
   }
 
   async componentDidMount() {
+    if (this.props.mapStore.providerWS.length <= 0) {
+      await this.props.mapStore.initProvider(1, 'Ecuador')
+    }
     if (getUser().type === '911') {
       navigate(`/app/911`)
     } else if (getUser().type === 'provider') {
@@ -74,8 +77,9 @@ class Board extends Component {
     }
     const token = await getUser().token
     const userId = await getUser().userId
+    const userType = await getUser().type
     let { socket } = this
-    socket = await conectSocket(token, userId)
+    socket = await conectSocket(token, userId, userType, [1, 2, 3])
 
     await this.setState({
       socket,
@@ -110,9 +114,10 @@ class Board extends Component {
     if (getUser().type !== 'operator') {
       this.getOperators()
     }
-    //console.log('GET   ---====', get('activeTasks'))
+    let { activeTasks } = this.state
+    activeTasks = get('activeTasks')
     await this.setState({
-      activeTasks: get('activeTasks'),
+      activeTasks,
     })
   }
 
@@ -204,7 +209,7 @@ class Board extends Component {
       Number(id)
     )
 
-    console.log('ExistsInActivatedTasks.status', ExistsInActivatedTasks)
+    //console.log('ExistsInActivatedTasks.status', ExistsInActivatedTasks)
     if (ExistsInActivatedTasks[0].exist) {
       this.addNewMessage(id)
     } else {
@@ -229,7 +234,7 @@ class Board extends Component {
     let { activeTasks } = this.state
     let task = null
     let chatSelector = 0
-    activeTasks = await activeTasks.map(item => {
+    await activeTasks.map(item => {
       if (item.task.id === Number(id)) {
         task = item.task
         if (
@@ -238,22 +243,33 @@ class Board extends Component {
           chatSelector = 1
         }
         item.task.messagesAll = messages.data
+        if (!item.task.change) {
+          item.task.change = true
+        } else {
+          item.task.change = false
+        }
       }
       return item
     })
-    await this.setState({ activeTasks })
+
     await save('activeTasks', activeTasks)
-    //console.log('task=========', task)
-    if (task.status.name === 'live') {
+    await this.setState({ activeTasks })
+
+    if (task.status.name === 'live' && this.state.whoFocusItem === Number(id)) {
+      console.log('live pass')
       let prov = ''
       if (chatSelector === 1) {
         prov = 'prov_'
       }
       var element = document.getElementById('scroll_' + prov + id)
-      element.scrollTop = element.scrollHeight - element.clientHeight
+      if (element) {
+        element.scrollTop = element.scrollHeight - element.clientHeight
+      }
     } else {
+      console.log('No live pass')
       this.notificationMessages(id, 'provider')
     }
+    return true
   }
 
   whoFocus = id => {
@@ -278,6 +294,7 @@ class Board extends Component {
     return ''
   }
   notificationOff = async (id, type) => {
+    console.log('OFF NOT')
     document.getElementById('taskid_' + id).classList.remove('haveNotification')
     document.getElementById('taskid_' + id).classList.remove('not_' + type)
     const nodeValue = document
@@ -448,13 +465,10 @@ class Board extends Component {
           if (icon !== null) {
             item.icon = icon
           }
-
-          //index = i
         }
         return item
       })
       if (!includesThis) {
-        //index = activeTasks.length
         await this.state.tasks.filter((item, index) => {
           if (item.id === id) {
             task = item
@@ -467,8 +481,6 @@ class Board extends Component {
       if (!includesThis) {
         if (task.status.name !== 'complete') {
           const messages = await this.getMessages(task.id)
-          //await this.getNotes(task.id)
-
           task.messagesAll = messages.data
           activeTasks.push({ task })
           execute = true
@@ -518,7 +530,7 @@ class Board extends Component {
 
       if (result) {
         const { activeTasks } = this.state
-        console.log('des activeTasks', activeTasks)
+        //console.log('des activeTasks', activeTasks)
         const activeTasksFilter = activeTasks.filter((item, index) => {
           let itemRet = item
           console.log('item.task.id', item.task.id)
@@ -847,7 +859,7 @@ class Board extends Component {
               ) : (
                 <div className="messageAssignetEmpty">
                   <p>
-                    Atento!!! en cualquier momento entra una nueva taréa...
+                    Atento!!! en cualquier momento entra una nueva historia...
                     Podrás verla en esta barra... <br />
                     Suerte :)
                   </p>
@@ -950,9 +962,11 @@ class Board extends Component {
                   updateActivateTask={this.updateActivateTask}
                   socket={this.state.socket}
                   color={item.task.color}
+                  change={item.task.change}
                   appID={item.task.client.aplicationId}
                   updateGlobalMapVars={this.updateGlobalMapVars}
                   addRemoveFavorite={this.addRemoveFavorite}
+                  notificationOff={this.notificationOff}
                   favoritesProviders={
                     item.task.favorites ? item.task.favorites : null
                   }

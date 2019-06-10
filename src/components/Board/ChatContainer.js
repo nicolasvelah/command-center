@@ -8,7 +8,7 @@ import { confirmAlert } from 'react-confirm-alert'
 
 import Chat from './ChatV2'
 import MapServiceTacking from '../Maps/MapServiceTackingV2'
-import { findUserById, getProviders } from '../../services/wsConect'
+import { findUserById } from '../../services/wsConect'
 import { geocodeLatLng, changeOrderProvider } from '../../services/helpers'
 import Svg from '../Tools/svg'
 
@@ -122,28 +122,26 @@ class ChatContainer extends React.Component {
       }
     )
     let { providers, ProvidersActiveServices, providerInChat } = this.state
-    await this.props.mapStore.WSData.map(async item => {
-      if (item.APP_ID === this.props.appID) {
-        providers = item.providers
-        ProvidersActiveServices = item.ProvidersActiveServices
-      }
-      return item
-    })
-    if (providers.length <= 0) {
-      providers = await getProviders(this.props.appID, 'Ecuador')
-      providers = providers.data
-      await providers.map(provider => {
-        provider.info.services.map(service => {
-          if (ProvidersActiveServices.indexOf(service.servicio) === -1) {
-            ProvidersActiveServices.push(service.servicio)
-          }
-          return service
+    await this.props.mapStore.providerWS.map(async data => {
+      if (data.appID === this.props.appID) {
+        providers = data.providers
+        await providers.map(provider => {
+          provider.info.services.map(service => {
+            if (ProvidersActiveServices.indexOf(service.servicio) === -1) {
+              ProvidersActiveServices.push(service.servicio)
+            }
+            return service
+          })
+          return provider
         })
-        return provider
-      })
-    }
+      }
+      return data
+    })
+
+    //console.log('this.props.item.providerId', this.props.item)
     if (this.props.item.providerId !== 0) {
       await providers.map(provider => {
+        //console.log('bucle 2 data.providers - provider', provider)
         if (provider.id === this.props.item.provider.id) {
           providerInChat = provider
         }
@@ -157,8 +155,8 @@ class ChatContainer extends React.Component {
       ProvidersActiveServices,
       providerInChat,
     })
-    //console.log('providers del etsa camada', providers)
-    await intercept(this.props.mapStore, 'clientIdWS', change => {
+
+    intercept(this.props.mapStore, 'clientIdWS', change => {
       if (context.props.item.clientId === change.newValue.id) {
         console.log(
           'este actor se esta moviendo:',
@@ -168,25 +166,21 @@ class ChatContainer extends React.Component {
             ' ' +
             this.props.item.client.lastName
         )
+        console.log('este actor se esta moviendo xx:', change.newValue)
+
         let { clientData } = this.state
-        clientData.lat = change.newValue.lat
-        clientData.lng = change.newValue.lng
+        const location = change.newValue.location.coordinates
+        clientData.lat = location[1]
+        clientData.lng = location[0]
         clientData.connected = true
         context.updateClient(clientData)
       }
       return change
     }).bind(this)
 
-    await intercept(this.props.mapStore, 'clientsDsWS', change => {
+    intercept(this.props.mapStore, 'clientsDsWS', change => {
       if (context.props.item.clientId === change.newValue) {
-        console.log(
-          'este cliente se Desconecto:',
-          change.newValue.id +
-            ' / ' +
-            this.props.item.client.name +
-            ' ' +
-            this.props.item.client.lastName
-        )
+        console.log('este cliente se Desconecto:', change.newValue)
         let { clientData } = this.state
         clientData.connected = false
         context.updateClient(clientData)
@@ -194,14 +188,14 @@ class ChatContainer extends React.Component {
       return change
     }).bind(this)
 
-    await intercept(this.props.mapStore, 'providerDsWS', change => {
+    intercept(this.props.mapStore, 'providerDsWS', change => {
       context.updateProvidersDS(change)
       return change
     }).bind(this)
 
-    await intercept(this.props.mapStore, 'WSData', change => {
-      change.newValue.map(async item => {
-        if (item.APP_ID === context.props.appID) {
+    intercept(this.props.mapStore, 'providerWS', change => {
+      change.newValue.map(item => {
+        if (item.appID === context.props.appID) {
           context.updateProviders(item.providers)
           context.updateProvidersActiveServices(item.ProvidersActiveServices)
         }
@@ -335,6 +329,7 @@ class ChatContainer extends React.Component {
       //console.log(this.props.whoFocusItem)
       //console.log(id)
       this.props.whoFocus(id)
+      this.props.notificationOff(id, 'provider')
       this.goBottom('scroll_' + id)
       this.goBottom('scroll_prov_' + id)
 
@@ -352,18 +347,22 @@ class ChatContainer extends React.Component {
   }
 
   asignProvider = async providerId => {
-    let message = `¿Estás segur@ que quieres asignar al proveedor ${this.state
-      .providerInChat.info.name +
-      ' ' +
-      this.state.providerInChat.info.lastName}?`
-    if (this.props.item.providerId !== 0) {
-      message = `¿Estás segur@ que quieres cambiar de proveedor de ${this.props
-        .item.provider.user.name +
-        ' ' +
-        this.props.item.provider.user.lastName} a ${this.state.providerInChat
-        .info.name +
+    let message = 'Asignar Proveedor?'
+    if (this.state.providerInChat) {
+      message = `¿Estás segur@ que quieres asignar al proveedor ${this.state
+        .providerInChat.info.name +
         ' ' +
         this.state.providerInChat.info.lastName}?`
+
+      if (this.props.item.providerId !== 0) {
+        message = `¿Estás segur@ que quieres cambiar de proveedor de ${this
+          .props.item.provider.user.name +
+          ' ' +
+          this.props.item.provider.user.lastName} a ${this.state.providerInChat
+          .info.name +
+          ' ' +
+          this.state.providerInChat.info.lastName}?`
+      }
     }
     confirmAlert({
       title: 'Asignara proveedor a esta Historia',
@@ -469,7 +468,7 @@ class ChatContainer extends React.Component {
     }
   }
   updateProvider = async (values, providerId) => {
-    console.log('updateProvider ' + providerId, values)
+    //console.log('updateProvider ' + providerId, values)
     let { providers, providerInChat } = this.state
     await providers.map(provider => {
       if (provider.id === providerId) {
@@ -482,11 +481,11 @@ class ChatContainer extends React.Component {
       }
       return provider
     })
-    console.log('updateProvider salida' + providerId, providers)
+    /*console.log('updateProvider salida' + providerId, providers)
     console.log(
       'updateProvider salida providerInChat' + providerId,
       providerInChat
-    )
+    )*/
     this.setState({
       providers,
       providerInChat,
@@ -516,7 +515,10 @@ class ChatContainer extends React.Component {
   }
   render() {
     const { item } = this.props
-    //console.log('item.providerId ', item)
+    console.log(
+      '________________________item.providerId item.messagesAll.change',
+      item.change
+    )
     return item.status.name !== 'complete' ? (
       <div
         className={
@@ -643,6 +645,7 @@ class ChatContainer extends React.Component {
             >
               {this.props.socket !== null ? (
                 <MapServiceTacking
+                  ref="mapa"
                   userId={item.clientId}
                   appId={item.client.aplicationId}
                   lat={item.serviceOrigin.position.latitude}
@@ -674,7 +677,6 @@ class ChatContainer extends React.Component {
                   service={item.service.name}
                   orderId={item.id}
                   addRemoveFavorite={this.props.addRemoveFavorite}
-                  favoritesProviders={this.props.favoritesProviders}
                   updateProvidersFavorite={this.updateProvidersFavorite}
                   asignProvider={this.asignProvider}
                   activeProviderNotification={this.activeProviderNotification}
@@ -682,7 +684,6 @@ class ChatContainer extends React.Component {
                   activeProviderCall={this.activeProviderCall}
                   searchProviderMode={this.state.searchProviderMode}
                   updateProvider={this.updateProvider}
-                  ref="mapa"
                 />
               ) : (
                 ''
@@ -740,32 +741,28 @@ class ChatContainer extends React.Component {
                           ' ' +
                           this.state.providerInChat.info.lastName}
                       </b>
-                      <button
-                        onClick={e => {
-                          e.preventDefault()
-                          this.setChatFav(!this.state.providerInChat.favorite)
-                          this.refs.mapa.wrappedInstance.favioriteInRef(
-                            this.state.providerInChat.id
-                          )
-                        }}
-                        className="btnicon btnFavorito"
-                      >
-                        <Svg
-                          title="Favorito"
-                          svgClass="svgIcon"
-                          viewBox="0 0 512 512"
-                          svgFill={
-                            !this.state.providerInChat.favorite
-                              ? '#333'
-                              : '#ed1848'
-                          }
-                          svgPathOne_d={
-                            !this.state.providerInChat.favorite
-                              ? 'M416 149c0-70.25-47.5-85-87.5-85-37.25 0-79.25 40.25-92.25 55.75-6 7.25-18.5 7.25-24.5 0-13-15.5-55-55.75-92.25-55.75-40 0-87.5 14.75-87.5 85 0 45.75 46.25 88.25 46.75 88.75l145.25 140 145-139.75c0.75-0.75 47-43.25 47-89zM448 149c0 60-55 110.25-57.25 112.5l-155.75 150c-3 3-7 4.5-11 4.5s-8-1.5-11-4.5l-156-150.5c-2-1.75-57-52-57-112 0-73.25 44.75-117 119.5-117 43.75 0 84.75 34.5 104.5 54 19.75-19.5 60.75-54 104.5-54 74.75 0 119.5 43.75 119.5 117z'
-                              : 'M224 416c-4 0-8-1.5-11-4.5l-156-150.5c-2-1.75-57-52-57-112 0-73.25 44.75-117 119.5-117 43.75 0 84.75 34.5 104.5 54 19.75-19.5 60.75-54 104.5-54 74.75 0 119.5 43.75 119.5 117 0 60-55 110.25-57.25 112.5l-155.75 150c-3 3-7 4.5-11 4.5z'
-                          }
-                        />
-                      </button>
+                      {this.state.providerInChat.favorite ? (
+                        <button
+                          onClick={e => {
+                            e.preventDefault()
+                            /*this.setChatFav(!this.state.providerInChat.favorite)
+                            this.refs.mapa.wrappedInstance.favioriteInRef(
+                              this.state.providerInChat.id
+                            )*/
+                          }}
+                          className="btnicon btnFavorito"
+                        >
+                          <Svg
+                            title="Favorito"
+                            svgClass="svgIcon"
+                            viewBox="0 0 512 512"
+                            svgFill="#ed1848"
+                            svgPathOne_d="M224 416c-4 0-8-1.5-11-4.5l-156-150.5c-2-1.75-57-52-57-112 0-73.25 44.75-117 119.5-117 43.75 0 84.75 34.5 104.5 54 19.75-19.5 60.75-54 104.5-54 74.75 0 119.5 43.75 119.5 117 0 60-55 110.25-57.25 112.5l-155.75 150c-3 3-7 4.5-11 4.5z"
+                          />
+                        </button>
+                      ) : (
+                        ''
+                      )}
                     </div>
 
                     {!this.state.providerInChat.time ? (
@@ -860,7 +857,12 @@ class ChatContainer extends React.Component {
                         }
                       />
                       {' / '}
-                      <b>{this.state.providerInChat.distance} m de dist.</b>
+                      <b>
+                        {/*this.state.providerInChat.distance
+                          ? this.state.providerInChat.distance
+                        : ''*/}{' '}
+                        m de dist.
+                      </b>
                     </div>
                     <div>
                       {this.state.providerInChat.info.services.map(service => (

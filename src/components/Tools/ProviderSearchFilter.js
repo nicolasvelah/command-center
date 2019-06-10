@@ -7,6 +7,7 @@ const inactiveColor = '#999'
 export default class ProviderSearchFilter extends React.Component {
   render() {
     const { ActiveSortProv } = this.props
+    //console.log('ProvidersActiveServices', this.props.ProvidersActiveServices)
     return (
       <div className="providersSearchFilters">
         <div>

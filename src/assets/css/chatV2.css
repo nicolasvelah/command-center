@@ -113,3 +113,8 @@
   white-space: normal;
   text-align: center;
 }
+.audioMessage {
+  width: 100%;
+  min-width: 150px;
+  outline: none;
+}

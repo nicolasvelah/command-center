@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import GoogleMapReact from 'google-map-react'
-import { inject, observer } from 'mobx-react'
+//import { inject, observer } from 'mobx-react'
 //import { fitBounds } from 'google-map-react/utils'
 import CMarker from './CMarker'
 import CMarkerClientServicePointer from './CMarkerClientServicePointer'
@@ -60,8 +60,8 @@ const StateContainer = styled.div`
 
 const WAIT_INTERVAL = 1000
 
-@inject('mapStore')
-@observer
+//@inject('mapStore')
+//@observer
 class MapServiceTacking extends Component {
   constructor(props) {
     super(props)
@@ -101,7 +101,10 @@ class MapServiceTacking extends Component {
     } else {
       country = 'Ecuador'
     }
-
+    /*console.log(
+      'this.props.ProvidersActiveServices Map V2',
+      this.props.ProvidersActiveServices
+    )*/
     this.setState({
       unmount: false,
       ProvidersActiveServices: this.selectConstructor(
@@ -160,7 +163,7 @@ class MapServiceTacking extends Component {
     if (this.state.service !== 'Todos' && !isService) {
       response = false
     }
-    this.props.updateProvider({ distance }, provider.id)
+    //this.props.updateProvider({ distance }, provider.id)
     return { response, distance }
   }
   setM = async m => {
@@ -385,7 +388,7 @@ class MapServiceTacking extends Component {
     this.setState({ activeProvider })
   }
   favioriteInRef(id) {
-    Array.from(this.RefItemSearchFilter.values())
+    /*Array.from(this.RefItemSearchFilter.values())
       .filter(node => node != null)
       .forEach(node => {
         //console.log('In ARRAY node.props.item.id', node)
@@ -394,7 +397,7 @@ class MapServiceTacking extends Component {
           //console.log('Entro', id)
           node.setFavorite(id)
         }
-      })
+      })*/
   }
   render() {
     const { center, zoom } = this.state
@@ -420,71 +423,68 @@ class MapServiceTacking extends Component {
 
             <div className="avalibleProviders">
               {this.props.providers
-                .filter(item => {
-                  const resp = this.providerFiltering(item)
-                  item.distance = resp.distance
-                  if (this.props.favoritesProviders !== null) {
-                    if (this.props.favoritesProviders.includes(item.id)) {
-                      item.favorite = true
-                    } else {
-                      item.favorite = false
-                    }
-                  } else {
-                    item.favorite = false
-                  }
-                  if (item.localFavorite) {
-                    item.favorite = item.localFavorite
-                  }
-                  return resp.response
-                })
-                .sort((a, b) => {
-                  if (this.state.ActiveSortProv === 'coneccion') {
-                    return a.connected === b.connected
-                      ? 0
-                      : a.connected
-                      ? -1
-                      : 1
-                  } else if (this.state.ActiveSortProv === 'inService') {
-                    return b.inService === a.inService
-                      ? 0
-                      : b.inService
-                      ? -1
-                      : 1
-                  } else if (this.state.ActiveSortProv === 'rate') {
-                    return b.info.rate - a.info.rate
-                  } else if (this.state.ActiveSortProv === 'favorite') {
-                    return a.favorite === b.favorite ? 0 : a.favorite ? -1 : 1
-                  } else if (this.state.ActiveSortProv === 'distance') {
-                    return a.distance - b.distance
-                  } else {
-                    return b.id - a.id
-                  }
-                })
-                .map(item => {
-                  return (
-                    <ProviderItemSearchFilter
-                      key={item.id}
-                      ref={c => this.RefItemSearchFilter.set(item.id, c)}
-                      item={item}
-                      centerActor={this.centerActor}
-                      calculateAndDisplayRoute={this.calculateAndDisplayRoute}
-                      addRemoveFavorite={this.props.addRemoveFavorite}
-                      orderId={this.props.orderId}
-                      favorite={item.favorite}
-                      updateProvidersFavorite={
-                        this.props.updateProvidersFavorite
+                ? this.props.providers
+                    .filter(item => {
+                      const resp = this.providerFiltering(item)
+                      item.distance = resp.distance
+                      //console.log('item.favorite', item.favorite)
+                      return resp.response
+                    })
+                    .sort((a, b) => {
+                      if (this.state.ActiveSortProv === 'coneccion') {
+                        return a.connected === b.connected
+                          ? 0
+                          : a.connected
+                          ? -1
+                          : 1
+                      } else if (this.state.ActiveSortProv === 'inService') {
+                        return b.inService === a.inService
+                          ? 0
+                          : b.inService
+                          ? -1
+                          : 1
+                      } else if (this.state.ActiveSortProv === 'rate') {
+                        return b.info.rate - a.info.rate
+                      } else if (this.state.ActiveSortProv === 'favorite') {
+                        return a.favorite === b.favorite
+                          ? 0
+                          : a.favorite
+                          ? -1
+                          : 1
+                      } else if (this.state.ActiveSortProv === 'distance') {
+                        return a.distance - b.distance
+                      } else {
+                        return b.id - a.id
                       }
-                      setActiveProvider={this.setActiveProvider}
-                      activeProvider={this.state.activeProvider}
-                      asignProvider={this.props.asignProvider}
-                      activeProviderNotification={
-                        this.props.activeProviderNotification
-                      }
-                      activeProviderChat={this.props.activeProviderChat}
-                      activeProviderCall={this.props.activeProviderCall}
-                    />
-                  )
-                })}
+                    })
+                    .map(item => {
+                      return (
+                        <ProviderItemSearchFilter
+                          key={item.id}
+                          ref={c => this.RefItemSearchFilter.set(item.id, c)}
+                          item={item}
+                          centerActor={this.centerActor}
+                          calculateAndDisplayRoute={
+                            this.calculateAndDisplayRoute
+                          }
+                          addRemoveFavorite={this.props.addRemoveFavorite}
+                          orderId={this.props.orderId}
+                          favorite={item.favorite}
+                          updateProvidersFavorite={
+                            this.props.updateProvidersFavorite
+                          }
+                          setActiveProvider={this.setActiveProvider}
+                          activeProvider={this.state.activeProvider}
+                          asignProvider={this.props.asignProvider}
+                          activeProviderNotification={
+                            this.props.activeProviderNotification
+                          }
+                          activeProviderChat={this.props.activeProviderChat}
+                          activeProviderCall={this.props.activeProviderCall}
+                        />
+                      )
+                    })
+                : null}
             </div>
           </div>
         ) : null}
@@ -579,31 +579,33 @@ class MapServiceTacking extends Component {
             )}
             {/*Proveedores en vivo*/}
             {this.props.providers
-              .filter(item => {
-                const resp = this.providerFiltering(item)
-                item.distance = resp.distance
-                if (resp.response) {
-                  item.classNameLocation = 'inTheRadio'
-                } else {
-                  item.classNameLocation = 'outTheRadio'
-                }
-                return true
-              })
-              .map(provider => (
-                <CMarker
-                  key={provider.id}
-                  lat={provider.lat}
-                  lng={provider.lng}
-                  clientDataState={provider.connected}
-                  isProvider={true}
-                  id={provider.id}
-                  info={provider.info}
-                  donde={'tacker poroviders'}
-                  color={'#333'}
-                  classNameLocation={provider.classNameLocation}
-                  activeProvider={this.state.activeProvider}
-                />
-              ))}
+              ? this.props.providers
+                  .filter(item => {
+                    const resp = this.providerFiltering(item)
+                    item.distance = resp.distance
+                    if (resp.response) {
+                      item.classNameLocation = 'inTheRadio'
+                    } else {
+                      item.classNameLocation = 'outTheRadio'
+                    }
+                    return true
+                  })
+                  .map(provider => (
+                    <CMarker
+                      key={provider.id}
+                      lat={provider.lat}
+                      lng={provider.lng}
+                      clientDataState={provider.connected}
+                      isProvider={true}
+                      id={provider.id}
+                      info={provider.info}
+                      donde={'tacker poroviders'}
+                      color={'#333'}
+                      classNameLocation={provider.classNameLocation}
+                      activeProvider={this.state.activeProvider}
+                    />
+                  ))
+              : null}
 
             {this.state.providersOrigins
               ? this.state.providersOrigins.map(providerOriginAddress => (

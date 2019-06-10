@@ -19,21 +19,22 @@ export default class Chat extends React.Component {
       })
     }
   }
-  sendMenssageByEnter = e => {
+  sendMenssageByEnter = async e => {
     if (e.key === 'Enter' && this.state.message.length >= 1) {
-      sendMessage(
+      await sendMessage(
         this.props.to,
         this.state.message,
         this.props.orderId,
-        this.props.isClientTo
+        this.props.isClientTo,
+        false
       )
-      this.props.addNewMessage(this.props.orderId)
+      await this.props.addNewMessage(this.props.orderId)
       document.getElementById('ChatTextarea_' + this.props.sid).value = ''
       this.setState({ message: '' })
     }
   }
   render() {
-    //console.log('mesajers para esta tarea', this.props.messagesTask)
+    console.log('mesajers para esta tarea', this.props.messagesTask)
     return (
       <div className="chatContainerV2">
         <div className="chatV2" id={'scroll_' + this.props.sid}>
@@ -63,8 +64,12 @@ export default class Chat extends React.Component {
                       </div>
                     </div>
                     <div className="message">
-                      {item.isImage ? (
+                      {item.messageType === 'image' ? (
                         <img src={item.message} alt="msnImg" />
+                      ) : item.messageType === 'audio' ? (
+                        <audio controls className="audioMessage">
+                          <source src={item.message} type="audio/mp4" />
+                        </audio>
                       ) : (
                         item.message
                       )}

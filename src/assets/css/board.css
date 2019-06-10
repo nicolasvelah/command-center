@@ -377,8 +377,8 @@
   width: 15px;
 }
 .chat-container.haveNotification {
-  background-color: #53a93f;
-  border-bottom-color: #53a93f;
+  /*background-color: #53a93f;
+  border-bottom-color: #53a93f;*/
   -webkit-animation: title_widget_alert 1.5s 3;
   animation: title_widget_alert 1.5s 3;
 }

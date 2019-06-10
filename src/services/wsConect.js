@@ -3,14 +3,13 @@ import io from 'socket.io-client'
 import { getUser } from '../services/auth'
 import { get } from './Storage'
 
-export const conectSocket = async (token, userId) => {
+export const conectSocket = async (token, userId, userType, APP_IDs) => {
   try {
-    const APP_ID = 1
     const country = await getLocationByIP(token)
     const wsToken = await getWsAccessToken(
       userId,
-      APP_ID,
-      false,
+      APP_IDs,
+      userType,
       country,
       token
     )
@@ -30,14 +29,15 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
   //console.log('updateMapData mapStore.WSData', mapStore.WSData)
   let newListener = true
   if (mapStore.WSData.length > 0) {
+    newListener = false
     //console.log('mapStore.WSData es mayor que 0')
-    mapStore.WSData.map(item => {
+    /*mapStore.WSData.map(item => {
       //console.log('mapStore.WSData BUcle item', item.APP_ID)
       if (item.APP_ID === APP_ID) {
         newListener = false
       }
       return item
-    })
+    })*/
   }
   if (newListener) {
     /*console.log(
@@ -69,19 +69,16 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
     }
     mapStore.setWSData(listenerData)
 
-    socket.on(`onClientLocation-app-${APP_ID}-${country}`, onClientLocation)
-    socket.on(
-      `onClientDisconnected-app-${APP_ID}-${country}`,
-      onClientDisconnected
-    )
+    socket.on(`on-client-location`, onClientLocation)
+    socket.on(`on-client-disconnected`, onClientDisconnected)
 
-    socket.on(`onProviderLocation-app-${APP_ID}-${country}`, data =>
+    socket.on(`on-provider-location`, data =>
       onProviderLocation(data, APP_ID, country)
     )
-    socket.on(`onProviderInService-app-${APP_ID}-${country}`, data =>
+    socket.on(`on-provider-in-service`, data =>
       onProviderInService(data, APP_ID, country)
     )
-    socket.on(`onProviderDisconnected-app-${APP_ID}-${country}`, data =>
+    socket.on(`on-provider-disconnected`, data =>
       onProviderDisconnected(data, APP_ID, country)
     )
   }
@@ -104,10 +101,10 @@ const getLocationByIP = async token => {
     console.log('no se pudo desde el backend')
   }
 }
-const getWsAccessToken = async (userId, appId, isClient, country, token) => {
+const getWsAccessToken = async (userId, appIds, userType, country, token) => {
   const data = {
-    appId,
-    isClient,
+    appIds,
+    userType,
     user: {
       id: userId,
     },
@@ -192,6 +189,7 @@ export const getProviders = async (appId, country) => {
         },
       }
     )
+    //const result = { data: [] }
     //console.log('getProviders Result', result)
     return result
   } catch (err) {
