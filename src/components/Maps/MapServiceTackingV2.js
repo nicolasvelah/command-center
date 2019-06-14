@@ -101,15 +101,17 @@ class MapServiceTacking extends Component {
     } else {
       country = 'Ecuador'
     }
-    /*console.log(
+
+    const ProvidersActiveServices = await this.selectConstructor(
+      this.props.ProvidersActiveServices
+    )
+    console.log(
       'this.props.ProvidersActiveServices Map V2',
       this.props.ProvidersActiveServices
-    )*/
+    )
     this.setState({
       unmount: false,
-      ProvidersActiveServices: this.selectConstructor(
-        this.props.ProvidersActiveServices
-      ),
+      ProvidersActiveServices,
       service: this.props.service,
     })
   }
@@ -210,8 +212,10 @@ class MapServiceTacking extends Component {
     })
   }
   selectConstructor = options => {
+    console.log('options -', options)
     let resp = []
     options.map(item => {
+      console.log('item -', item)
       resp.push({ label: item, value: item })
       return item
     })

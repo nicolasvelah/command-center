@@ -37,7 +37,7 @@ export default class Chat extends React.Component {
   }
 
   render() {
-    console.log('mesajers para esta tarea', this.props.messagesTask)
+    //console.log('mesajers para esta tarea', this.props.messagesTask)
     return (
       <div className="chatContainer">
         <div className="chat">

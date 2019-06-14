@@ -9,7 +9,11 @@ import { confirmAlert } from 'react-confirm-alert'
 import Chat from './ChatV2'
 import MapServiceTacking from '../Maps/MapServiceTackingV2'
 import { findUserById } from '../../services/wsConect'
-import { geocodeLatLng, changeOrderProvider } from '../../services/helpers'
+import {
+  geocodeLatLng,
+  changeOrderProvider,
+  getMessagesById,
+} from '../../services/helpers'
 import Svg from '../Tools/svg'
 
 import 'react-confirm-alert/src/react-confirm-alert.css'
@@ -137,7 +141,7 @@ class ChatContainer extends React.Component {
       }
       return data
     })
-
+    console.log('INIT ProvidersActiveServices', ProvidersActiveServices)
     //console.log('this.props.item.providerId', this.props.item)
     if (this.props.item.providerId !== 0) {
       await providers.map(provider => {
@@ -148,6 +152,7 @@ class ChatContainer extends React.Component {
         return provider
       })
     }
+
     await this.setState({
       searchProviderMode,
       clientData: clientGLData.data,
@@ -305,7 +310,7 @@ class ChatContainer extends React.Component {
     }
 
     if (from === 'closeChat') {
-      await this.props.desactivateTask(item.id)
+      await this.props.desactivateTask(item.id, true)
     } else {
       await this.props.openChatTriger(item.id, status)
       this.setState({ status, openChat: haveToOpen })
@@ -391,14 +396,18 @@ class ChatContainer extends React.Component {
   }
 
   activeProviderChat = async providerId => {
+    console.log('ejecuta cambio de proveedor')
     try {
       let { providerInChat, providers } = this.state
+      const messages = await getMessagesById(this.props.item.id, providerId)
       providers.map(provider => {
         if (provider.id === providerId) {
           providerInChat = provider
+          providerInChat.messagesAll = messages.data
         }
         return provider
       })
+      console.log('providerInChat salida:', providerInChat)
       this.setState({ providerInChat })
     } catch (err) {
       console.error(err.message)
@@ -515,10 +524,7 @@ class ChatContainer extends React.Component {
   }
   render() {
     const { item } = this.props
-    console.log(
-      '________________________item.providerId item.messagesAll.change',
-      item.change
-    )
+
     return item.status.name !== 'complete' ? (
       <div
         className={
@@ -634,7 +640,7 @@ class ChatContainer extends React.Component {
               </div>
             </div>
           </div>
-          {item.status.name === 'live' && this.state.providers.length > 0 ? (
+          {item.status.name === 'live' && this.state.providers.length >= 0 ? (
             <div
               className="ChatMap"
               style={
@@ -643,7 +649,10 @@ class ChatContainer extends React.Component {
                   : { borderRight: '3px solid  #53a93f' }
               }
             >
-              {this.props.socket !== null ? (
+              {(this.props.socket !== null &&
+                this.state.ProvidersActiveServices.length > 0) ||
+              (this.state.ProvidersActiveServices.length >= 0 &&
+                item.client.aplicationId === 2) ? (
                 <MapServiceTacking
                   ref="mapa"
                   userId={item.clientId}
@@ -920,15 +929,28 @@ class ChatContainer extends React.Component {
                       </button>
                     </ComunicationTools>
                   </div>
-                  <Chat
-                    messagesTask={item.messagesAll.provider}
-                    sid={'prov_' + item.id}
-                    goBottom={this.goBottom}
-                    orderId={item.id}
-                    isClientTo={false}
-                    to={this.state.providerInChat.id}
-                    addNewMessage={this.props.addNewMessage}
-                  />
+                  {this.state.searchProviderMode &&
+                  this.state.providerInChat.messagesAll ? (
+                    <Chat
+                      messagesTask={this.state.providerInChat.messagesAll}
+                      sid={'prov_' + item.id}
+                      goBottom={this.goBottom}
+                      orderId={item.id}
+                      isClientTo={false}
+                      to={this.state.providerInChat.id}
+                      addNewMessage={this.props.addNewMessage}
+                    />
+                  ) : (
+                    <Chat
+                      messagesTask={item.messagesAll.provider}
+                      sid={'prov_' + item.id}
+                      goBottom={this.goBottom}
+                      orderId={item.id}
+                      isClientTo={false}
+                      to={item.provider.user.id}
+                      addNewMessage={this.props.addNewMessage}
+                    />
+                  )}
                 </ChatProviderHeader>
               ) : (
                 <div className="ProviderNotSelected">

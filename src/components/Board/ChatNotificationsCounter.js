@@ -8,6 +8,8 @@ export default class ChatNotificationsCounter extends React.Component {
   }
 
   render() {
+    //console.log('CLIENT', this.props.t.client.name)
+    //console.log('this.props.t.message', this.props.t)
     return (
       <div>
         <img

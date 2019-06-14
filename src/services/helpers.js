@@ -10,7 +10,6 @@ export const sendMessage = async (
   assistanceMode
 ) => {
   try {
-    console.log('Enviando REST... ')
     const result = await axios.post(
       `${process.env.API_URL}/sendMessage`,
       {
@@ -34,7 +33,23 @@ export const sendMessage = async (
     return []
   }
 }
+export const getMessagesById = async (orderId, to) => {
+  const messages = await axios.post(
+    `${process.env.API_URL}/getMessagesById`,
+    {
+      orderId,
+      to,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': getUser().token,
+      },
+    }
+  )
 
+  return messages
+}
 export const operatorsAll = async () => {
   try {
     const data = await axios.post(

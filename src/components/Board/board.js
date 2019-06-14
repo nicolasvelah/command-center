@@ -229,6 +229,7 @@ class Board extends Component {
     return [{ exist, status }]
   }
   addNewMessage = async id => {
+    await updateChatState(id)
     const messages = await this.getMessages(id)
 
     let { activeTasks } = this.state
@@ -254,9 +255,18 @@ class Board extends Component {
 
     await save('activeTasks', activeTasks)
     await this.setState({ activeTasks })
-
+    let ChatTriger = false
+    let notTriger = false
     if (task.status.name === 'live' && this.state.whoFocusItem === Number(id)) {
-      console.log('live pass')
+      ChatTriger = true
+    } else if (task.status.name === 'live') {
+      ChatTriger = true
+      notTriger = true
+    } else {
+      notTriger = true
+    }
+
+    if (ChatTriger) {
       let prov = ''
       if (chatSelector === 1) {
         prov = 'prov_'
@@ -265,8 +275,9 @@ class Board extends Component {
       if (element) {
         element.scrollTop = element.scrollHeight - element.clientHeight
       }
-    } else {
-      console.log('No live pass')
+    }
+
+    if (notTriger) {
       this.notificationMessages(id, 'provider')
     }
     return true
@@ -294,7 +305,7 @@ class Board extends Component {
     return ''
   }
   notificationOff = async (id, type) => {
-    console.log('OFF NOT')
+    //console.log('OFF NOT')
     document.getElementById('taskid_' + id).classList.remove('haveNotification')
     document.getElementById('taskid_' + id).classList.remove('not_' + type)
     const nodeValue = document
@@ -521,28 +532,32 @@ class Board extends Component {
       console.log('error', err.message)
     }
   }
-  desactivateTask = async id => {
+  desactivateTask = async (id, go) => {
     //console.log('dasactivar' + id)
     try {
-      const result = window.confirm(
-        'Si cierras la tarea solicitaras Rate del servicio al cliente y liberaras las aplicaciones de los actores. ¿Quiéres cerrar la tarea?'
-      )
+      let result = true
+      if (go) {
+        result = window.confirm(
+          'Si cierras la tarea solicitaras Rate del servicio al cliente y liberaras las aplicaciones de los actores. ¿Quiéres cerrar la tarea?'
+        )
+      }
 
       if (result) {
         const { activeTasks } = this.state
         //console.log('des activeTasks', activeTasks)
         const activeTasksFilter = activeTasks.filter((item, index) => {
           let itemRet = item
-          console.log('item.task.id', item.task.id)
+          //console.log('item.task.id', item.task.id)
           if (item.task.id === id) {
             itemRet = null
           }
           return itemRet
         })
-        console.log(' des activeTasksFilter', activeTasksFilter)
-
-        await this.trigerColumn('complete', id)
-        //await save('activeTasks', activeTasksFilter)
+        //console.log(' des activeTasksFilter', activeTasksFilter)
+        if (go) {
+          await this.trigerColumn('complete', id)
+          //await save('activeTasks', activeTasksFilter)
+        }
 
         await this.setState({
           activeTasks: activeTasksFilter,
@@ -625,6 +640,7 @@ class Board extends Component {
     ev.preventDefault()
 
     let id = ev.dataTransfer.getData('text')
+    console.log('Drop id', id)
 
     let result = true
     if (cat === 'complete') {
@@ -662,10 +678,10 @@ class Board extends Component {
       id = id.split('_')
       id = Number(id[1])
       if (reopenconfirm) {
-        this.trigerColumn(cat, idNumber)
+        await this.trigerColumn(cat, idNumber)
 
         if (cat === 'complete') {
-          await this.desactivateTask(id)
+          await this.desactivateTask(id, false)
         }
       }
       if (cat !== 'complete') {

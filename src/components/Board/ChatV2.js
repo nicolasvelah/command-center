@@ -28,13 +28,14 @@ export default class Chat extends React.Component {
         this.props.isClientTo,
         false
       )
+
       await this.props.addNewMessage(this.props.orderId)
       document.getElementById('ChatTextarea_' + this.props.sid).value = ''
       this.setState({ message: '' })
     }
   }
   render() {
-    console.log('mesajers para esta tarea', this.props.messagesTask)
+    //console.log('mesajers para esta tarea', this.props.messagesTask)
     return (
       <div className="chatContainerV2">
         <div className="chatV2" id={'scroll_' + this.props.sid}>
