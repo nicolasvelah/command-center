@@ -40,12 +40,13 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
     })*/
   }
   if (newListener) {
-    /*console.log(
+    console.log(
       '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nuevo listener APP_ID: ' +
         APP_ID +
         ' / pais: ' +
         country
-    )*/
+    )
+
     mapStoreLocal = mapStore
     const providers = await getProviders(APP_ID, country)
     const clients = await getClients(APP_ID, country)
@@ -83,6 +84,17 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
     )
   }
 }
+
+export const onNotification = (socket, callback) => {
+  socket.on(`on-notification`, data => callback(data))
+}
+
+//const onNotification = data => {
+//MsmNewTask(data.dat.data.title)
+//return data
+//console.log('onNotification data', data)
+//}
+
 //CONFIG DATA
 const getLocationByIP = async token => {
   try {

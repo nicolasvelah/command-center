@@ -18,7 +18,11 @@ import {
   updateChatState,
 } from '../../services/helpers'
 //import Filter from './Filter'
-import { conectSocket, updateMapData } from '../../services/wsConect'
+import {
+  conectSocket,
+  updateMapData,
+  onNotification,
+} from '../../services/wsConect'
 import Loading from '../Tools/Loading'
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -80,6 +84,8 @@ class Board extends Component {
     const userType = await getUser().type
     let { socket } = this
     socket = await conectSocket(token, userId, userType, [1, 2, 3])
+
+    onNotification(socket, this.startNotificationsWs)
 
     await this.setState({
       socket,
@@ -145,12 +151,36 @@ class Board extends Component {
       )
     }
   }
+  //WEBSOCKETS NOTIFICATIONS TRIEGER
+  startNotificationsWs(data) {
+    const dataNotification = data.dat
+
+    if (isLoggedIn()) {
+      if (dataNotification.data.type === 'chat') {
+        this.chatNotifications(dataNotification.data.content.orderId)
+      } else if (
+        dataNotification.data.type === 'WORKINPROGRESS' ||
+        dataNotification.data.type === 'WORKFINISHED'
+      ) {
+        this.providerState(
+          dataNotification.data.content.orderId,
+          dataNotification.data.type
+        )
+      } else {
+        //
+        if (dataNotification.data.type !== 'updateOrder') {
+          MsmNewTask(dataNotification.notification.title)
+        }
+        this.getMyTasks()
+      }
+    }
+  }
+
   //FIREBASE NOTIFICATIONS TRIEGER
   startNotifications(messaging) {
     const context = this
     messaging.onMessage(function(payload) {
       if (isLoggedIn()) {
-        console.log('Frond Message received.', payload)
         const notification = JSON.parse(payload.data.content)
         if (notification.type === 'chat') {
           context.chatNotifications(notification.orderId)
