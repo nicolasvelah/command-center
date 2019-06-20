@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { getUser, logout, isLoggedIn, logoutLocal } from '../../services/auth'
 import { navigate } from 'gatsby'
 
-import { askForPermissioToReceiveNotifications } from '../../services/push-notification'
+//import { askForPermissioToReceiveNotifications } from '../../services/push-notification'
 import { ToastContainer } from 'react-toastify'
 import TaskItem from './TaskItem'
 import ChatContainer from './ChatContainer'
@@ -85,7 +85,13 @@ class Board extends Component {
     let { socket } = this
     socket = await conectSocket(token, userId, userType, [1, 2, 3])
 
-    onNotification(socket, this.startNotificationsWs)
+    onNotification(
+      socket,
+      this.startNotificationsWs,
+      this.chatNotifications,
+      this.getMyTasks,
+      this.providerState
+    )
 
     await this.setState({
       socket,
@@ -95,14 +101,17 @@ class Board extends Component {
     await this.getMyTasks()
 
     //Push Notifications
-    const messaging = await askForPermissioToReceiveNotifications()
+
+    //const messaging = await askForPermissioToReceiveNotifications()
     const context = this
+    /*
     if (messaging !== false) {
       this.startNotifications(messaging)
     } else {
       const messaging2 = await askForPermissioToReceiveNotifications()
       this.startNotifications(messaging2)
     }
+    */
     window.addEventListener(
       'focus',
       function(event) {
@@ -152,31 +161,31 @@ class Board extends Component {
     }
   }
   //WEBSOCKETS NOTIFICATIONS TRIEGER
-  startNotificationsWs(data) {
+  startNotificationsWs(data, chatNotifications, getMyTasks, providerState) {
     const dataNotification = data.dat
-
+    console.log('data type', dataNotification.data.type)
     if (isLoggedIn()) {
       if (dataNotification.data.type === 'chat') {
-        this.chatNotifications(dataNotification.data.content.orderId)
+        chatNotifications(dataNotification.data.content.orderId)
       } else if (
         dataNotification.data.type === 'WORKINPROGRESS' ||
         dataNotification.data.type === 'WORKFINISHED'
       ) {
-        this.providerState(
+        providerState(
           dataNotification.data.content.orderId,
           dataNotification.data.type
         )
       } else {
-        //
+        getMyTasks()
         if (dataNotification.data.type !== 'updateOrder') {
           MsmNewTask(dataNotification.notification.title)
         }
-        this.getMyTasks()
       }
     }
   }
 
   //FIREBASE NOTIFICATIONS TRIEGER
+  /*
   startNotifications(messaging) {
     const context = this
     messaging.onMessage(function(payload) {
@@ -198,6 +207,7 @@ class Board extends Component {
       }
     })
   }
+*/
 
   //PROVIDER
   chageProvider = () => {
@@ -231,6 +241,7 @@ class Board extends Component {
       providerState: 'WIP',
       tasks,
     })
+    console.log('Completo providerState')
   }
 
   //CHAT
@@ -238,8 +249,6 @@ class Board extends Component {
     const ExistsInActivatedTasks = await this.checkExistsInActivatedTasks(
       Number(id)
     )
-
-    //console.log('ExistsInActivatedTasks.status', ExistsInActivatedTasks)
     if (ExistsInActivatedTasks[0].exist) {
       this.addNewMessage(id)
     } else {

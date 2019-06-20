@@ -85,8 +85,16 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
   }
 }
 
-export const onNotification = (socket, callback) => {
-  socket.on(`on-notification`, data => callback(data))
+export const onNotification = (
+  socket,
+  startNotificationsWs,
+  chatNotifications,
+  getMyTasks,
+  providerState
+) => {
+  socket.on(`on-notification`, data => {
+    startNotificationsWs(data, chatNotifications, getMyTasks, providerState)
+  })
 }
 
 //const onNotification = data => {
