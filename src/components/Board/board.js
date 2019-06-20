@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { getUser, logout, isLoggedIn, logoutLocal } from '../../services/auth'
 import { navigate } from 'gatsby'
-
-//import { askForPermissioToReceiveNotifications } from '../../services/push-notification'
 import { ToastContainer } from 'react-toastify'
 import TaskItem from './TaskItem'
 import ChatContainer from './ChatContainer'
@@ -85,7 +83,7 @@ class Board extends Component {
     let { socket } = this
     socket = await conectSocket(token, userId, userType, [1, 2, 3])
 
-    onNotification(
+    await onNotification(
       socket,
       this.startNotificationsWs,
       this.chatNotifications,
@@ -102,16 +100,8 @@ class Board extends Component {
 
     //Push Notifications
 
-    //const messaging = await askForPermissioToReceiveNotifications()
     const context = this
-    /*
-    if (messaging !== false) {
-      this.startNotifications(messaging)
-    } else {
-      const messaging2 = await askForPermissioToReceiveNotifications()
-      this.startNotifications(messaging2)
-    }
-    */
+
     window.addEventListener(
       'focus',
       function(event) {
@@ -162,52 +152,31 @@ class Board extends Component {
   }
   //WEBSOCKETS NOTIFICATIONS TRIEGER
   startNotificationsWs(data, chatNotifications, getMyTasks, providerState) {
-    const dataNotification = data.dat
-    console.log('data type', dataNotification.data.type)
-    if (isLoggedIn()) {
-      if (dataNotification.data.type === 'chat') {
-        chatNotifications(dataNotification.data.content.orderId)
-      } else if (
-        dataNotification.data.type === 'WORKINPROGRESS' ||
-        dataNotification.data.type === 'WORKFINISHED'
-      ) {
-        providerState(
-          dataNotification.data.content.orderId,
-          dataNotification.data.type
-        )
-      } else {
-        getMyTasks()
-        if (dataNotification.data.type !== 'updateOrder') {
-          MsmNewTask(dataNotification.notification.title)
-        }
-      }
-    }
-  }
-
-  //FIREBASE NOTIFICATIONS TRIEGER
-  /*
-  startNotifications(messaging) {
-    const context = this
-    messaging.onMessage(function(payload) {
+    try {
+      const dataNotification = data.dat
+      console.log('data type', data)
       if (isLoggedIn()) {
-        const notification = JSON.parse(payload.data.content)
-        if (notification.type === 'chat') {
-          context.chatNotifications(notification.orderId)
+        if (dataNotification.data.type === 'chat') {
+          chatNotifications(dataNotification.data.content.orderId)
         } else if (
-          notification.type === 'WORKINPROGRESS' ||
-          notification.type === 'WORKFINISHED'
+          dataNotification.data.type === 'WORKINPROGRESS' ||
+          dataNotification.data.type === 'WORKFINISHED'
         ) {
-          context.providerState(notification.orderId, notification.type)
+          providerState(
+            dataNotification.data.content.orderId,
+            dataNotification.data.type
+          )
         } else {
-          context.getMyTasks()
-          if (notification.type !== 'updateOrder') {
-            MsmNewTask(payload.data.title)
+          getMyTasks()
+          if (dataNotification.data.type !== 'updateOrder') {
+            MsmNewTask(dataNotification.notification.title)
           }
         }
       }
-    })
+    } catch (e) {
+      console.log(e)
+    }
   }
-*/
 
   //PROVIDER
   chageProvider = () => {

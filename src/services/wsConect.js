@@ -97,12 +97,6 @@ export const onNotification = (
   })
 }
 
-//const onNotification = data => {
-//MsmNewTask(data.dat.data.title)
-//return data
-//console.log('onNotification data', data)
-//}
-
 //CONFIG DATA
 const getLocationByIP = async token => {
   try {
