@@ -163,6 +163,7 @@ export default class Task extends Component {
         is911: is911,
       })
     }
+    console.log('Mensaje: ', e.target.value.length)
     this.scrollToBottom(id)
   }
 

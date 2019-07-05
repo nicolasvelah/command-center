@@ -25,6 +25,8 @@ import Loading from '../Tools/Loading'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
+import Masonry from 'react-masonry-css'
+@observer
 @inject('mapStore')
 @observer
 class Board extends Component {
@@ -802,9 +804,9 @@ class Board extends Component {
       notresponse: [],
       complete: [],
     }
-
-    //TASK ITEMS
     const context = this
+    //TASK ITEMS
+
     this.state.tasks
       .sort(function(a, b) {
         return a.priority - b.priority
@@ -909,7 +911,15 @@ class Board extends Component {
                   style={{ width: '20px', margin: '0px 0px 0px 0px' }}
                 />
               </span>
-              {tasks.notresponse}
+              {
+              <Masonry
+                  breakpointCols={{default: 2}}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {tasks.notresponse}
+                </Masonry>
+              }
             </div>
             <div
               className="standby b-row"
@@ -917,7 +927,15 @@ class Board extends Component {
               onDrop={e => this.onDrop(e, 'standby')}
             >
               <span className="column-header">En Espera</span>
-              {tasks.standby}
+              {
+                <Masonry
+                  breakpointCols={{default: 2}}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {tasks.standby}
+                </Masonry>
+              }
             </div>
             <div
               className="live b-row"
@@ -925,7 +943,16 @@ class Board extends Component {
               onDrop={e => this.onDrop(e, 'live')}
             >
               <span className="column-header">En Vivo</span>
-              {tasks.live}
+              {
+              <Masonry
+                  breakpointCols={{default: 2}}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {tasks.live}
+                </Masonry>
+              }
+              
             </div>
           </div>
           <div
@@ -936,7 +963,6 @@ class Board extends Component {
           >
             <span className="column-header">Resueltos</span>
             {tasks.complete}
-
             {getUser().type !== 'operator' ? (
               <div className="column-footer">
                 <button
