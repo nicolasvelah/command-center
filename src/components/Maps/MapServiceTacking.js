@@ -7,7 +7,7 @@ import Autocomplete from 'react-google-autocomplete'
 import io from 'socket.io-client'
 import styled from 'styled-components'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getUser, getAccessToken } from '../../services/auth'
 import '../../assets/css/map.css'
 
 const Button = styled.button`
@@ -53,11 +53,12 @@ class MapServiceTacking extends Component {
     try {
       const publicIp = require('public-ip')
       const ip = await publicIp.v4()
+      const accessToken = await getAccessToken()
       const response = await axios({
         url: `${process.env.WS_URL}/api/v1/geo-ip/${ip}`,
         method: 'get',
         headers: {
-          jwt: token,
+          jwt: accessToken,
         },
       })
       const { country } = response.data
@@ -78,12 +79,12 @@ class MapServiceTacking extends Component {
       },
       country,
     }
-
+    const accessToken = await getAccessToken()
     const response = await axios({
       method: 'POST',
       url: `${process.env.WS_URL}/api/v1/ws/get-access-token`,
       headers: {
-        jwt: token,
+        jwt: accessToken,
       },
       data,
     })
@@ -136,11 +137,12 @@ class MapServiceTacking extends Component {
   async findUser(userId, isClient) {
     //console.log('find userId-------------------', userId)
     try {
+      const accessToken = await accessToken()
       const user = await axios({
         method: 'POST',
         url: `${process.env.WS_URL}/api/v1/find-user`,
         headers: {
-          jwt: token,
+          jwt: accessToken,
         },
         data: {
           userId,

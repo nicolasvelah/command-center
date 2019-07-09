@@ -7,7 +7,7 @@ import Autocomplete from 'react-google-autocomplete'
 import io from 'socket.io-client'
 import styled from 'styled-components'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getUser, accessToken } from '../../services/auth'
 import '../../assets/css/map.css'
 
 const Button = styled.button`
@@ -58,11 +58,12 @@ class MapServiceLocator extends Component {
     try {
       const publicIp = require('public-ip')
       const ip = await publicIp.v4()
+      const accessToken = await getAccessToken()
       const response = await axios({
         url: `${process.env.WS_URL}/api/v1/geo-ip/${ip}`,
         method: 'get',
         headers: {
-          jwt: token,
+          jwt: accessToken,
         },
       })
       const { country } = response.data
@@ -153,11 +154,12 @@ class MapServiceLocator extends Component {
   //GEOLOCALIZATION
   async getClients(country) {
     try {
+      const accessToken = await getAccessToken()
       const res = await axios({
         method: 'POST',
         url: `${process.env.WS_URL}/api/v1/clients`,
         headers: {
-          jwt: token,
+          jwt: accessToken,
         },
         data: {
           country,
@@ -207,11 +209,12 @@ class MapServiceLocator extends Component {
   async getProviders(country) {
     console.log('this.props.providerId', this.props.providerId)
     try {
+      const accessToken = await getAccessToken()
       const res = await axios({
         method: 'POST',
         url: `${process.env.WS_URL}/api/v1/providers`,
         headers: {
-          jwt: token,
+          jwt: accessToken,
         },
         data: {
           country,

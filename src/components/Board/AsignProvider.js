@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getAccessToken } from '../../services/auth'
 import Select from 'react-select'
 import styled from 'styled-components'
 import star from '../../images/star-full.svg'
@@ -85,6 +85,7 @@ export default class AsignProvider extends Component {
     return data
   }
   getServices = async id => {
+    const accessToken = await getAccessToken()
     const data = await axios
       .get(
         `${process.env.API_URL}/services/` + id,
@@ -92,7 +93,7 @@ export default class AsignProvider extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -110,6 +111,7 @@ export default class AsignProvider extends Component {
     return data
   }
   getProvider = async id => {
+    const accessToken = await getAccessToken()
     const data = await axios
       .get(
         `${process.env.API_URL}/providers/` + id,
@@ -117,7 +119,7 @@ export default class AsignProvider extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )

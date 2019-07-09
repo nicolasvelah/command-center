@@ -37,9 +37,10 @@ export const handleLogin = async ({ username, password }) => {
     const response = await axios.post(`${process.env.API_URL}/login`, {
       data: loginEncryptedData,
     })
+    console.log('response', response)
     if (response.data.token != null && response.data.auth === true) {
       getUserData(response.data.token)
-      getRefreshToken(response.data.token)
+
       return true
     }
     return false
@@ -61,7 +62,10 @@ const getUserData = async token => {
       }
     )
     .then(async response => {
+      getRefreshToken(token)
       response.data.token = token
+      response.data.expiresIn = 60 * 60 * 5
+      console.log('response.data', response.data)
       setUser(response.data)
     })
     .catch(function(error) {
@@ -126,9 +130,7 @@ async function refreshToken(user) {
  */
 export async function getAccessToken() {
   let user = await getUser()
-  console.log('USER', user)
   const { token, expiresIn, updatedAt } = user
-  console.log('token getAccessToken', token)
   const currentDate = new Date()
   const tokenDate = new Date(updatedAt)
   //diference in seconds
@@ -171,6 +173,8 @@ export async function getRefreshToken(token) {
       jwt: token,
     },
   })
-  console.log('getRefreshToken', response)
+  let user = await getUser()
+  user.token = token
+  await setUser({ ...user, updatedAt: new Date() })
   return response
 }

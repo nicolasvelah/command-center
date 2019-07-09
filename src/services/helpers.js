@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getUser, logoutLocal } from './auth'
+import { getUser, logoutLocal, getAccessToken } from './auth'
 import { toast } from 'react-toastify'
 
 export const sendMessage = async (
@@ -10,6 +10,7 @@ export const sendMessage = async (
   assistanceMode
 ) => {
   try {
+    const accessToken = await getAccessToken()
     const result = await axios.post(
       `${process.env.API_URL}/sendMessage`,
       {
@@ -22,7 +23,7 @@ export const sendMessage = async (
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -34,6 +35,7 @@ export const sendMessage = async (
   }
 }
 export const getMessagesById = async (orderId, to) => {
+  const accessToken = await getAccessToken()
   const messages = await axios.post(
     `${process.env.API_URL}/getMessagesById`,
     {
@@ -43,7 +45,7 @@ export const getMessagesById = async (orderId, to) => {
     {
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
+        'x-access-token': accessToken,
       },
     }
   )
@@ -52,13 +54,14 @@ export const getMessagesById = async (orderId, to) => {
 }
 export const operatorsAll = async () => {
   try {
+    const accessToken = await getAccessToken()
     const data = await axios.post(
       `${process.env.API_URL}/getOperators`,
       {},
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -72,6 +75,7 @@ export const operatorsAll = async () => {
 export const MsmNewTask = title => toast(title)
 
 export const messagesAll = async id => {
+  const accessToken = await getAccessToken()
   const messages = await axios.post(
     `${process.env.API_URL}/getMessages`,
     {
@@ -80,7 +84,7 @@ export const messagesAll = async id => {
     {
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
+        'x-access-token': accessToken,
       },
     }
   )
@@ -89,6 +93,7 @@ export const messagesAll = async id => {
 }
 
 export const notesAll = async id => {
+  const accessToken = await getAccessToken()
   const notes = await axios.post(
     `${process.env.API_URL}/orders/getNotes`,
     {
@@ -97,7 +102,7 @@ export const notesAll = async id => {
     {
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
+        'x-access-token': accessToken,
       },
     }
   )
@@ -106,13 +111,14 @@ export const notesAll = async id => {
 
 export const updateChatState = async orderId => {
   try {
+    const accessToken = await getAccessToken()
     await axios.post(
       `${process.env.API_URL}/updateChatState/` + orderId,
       {},
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -125,13 +131,14 @@ export const updateChatState = async orderId => {
 
 export const getAllTasks = async () => {
   try {
+    const accessToken = await getAccessToken()
     const tasks = await axios.post(
       `${process.env.API_URL}/orders/getOrders`,
       {},
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -176,6 +183,7 @@ export const colorGenerator = () => {
   return color
 }
 export const updateStatus = async (id, cat) => {
+  const accessToken = await getAccessToken()
   return await axios.post(
     `${process.env.API_URL}/orders/updateStatus`,
     {
@@ -185,7 +193,7 @@ export const updateStatus = async (id, cat) => {
     {
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
+        'x-access-token': accessToken,
       },
     }
   )
@@ -193,6 +201,7 @@ export const updateStatus = async (id, cat) => {
 
 export const changeOrderProvider = async (orderId, providerId) => {
   try {
+    const accessToken = await getAccessToken()
     await axios.post(
       `${process.env.API_URL}/orders/changeOrderProvider`,
       {
@@ -202,7 +211,7 @@ export const changeOrderProvider = async (orderId, providerId) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )

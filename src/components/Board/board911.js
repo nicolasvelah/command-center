@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getUser, logout } from '../../services/auth'
+import { getUser, logout, getAccessToken } from '../../services/auth'
 import { navigate } from 'gatsby'
 
 import axios from 'axios'
@@ -92,6 +92,7 @@ export default class Board extends Component {
 
   //CHAT
   getMessages = async id => {
+    const accessToken = await getAccessToken()
     const messages = await axios.post(
       `${process.env.API_URL}/getMessages`,
       {
@@ -100,7 +101,7 @@ export default class Board extends Component {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -137,13 +138,14 @@ export default class Board extends Component {
 
   //TASKS
   getMyTasks = async () => {
+    const accessToken = await getAccessToken()
     try {
       const tasks = await axios.post(
         `${process.env.API_URL}/orders/getOrders`,
         {},
         {
           headers: {
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )

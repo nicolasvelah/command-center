@@ -1,24 +1,22 @@
 import axios from 'axios'
 import io from 'socket.io-client'
-import { getUser, getAccessToken } from '../services/auth'
+import { getAccessToken } from '../services/auth'
 import { get } from './Storage'
 
 export const conectSocket = async (token, userId, userType, APP_IDs) => {
   try {
     const country = await getLocationByIP(token)
-    const wsToken = await getWsAccessToken2(
+    const wsToken = await getWsAccessToken(
       userId,
       APP_IDs,
       userType,
       country,
       token
     )
-    const wsToken2 = await getWsAccessToken(userId, APP_IDs, userType, country)
-    console.log('wsToken2', wsToken2)
     console.log('wsToken', wsToken)
     const socket = await io(process.env.WS_URL, {
       query: {
-        token: wsToken2,
+        token: wsToken,
       },
     })
     console.log('socket', socket)
@@ -120,7 +118,7 @@ const getLocationByIP = async token => {
   }
 }
 /* ------------------------------------- */
-const getWsAccessToken2 = async (userId, appIds, userType, country, token) => {
+const getWsAccessToken = async (userId, appIds, userType, country, token) => {
   const data = {
     appIds,
     userType,
@@ -140,33 +138,6 @@ const getWsAccessToken2 = async (userId, appIds, userType, country, token) => {
   })
   return response.data
 }
-
-/* ---------------------------------- */
-const getWsAccessToken = async (userId, appIds, userType, country) => {
-  const accessToken = await getAccessToken()
-  console.log('accessToken', accessToken)
-  const data = {
-    appIds,
-    userType,
-    user: {
-      id: userId,
-    },
-    country,
-  }
-
-  const response = await axios({
-    method: 'POST',
-    url: `${process.env.WS_URL}/api/v1/ws/get-access-token`,
-    headers: {
-      jwt: accessToken,
-    },
-    data,
-  })
-
-  //return a token from ws api
-  return response.data
-}
-/* ___________________________________*/
 
 //ON EVENT
 //Client
@@ -202,6 +173,7 @@ const onProviderInService = async (data, APP_ID, country) => {
 
 export const findUserById = async (userId, isClient) => {
   try {
+    const accessToken = await getAccessToken()
     const result = await axios.post(
       `${process.env.WS_URL}/api/v1/find-user`,
       {
@@ -211,7 +183,7 @@ export const findUserById = async (userId, isClient) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          jwt: getUser().token,
+          jwt: accessToken,
         },
       }
     )
@@ -223,6 +195,7 @@ export const findUserById = async (userId, isClient) => {
 }
 export const getProviders = async (appId, country) => {
   try {
+    const accessToken = await getAccessToken()
     const result = await axios.post(
       `${process.env.WS_URL}/api/v1/providers`,
       {
@@ -232,7 +205,7 @@ export const getProviders = async (appId, country) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          jwt: getUser().token,
+          jwt: accessToken,
         },
       }
     )
@@ -246,6 +219,7 @@ export const getProviders = async (appId, country) => {
 }
 const getClients = async (appId, country) => {
   try {
+    const accessToken = await getAccessToken()
     const result = await axios.post(
       `${process.env.WS_URL}/api/v1/clients`,
       {
@@ -255,7 +229,7 @@ const getClients = async (appId, country) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          jwt: getUser().token,
+          jwt: accessToken,
         },
       }
     )

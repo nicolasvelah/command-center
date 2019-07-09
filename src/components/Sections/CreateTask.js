@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getUser, getAccessToken } from '../../services/auth'
 import Select, { Async } from 'react-select'
 import styled from 'styled-components'
 //import MapServiceLocator from '../Maps/MapServiceLocator'
@@ -127,10 +127,11 @@ export default class CreateTask extends Component {
     this.getCategories()
   }
 
-  getClient = (inputValue, callback) => {
+  getClient = async (inputValue, callback) => {
     if (!this.state.isLoading && inputValue) {
       let options = []
       if (this.state.keyWord !== '') {
+        const accessToken = await getAccessToken()
         axios
           .post(
             `${process.env.API_URL}/clients/searchClients`,
@@ -140,7 +141,7 @@ export default class CreateTask extends Component {
             {
               headers: {
                 'Content-Type': 'application/json',
-                'x-access-token': getUser().token,
+                'x-access-token': accessToken,
               },
             }
           )
@@ -174,6 +175,7 @@ export default class CreateTask extends Component {
   }
   getOperators = async () => {
     try {
+      const accessToken = await getAccessToken()
       const data = await axios
         .post(
           `${process.env.API_URL}/getOperators`,
@@ -181,7 +183,7 @@ export default class CreateTask extends Component {
           {
             headers: {
               'Content-Type': 'application/json',
-              'x-access-token': getUser().token,
+              'x-access-token': accessToken,
             },
           }
         )
@@ -203,6 +205,7 @@ export default class CreateTask extends Component {
     }
   }
   getCategories = async () => {
+    const accessToken = await getAccessToken()
     const data = await axios
       .get(
         `${process.env.API_URL}/categories`,
@@ -210,7 +213,7 @@ export default class CreateTask extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -228,6 +231,7 @@ export default class CreateTask extends Component {
     return data
   }
   getServices = async id => {
+    const accessToken = await getAccessToken()
     const data = await axios
       .get(
         `${process.env.API_URL}/services/` + id,
@@ -235,7 +239,7 @@ export default class CreateTask extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -253,6 +257,7 @@ export default class CreateTask extends Component {
     return data
   }
   getProvider = async id => {
+    const accessToken = await getAccessToken()
     const data = await axios
       .get(
         `${process.env.API_URL}/providers/` + id,
@@ -260,7 +265,7 @@ export default class CreateTask extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -370,6 +375,7 @@ export default class CreateTask extends Component {
       return
     }
     try {
+      const accessToken = await getAccessToken()
       await axios.post(
         `${process.env.API_URL}/orders/addOrder`,
         {
@@ -383,7 +389,7 @@ export default class CreateTask extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
             lat: this.state.lat.value,
             len: this.state.lnt.value,
           },

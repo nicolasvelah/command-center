@@ -1,5 +1,11 @@
 import React, { Component } from 'react'
-import { getUser, logout, isLoggedIn, logoutLocal } from '../../services/auth'
+import {
+  getUser,
+  logout,
+  isLoggedIn,
+  logoutLocal,
+  getAccessToken,
+} from '../../services/auth'
 import { navigate } from 'gatsby'
 import { ToastContainer } from 'react-toastify'
 import TaskItem from './TaskItem'
@@ -84,7 +90,8 @@ class Board extends Component {
     const userId = await getUser().userId
     const userType = await getUser().type
     let { socket } = this
-    socket = await conectSocket(token, userId, userType, [1, 2, 3])
+    const accessToken = await getAccessToken()
+    socket = await conectSocket(accessToken, userId, userType, [1, 2, 3])
     await onNotification(
       socket,
       this.startNotificationsWs,
@@ -97,10 +104,8 @@ class Board extends Component {
       socket,
     })
     //Tasks
-    //console.log('init traer ordenes en did mount ')
-    console.log('Llego Task')
+    console.log('init traer ordenes en did mount ')
     await this.getMyTasks()
-    console.log('Llego')
     //Push Notifications
 
     const context = this
