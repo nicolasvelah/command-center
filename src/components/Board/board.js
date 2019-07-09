@@ -80,11 +80,11 @@ class Board extends Component {
       logout()
     }
     const token = await getUser().token
+    console.log('token componentDidMount', token)
     const userId = await getUser().userId
     const userType = await getUser().type
     let { socket } = this
     socket = await conectSocket(token, userId, userType, [1, 2, 3])
-
     await onNotification(
       socket,
       this.startNotificationsWs,
@@ -92,14 +92,15 @@ class Board extends Component {
       this.getMyTasks,
       this.providerState
     )
-
+    console.log('Llego set')
     await this.setState({
       socket,
     })
     //Tasks
     //console.log('init traer ordenes en did mount ')
+    console.log('Llego Task')
     await this.getMyTasks()
-
+    console.log('Llego')
     //Push Notifications
 
     const context = this
@@ -912,8 +913,8 @@ class Board extends Component {
                 />
               </span>
               {
-              <Masonry
-                  breakpointCols={{default: 2}}
+                <Masonry
+                  breakpointCols={{ default: 2 }}
                   className="my-masonry-grid"
                   columnClassName="my-masonry-grid_column"
                 >
@@ -929,7 +930,7 @@ class Board extends Component {
               <span className="column-header">En Espera</span>
               {
                 <Masonry
-                  breakpointCols={{default: 2}}
+                  breakpointCols={{ default: 2 }}
                   className="my-masonry-grid"
                   columnClassName="my-masonry-grid_column"
                 >
@@ -944,15 +945,14 @@ class Board extends Component {
             >
               <span className="column-header">En Vivo</span>
               {
-              <Masonry
-                  breakpointCols={{default: 2}}
+                <Masonry
+                  breakpointCols={{ default: 2 }}
                   className="my-masonry-grid"
                   columnClassName="my-masonry-grid_column"
                 >
                   {tasks.live}
                 </Masonry>
               }
-              
             </div>
           </div>
           <div

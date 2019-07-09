@@ -1,23 +1,27 @@
 import axios from 'axios'
 import io from 'socket.io-client'
-import { getUser } from '../services/auth'
+import { getUser, getAccessToken } from '../services/auth'
 import { get } from './Storage'
 
 export const conectSocket = async (token, userId, userType, APP_IDs) => {
   try {
     const country = await getLocationByIP(token)
-    const wsToken = await getWsAccessToken(
+    const wsToken = await getWsAccessToken2(
       userId,
       APP_IDs,
       userType,
       country,
       token
     )
+    const wsToken2 = await getWsAccessToken(userId, APP_IDs, userType, country)
+    console.log('wsToken2', wsToken2)
+    console.log('wsToken', wsToken)
     const socket = await io(process.env.WS_URL, {
       query: {
-        token: wsToken,
+        token: wsToken2,
       },
     })
+    console.log('socket', socket)
     return socket
   } catch (err) {
     console.log(err.message)
@@ -115,7 +119,8 @@ const getLocationByIP = async token => {
     console.log('no se pudo desde el backend')
   }
 }
-const getWsAccessToken = async (userId, appIds, userType, country, token) => {
+/* ------------------------------------- */
+const getWsAccessToken2 = async (userId, appIds, userType, country, token) => {
   const data = {
     appIds,
     userType,
@@ -135,6 +140,34 @@ const getWsAccessToken = async (userId, appIds, userType, country, token) => {
   })
   return response.data
 }
+
+/* ---------------------------------- */
+const getWsAccessToken = async (userId, appIds, userType, country) => {
+  const accessToken = await getAccessToken()
+  console.log('accessToken', accessToken)
+  const data = {
+    appIds,
+    userType,
+    user: {
+      id: userId,
+    },
+    country,
+  }
+
+  const response = await axios({
+    method: 'POST',
+    url: `${process.env.WS_URL}/api/v1/ws/get-access-token`,
+    headers: {
+      jwt: accessToken,
+    },
+    data,
+  })
+
+  //return a token from ws api
+  return response.data
+}
+/* ___________________________________*/
+
 //ON EVENT
 //Client
 const onClientLocation = async data => {
