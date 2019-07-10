@@ -13,13 +13,11 @@ export const conectSocket = async (token, userId, userType, APP_IDs) => {
       country,
       token
     )
-    console.log('wsToken', wsToken)
     const socket = await io(process.env.WS_URL, {
       query: {
         token: wsToken,
       },
     })
-    console.log('socket', socket)
     return socket
   } catch (err) {
     console.log(err.message)

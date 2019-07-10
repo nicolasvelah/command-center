@@ -85,12 +85,12 @@ class Board extends Component {
     } else if (getUser().type === 'provider') {
       logout()
     }
-    const token = await getUser().token
-    console.log('token componentDidMount', token)
+    //const token = await getUser().token
     const userId = await getUser().userId
     const userType = await getUser().type
     let { socket } = this
     const accessToken = await getAccessToken()
+    console.log('board')
     socket = await conectSocket(accessToken, userId, userType, [1, 2, 3])
     await onNotification(
       socket,
@@ -99,12 +99,10 @@ class Board extends Component {
       this.getMyTasks,
       this.providerState
     )
-    console.log('Llego set')
     await this.setState({
       socket,
     })
     //Tasks
-    console.log('init traer ordenes en did mount ')
     await this.getMyTasks()
     //Push Notifications
 

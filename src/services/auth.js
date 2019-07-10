@@ -37,7 +37,6 @@ export const handleLogin = async ({ username, password }) => {
     const response = await axios.post(`${process.env.API_URL}/login`, {
       data: loginEncryptedData,
     })
-    console.log('response', response)
     if (response.data.token != null && response.data.auth === true) {
       getUserData(response.data.token)
 
@@ -65,7 +64,6 @@ const getUserData = async token => {
       getRefreshToken(token)
       response.data.token = token
       response.data.expiresIn = 60 * 60 * 5
-      console.log('response.data', response.data)
       setUser(response.data)
     })
     .catch(function(error) {
@@ -113,7 +111,8 @@ async function refreshToken(user) {
     })
     const { token, expiresIn } = response.data
     user.token = token
-    user.expiresIn = expiresIn
+    //user.expiresIn = expiresIn
+    user.expiresIn = 60 * 2
     await setUser({ ...user, updatedAt: new Date() })
 
     return token
@@ -137,30 +136,13 @@ export async function getAccessToken() {
   const difference = (currentDate.getTime() - tokenDate.getTime()) / 1000
 
   if (expiresIn - difference >= 60) {
+    console.log('Token aun valido')
     return token
   }
 
   // console.log('the token will expires soon or is expired', expiresIn - difference);
   const newToken = await refreshToken(user)
   console.log('new token', newToken)
-  if (newToken === 403) {
-    console.log('intento 2')
-    console.log('valor 1', user.token)
-    await sleep(1000) //sleep one second
-    user = await getUser()
-    console.log('valor 2', user.token)
-    const newToken2 = await refreshToken(user)
-    console.log('new token 2', newToken2)
-    if (newToken === 403 || newToken === 500) {
-      throw new Error('Su sesión ha expirado')
-    }
-    console.log('token refrescado al intento 2', user.token)
-    return newToken2
-  }
-  if (newToken === 500) {
-    throw new Error('Su sesión ha expirado')
-  }
-  console.log('token refrescado al intento 1', user.token)
   return newToken
 }
 
