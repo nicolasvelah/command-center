@@ -7,7 +7,7 @@ import Autocomplete from 'react-google-autocomplete'
 import io from 'socket.io-client'
 import styled from 'styled-components'
 import axios from 'axios'
-import { getUser, getAccessToken } from '../../services/auth'
+import { getAccessToken } from '../../services/auth'
 import '../../assets/css/map.css'
 
 const Button = styled.button`
@@ -28,7 +28,7 @@ const Button = styled.button`
   zindex: 1;
 `
 
-let token = getUser().token
+//let token = getUser().token
 const APP_ID = 1
 
 class MapServiceTacking extends Component {
@@ -93,7 +93,6 @@ class MapServiceTacking extends Component {
     return response.data
   }
   async componentDidMount() {
-    token = await getUser().token
     //Geolocalizacion
     const { userId } = this.state
     this.google = window.google = window.google ? window.google : {}
@@ -137,7 +136,7 @@ class MapServiceTacking extends Component {
   async findUser(userId, isClient) {
     //console.log('find userId-------------------', userId)
     try {
-      const accessToken = await accessToken()
+      const accessToken = await getAccessToken()
       const user = await axios({
         method: 'POST',
         url: `${process.env.WS_URL}/api/v1/find-user`,

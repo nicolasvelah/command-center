@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import axios from 'axios'
 import { getUser, getAccessToken } from '../../services/auth'
 import Chart from 'react-google-charts'
@@ -6,7 +6,7 @@ import '../../assets/css/operators.css'
 import flag from '../../images/flag.svg'
 import star from '../../images/star-full.svg'
 
-export default class Operators extends Component {
+export default class Operators extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {

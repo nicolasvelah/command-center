@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import axios from 'axios'
-import { getUser, getAccessToken } from '../../services/auth'
+import { getAccessToken } from '../../services/auth'
 import Select, { Async } from 'react-select'
 import styled from 'styled-components'
 //import MapServiceLocator from '../Maps/MapServiceLocator'
@@ -58,7 +58,7 @@ const Error = styled.div`
 const InputContainer = styled.div`
   position: relative;
 `
-export default class CreateTask extends Component {
+export default class CreateTask extends React.PureComponent {
   validations = {
     operator: { required: true },
     client: { required: true },

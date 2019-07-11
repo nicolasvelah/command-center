@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getUser, logoutLocal, getAccessToken } from './auth'
+import { logoutLocal, getAccessToken } from './auth'
 import { toast } from 'react-toastify'
 
 export const sendMessage = async (

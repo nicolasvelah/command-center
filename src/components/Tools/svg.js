@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default class Svg extends React.Component {
+export default class Svg extends React.PureComponent {
   render() {
     return (
       <svg

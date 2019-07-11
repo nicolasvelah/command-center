@@ -3,7 +3,7 @@ import { getUser } from '../../services/auth'
 import '../../assets/css/chatV2.css'
 import { sendMessage } from '../../services/helpers'
 
-export default class Chat extends React.Component {
+export default class Chat extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = { message: '' }

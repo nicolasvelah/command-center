@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { DatePickerInput } from 'rc-datepicker'
 import InfiniteScroll from 'react-infinite-scroller'
 import axios from 'axios'
 import Select from 'react-select'
-import { getUser, logoutLocal, getAccessToken } from '../../services/auth'
+import { logoutLocal, getAccessToken } from '../../services/auth'
 import Modal from '../Tools/modal'
 import Task from '../Board/Task'
 import ExcelDownload from '../Tools/ExcelDownload'
@@ -27,7 +27,7 @@ const columnsAll = [
   { label: 'Ciudad', value: 'Ciudad', id: 8 },
   { label: 'Direccion', value: 'Direccion', id: 9 },
 ]
-export default class Deliveries extends Component {
+export default class Deliveries extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {

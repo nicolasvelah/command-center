@@ -77,7 +77,7 @@ const Wrapper = styled.div`
   }
 `
 
-export default class CMarker extends React.Component {
+export default class CMarker extends React.PureComponent {
   state = {
     active: false,
   }

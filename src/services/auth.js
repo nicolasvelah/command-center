@@ -95,11 +95,6 @@ export const logoutLocal = async callback => {
   //window.localStorage.setItem('fbtk', '')
 }
 
-/* --------------------------------------------------------------*/
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
 async function refreshToken(user) {
   try {
     const response = await axios({
@@ -111,8 +106,8 @@ async function refreshToken(user) {
     })
     const { token, expiresIn } = response.data
     user.token = token
-    //user.expiresIn = expiresIn
-    user.expiresIn = 60 * 2
+    user.expiresIn = expiresIn
+    //user.expiresIn = 60 * 2
     await setUser({ ...user, updatedAt: new Date() })
 
     return token

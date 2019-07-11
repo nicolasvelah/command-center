@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/messaging'
 import axios from 'axios'
-import { getUser, getAccessToken } from '../services/auth'
+import { getAccessToken } from '../services/auth'
 
 export const initializeFirebase = () => {
   if (typeof window !== 'undefined') {

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { navigate } from 'gatsby'
 import { isLoggedIn, logout, getUser } from '../../services/auth'
 import Modal from './modal'
@@ -15,7 +15,7 @@ import users from '../../images/users.svg'
 import exit from '../../images/exit.svg'
 import circleRight from '../../images/circle-right.svg'
 
-export default class navBar extends Component {
+export default class navBar extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {

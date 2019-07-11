@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   }
 `
 
-export default class CMarkerSelector extends React.Component {
+export default class CMarkerSelector extends React.PureComponent {
   render() {
     return (
       <Wrapper>

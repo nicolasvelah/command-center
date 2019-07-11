@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import axios from 'axios'
-import { getUser, getAccessToken } from '../../services/auth'
+import { getAccessToken } from '../../services/auth'
 
 import '../../assets/css/search.css'
 

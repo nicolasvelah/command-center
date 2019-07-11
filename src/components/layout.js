@@ -12,7 +12,7 @@ import '../assets/css/layout.css'
 const initFirebase = async () => {
   await initializeFirebase()
 }
-export default class Layout extends React.Component {
+export default class Layout extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
