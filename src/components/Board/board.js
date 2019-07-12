@@ -99,20 +99,21 @@ class Board extends Component {
       this.getMyTasks,
       this.providerState
     )
+    console.log('PantallaActualizada')
     await this.setState({
       socket,
     })
     //Tasks
-    await this.getMyTasks()
+    await this.getMyTasks('componenedidmount')
     //Push Notifications
 
+    /*_________________________________________________________________
     const context = this
-
     window.addEventListener(
       'focus',
       function(event) {
         if (isLoggedIn()) {
-          context.getMyTasks()
+          context.getMyTasks('addEventlistener')
           if (typeof context.state.curTask[0] !== 'undefined') {
             //console.log('entro para traer mensajes')
             context.chatNotifications(context.state.curTask[0].id)
@@ -121,6 +122,7 @@ class Board extends Component {
       },
       false
     )
+    */
     //OPERADORES
     if (getUser().type !== 'operator') {
       this.getOperators()
@@ -173,9 +175,10 @@ class Board extends Component {
             dataNotification.data.type
           )
         } else {
-          getMyTasks()
+          getMyTasks('startNotificactionWs')
           if (dataNotification.data.type !== 'updateOrder') {
             MsmNewTask(dataNotification.notification.title)
+            
           }
         }
       }
@@ -329,7 +332,7 @@ class Board extends Component {
       nodeValue[0].innerHTML = 0
     }
     await updateChatState(id)
-    await this.getMyTasks()
+    //await this.getMyTasks('notification off')
     return ''
   }
 
@@ -429,7 +432,7 @@ class Board extends Component {
     let activetask = get('activeTasks', column)
     let task = null
     if (column === 'provider') {
-      await this.getMyTasks()
+      await this.getMyTasks('updateActivateTask')
       await this.state.tasks.map(item => {
         if (item.id === id) {
           task = item
@@ -624,7 +627,8 @@ class Board extends Component {
   }
 
   //TASKS
-  getMyTasks = async () => {
+  getMyTasks = async desde => {
+    console.log('Trayendo Tareas desde' + desde)
     try {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
@@ -733,7 +737,7 @@ class Board extends Component {
       if (item.status.name === 'complete') {
         try {
           await updateStatus(item.id, 'delivered')
-          this.getMyTasks()
+          this.getMyTasks('Delivery')
         } catch (err) {
           console.log(err)
         }
@@ -842,7 +846,6 @@ class Board extends Component {
             whoFocusItem={this.state.whoFocusItem}
           />
         )
-        console.log('Se hizo push')
         return true
       })
 
