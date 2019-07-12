@@ -13,6 +13,7 @@ export default class TaskItem extends React.PureComponent {
   }
 
   render() {
+    console.log('this.props.t.color', this.props.t.color)
     return (
       <div
         onDragStart={e => this.props.onDragStart(e, 'id_' + this.props.t.id)}

@@ -842,6 +842,7 @@ class Board extends Component {
             whoFocusItem={this.state.whoFocusItem}
           />
         )
+        console.log('Se hizo push')
         return true
       })
 

@@ -49,6 +49,27 @@ export const handleLogin = async ({ username, password }) => {
   }
 }
 const getUserData = async token => {
+  try {
+    const response = await axios.post(
+      `${process.env.API_URL}/me`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'x-access-token': token,
+        },
+      }
+    )
+    getRefreshToken(token)
+    response.data.token = token
+    response.data.expiresIn = 60 * 60 * 5
+    setUser(response.data)
+  } catch (e) {
+    console.log(e)
+    return e
+  }
+
+  /*
   axios
     .post(
       `${process.env.API_URL}/me`,
@@ -69,6 +90,7 @@ const getUserData = async token => {
     .catch(function(error) {
       console.log(error)
     })
+  */
 }
 export const isLoggedIn = () => {
   const user = getUser()
