@@ -94,8 +94,8 @@ class ChatContainer extends React.Component {
   async componentDidMount() {
     //GET USER GEOLOCALIZATION DATA
     const clientGLData = await findUserById(this.props.item.clientId, true)
+    console.log('++Iniciando haveToOpenChat ++')
     await this.haveToOpenChat(this.props.item.status.name, 'init')
-
     let { searchProviderMode } = this.state
     if (this.props.item.provider !== null) {
       if (this.props.item.providerId !== 0) {
@@ -163,6 +163,7 @@ class ChatContainer extends React.Component {
 
     intercept(this.props.mapStore, 'clientIdWS', change => {
       if (context.props.item.clientId === change.newValue.id) {
+        /*
         console.log(
           'este actor se esta moviendo:',
           change.newValue.id +
@@ -172,6 +173,7 @@ class ChatContainer extends React.Component {
             this.props.item.client.lastName
         )
         console.log('este actor se esta moviendo xx:', change.newValue)
+        */
 
         let { clientData } = this.state
         const location = change.newValue.location.coordinates
@@ -316,6 +318,7 @@ class ChatContainer extends React.Component {
       this.setState({ status, openChat: haveToOpen })
     }
     this.props.chatTopPositionTriger()
+    console.log('haveToOpenChat', from)
   }
 
   focusChat = id => {

@@ -122,11 +122,60 @@ export const updateChatState = async orderId => {
         },
       }
     )
-    //console.log('Exito en updateChatState')
+    console.log('Exito en updateChatState')
   } catch (error) {
     console.log('Error en updateChatState', error.message)
   }
   return
+}
+
+export const getOrderById = async orderId => {
+  try {
+    const accessToken = await getAccessToken()
+    const tasks = await axios.post(
+      `${process.env.API_URL}/orders/get-order-by-id/${orderId}`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': accessToken,
+        },
+      }
+    )
+    var CryptoJS = require('crypto-js')
+    let decryptedData = CryptoJS.AES.decrypt(
+      tasks.data,
+      process.env.CRYPTO_SECRET
+    ).toString(CryptoJS.enc.Utf8)
+    decryptedData = JSON.parse(decryptedData)
+
+    //const activeTasks = JSON.parse(window.localStorage.getItem('activeTasks'))
+    /*
+    decryptedData.tasks = decryptedData.tasks.map(item => {
+      let generate = true
+      if (typeof activeTasks !== undefined && activeTasks !== null) {
+        activeTasks.map(itemAc => {
+          if (item.id === itemAc.task.id) {
+            item.color = itemAc.task.color
+            generate = false
+          }
+          return itemAc
+        })
+      }
+      if (generate) {
+        item.color = colorGenerator()
+      }
+
+      return item
+    })
+    */
+    //console.log('activeTasks', activeTasks)
+    //console.log('tasks ', decryptedData.tasks)
+    return decryptedData.tasks
+  } catch (err) {
+    console.log(err)
+    return err
+  }
 }
 
 export const getAllTasks = async () => {
@@ -169,7 +218,6 @@ export const getAllTasks = async () => {
       return item
     })
 
-    //console.log('tasks ', decryptedData)
     return decryptedData
   } catch (err) {
     console.log(err)
@@ -183,6 +231,7 @@ export const colorGenerator = () => {
   return color
 }
 export const updateStatus = async (id, cat) => {
+  console.log('Estado actualizado')
   const accessToken = await getAccessToken()
   return await axios.post(
     `${process.env.API_URL}/orders/updateStatus`,

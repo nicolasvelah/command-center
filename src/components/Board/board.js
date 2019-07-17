@@ -20,6 +20,7 @@ import {
   getAllTasks,
   updateStatus,
   updateChatState,
+  getOrderById,
 } from '../../services/helpers'
 //import Filter from './Filter'
 import {
@@ -92,14 +93,16 @@ class Board extends Component {
     const accessToken = await getAccessToken()
     console.log('board')
     socket = await conectSocket(accessToken, userId, userType, [1, 2, 3])
+    
     await onNotification(
       socket,
       this.startNotificationsWs,
       this.chatNotifications,
       this.getMyTasks,
-      this.providerState
+      this.providerState,
+      this.getMyLastTasks
     )
-    console.log('PantallaActualizada')
+    
     await this.setState({
       socket,
     })
@@ -159,10 +162,15 @@ class Board extends Component {
     }
   }
   //WEBSOCKETS NOTIFICATIONS TRIEGER
-  startNotificationsWs(data, chatNotifications, getMyTasks, providerState) {
+  async startNotificationsWs(
+    data,
+    chatNotifications,
+    getMyTasks,
+    providerState,
+    getMyLastTasks
+  ) {
     try {
       const dataNotification = data.dat
-      console.log('data type', data)
       if (isLoggedIn()) {
         if (dataNotification.data.type === 'chat') {
           chatNotifications(dataNotification.data.content.orderId)
@@ -175,10 +183,15 @@ class Board extends Component {
             dataNotification.data.type
           )
         } else {
-          getMyTasks('startNotificactionWs')
-          if (dataNotification.data.type !== 'updateOrder') {
-            MsmNewTask(dataNotification.notification.title)
-            
+          if (dataNotification.data.type === 'order') {
+            console.log('LLEGOOOO PANAAAAA orderId', dataNotification.data.content)
+             MsmNewTask(dataNotification.notification.title)
+             getMyLastTasks('websockets', dataNotification.data.content.orderId)
+          } else {
+            getMyTasks('startNotificactionWs')
+            if (dataNotification.data.type !== 'updateOrder') {
+              MsmNewTask(dataNotification.notification.title)
+            }
           }
         }
       }
@@ -322,7 +335,7 @@ class Board extends Component {
     return ''
   }
   notificationOff = async (id, type) => {
-    //console.log('OFF NOT')
+    console.log('OFF NOT')
     document.getElementById('taskid_' + id).classList.remove('haveNotification')
     document.getElementById('taskid_' + id).classList.remove('not_' + type)
     const nodeValue = document
@@ -364,6 +377,7 @@ class Board extends Component {
     }
 
     await this.trigerColumn(column, id)
+    console.log('trigerColumn Open Chat')
 
     this.setState({ openChat })
 
@@ -476,6 +490,7 @@ class Board extends Component {
     }
   }
   activateTask = async (id, icon) => {
+    console.log('activateTask')
     try {
       let { activeTasks } = this.state
 
@@ -523,11 +538,9 @@ class Board extends Component {
       }
 
       if (execute) {
-        //console.log('execute', execute)
         await this.openChat(id, 'live')
 
         await save('activeTasks', activeTasks)
-
         await this.setState({
           activeTasks,
         })
@@ -550,6 +563,7 @@ class Board extends Component {
     }
   }
   desactivateTask = async (id, go) => {
+    console.log('desactivate Task')
     //console.log('dasactivar' + id)
     try {
       let result = true
@@ -573,6 +587,7 @@ class Board extends Component {
         //console.log(' des activeTasksFilter', activeTasksFilter)
         if (go) {
           await this.trigerColumn('complete', id)
+          console.log('trigerColumn desactivate')
           //await save('activeTasks', activeTasksFilter)
         }
 
@@ -592,6 +607,7 @@ class Board extends Component {
       console.log('id', id)*/
       await this.updateActivateTask(col, id)
       await updateStatus(id, col)
+      console.log('=======updateStatus triger Column=========')
 
       let { tasks } = this.state
 
@@ -628,13 +644,30 @@ class Board extends Component {
 
   //TASKS
   getMyTasks = async desde => {
-    console.log('Trayendo Tareas desde' + desde)
+    console.log('Trayendo Tareas desde ' + desde)
     try {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
 
       this.setState({
         tasks: decryptedData.tasks,
+      })
+    } catch (err) {
+      console.log(err)
+      logoutLocal()
+    }
+    return true
+  }
+  getMyLastTasks = async (desde, orderId) => {
+    let { tasks } = this.state
+    console.log('Trayendo la ultima tarea ' + desde + ' con orderId ' + orderId)
+    try {
+      const decryptedData = await getOrderById(orderId)
+      await tasks.push(decryptedData)
+      //console.log('new tasks', tasks)
+
+      this.setState({
+        tasks,
       })
     } catch (err) {
       console.log(err)
@@ -682,6 +715,7 @@ class Board extends Component {
         }
         return task
       })
+
       if (cat === 'backlog' && operator !== null) {
         alert(
           'Esta columna es solo para tareas que no tengan asiganado un operador.'
@@ -697,11 +731,13 @@ class Board extends Component {
       id = Number(id[1])
       if (reopenconfirm) {
         await this.trigerColumn(cat, idNumber)
-
+        console.log('trigerColumn Drop')
         if (cat === 'complete') {
           await this.desactivateTask(id, false)
+          console.log('desactivateTask Drop')
         }
       }
+
       if (cat !== 'complete') {
         let icon = service
         icon =
@@ -712,7 +748,11 @@ class Board extends Component {
             .replace(/[^\w]+/g, '')
             .replace(/^-+/, '')
             .replace(/-+$/, '') + '.svg'
-        await this.activateTask(id, icon)
+
+        if (cat === 'live') {
+          await this.activateTask(id, icon)
+          console.log('activateTask Drop')
+        }
       }
 
       Array.from(this.RefChatContainer.values())
@@ -728,6 +768,7 @@ class Board extends Component {
       dragStard: false,
     })
   }
+
   Delivery = async () => {
     this.setState({
       isLoading: true,
@@ -737,6 +778,8 @@ class Board extends Component {
       if (item.status.name === 'complete') {
         try {
           await updateStatus(item.id, 'delivered')
+          console.log('=======updateStatus Delivery=========')
+
           this.getMyTasks('Delivery')
         } catch (err) {
           console.log(err)

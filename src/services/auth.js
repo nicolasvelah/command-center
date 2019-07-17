@@ -153,7 +153,7 @@ export async function getAccessToken() {
   const difference = (currentDate.getTime() - tokenDate.getTime()) / 1000
 
   if (expiresIn - difference >= 60) {
-    console.log('Token aun valido')
+    //console.log('Token aun valido')
     return token
   }
 
