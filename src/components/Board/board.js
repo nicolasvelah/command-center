@@ -362,10 +362,10 @@ class Board extends Component {
     return messages
   }
   addMensages = (msm, type) => {}
-  openChat = async (id, column) => {
+  openChat = async (id, column, type) => {
     let { openChat } = this.state
     let includesThis = true
-
+    console.log('OpenChat', openChat)
     openChat = openChat.filter(item => {
       let itemResp = item
       if (item === id) {
@@ -378,9 +378,11 @@ class Board extends Component {
     if (includesThis) {
       openChat.push(id)
     }
-
-    await this.trigerColumn(column, id)
-    console.log('trigerColumn Open Chat ID: ', id)
+    if (type === 'click') {
+      await this.trigerColumn(column, id)
+      console.log('trigerColumn Open Chat ID: ', id)
+    }
+   
 
     this.setState({ openChat })
 
@@ -523,10 +525,14 @@ class Board extends Component {
         })
       }
       task.icon = icon
+      //console.log('Entro', task)
+      //console.log('AllTask', this.state.tasks)
 
       if (!includesThis) {
         if (task.status.name !== 'complete') {
+          console.log('Entro 2')
           const messages = await this.getMessages(task.id)
+          console.log('Entro 3')
           task.messagesAll = messages.data
           activeTasks.push({ task })
           execute = true
@@ -539,16 +545,14 @@ class Board extends Component {
       } else if (statusS !== 'live') {
         execute = true
       }
-
+      console.log('newTask:', task)
       if (execute) {
-        await this.openChat(id, 'live')
-
+        await this.openChat(id, 'live','click')
         await save('activeTasks', activeTasks)
         await this.setState({
           activeTasks,
         })
 
-        /*
         await Array.from(this.RefChatContainer.values())
           .filter(node => node != null)
           .forEach(node => {
@@ -557,8 +561,6 @@ class Board extends Component {
               node.wrappedInstance.haveToOpenChat('live', 'board')
             }
           })
-          */
-        //console.log('activeTasks ------------', activeTasks)
         //const scrollWidthValue = (index - 1) * 420
       }
       this.notificationOff(id, 'provider')
@@ -1016,7 +1018,16 @@ class Board extends Component {
             style={getUser().type === 'operator' ? {} : {}}
           >
             <span className="column-header">Resueltos</span>
-            {tasks.complete}
+            {
+              <Masonry
+                breakpointCols={{ default: 17 }}
+                className="my-masonry-grid"
+                columnClassName="my-masonry-grid_column"
+              >
+                {tasks.complete}
+              </Masonry>
+            }
+
             {getUser().type !== 'operator' ? (
               <div className="column-footer">
                 <button

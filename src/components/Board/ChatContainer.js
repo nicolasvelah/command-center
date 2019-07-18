@@ -95,7 +95,7 @@ class ChatContainer extends React.Component {
     //GET USER GEOLOCALIZATION DATA
     const clientGLData = await findUserById(this.props.item.clientId, true)
     console.log('++Iniciando haveToOpenChat ++')
-    await this.haveToOpenChat(this.props.item.status.name, 'init')
+    await this.haveToOpenChat(this.props.item.status.name, 'init','init')
     let { searchProviderMode } = this.state
     if (this.props.item.provider !== null) {
       if (this.props.item.providerId !== 0) {
@@ -262,7 +262,7 @@ class ChatContainer extends React.Component {
     }
   }
 
-  haveToOpenChat = async (statusInit, from) => {
+  haveToOpenChat = async (statusInit, from, type) => {
     let haveToOpen = false
 
     let { status } = this.state
@@ -314,7 +314,7 @@ class ChatContainer extends React.Component {
     if (from === 'closeChat') {
       await this.props.desactivateTask(item.id, true)
     } else {
-      await this.props.openChatTriger(item.id, status)
+      await this.props.openChatTriger(item.id, status, type)
       this.setState({ status, openChat: haveToOpen })
     }
     this.props.chatTopPositionTriger()
@@ -610,7 +610,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'openChat')
+                  this.haveToOpenChat(item.status.name, 'openChat','click')
                 }}
                 className="openChat"
               >
@@ -619,7 +619,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={async e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'NotAswere')
+                  this.haveToOpenChat(item.status.name, 'NotAswere','click')
                 }}
                 className="NotAswere"
               >
@@ -631,7 +631,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'closeChat')
+                  this.haveToOpenChat(item.status.name, 'closeChat','click')
                 }}
                 className="closeChat"
               >
