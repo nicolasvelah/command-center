@@ -93,7 +93,7 @@ class Board extends Component {
     const accessToken = await getAccessToken()
     console.log('board')
     socket = await conectSocket(accessToken, userId, userType, [1, 2, 3])
-    
+
     await onNotification(
       socket,
       this.startNotificationsWs,
@@ -102,7 +102,7 @@ class Board extends Component {
       this.providerState,
       this.getMyLastTasks
     )
-    
+
     await this.setState({
       socket,
     })
@@ -184,11 +184,14 @@ class Board extends Component {
           )
         } else {
           if (dataNotification.data.type === 'order') {
-            console.log('LLEGOOOO PANAAAAA orderId', dataNotification.data.content)
-             MsmNewTask(dataNotification.notification.title)
-             getMyLastTasks('websockets', dataNotification.data.content.orderId)
+            console.log(
+              'LLEGOOOO PANAAAAA orderId',
+              dataNotification.data.content
+            )
+            MsmNewTask(dataNotification.notification.title)
+            getMyLastTasks('websockets', dataNotification.data.content.orderId)
           } else {
-            getMyTasks('startNotificactionWs')
+            //getMyTasks('startNotificactionWs')
             if (dataNotification.data.type !== 'updateOrder') {
               MsmNewTask(dataNotification.notification.title)
             }
@@ -377,7 +380,7 @@ class Board extends Component {
     }
 
     await this.trigerColumn(column, id)
-    console.log('trigerColumn Open Chat')
+    console.log('trigerColumn Open Chat ID: ', id)
 
     this.setState({ openChat })
 
@@ -545,6 +548,7 @@ class Board extends Component {
           activeTasks,
         })
 
+        /*
         await Array.from(this.RefChatContainer.values())
           .filter(node => node != null)
           .forEach(node => {
@@ -553,7 +557,7 @@ class Board extends Component {
               node.wrappedInstance.haveToOpenChat('live', 'board')
             }
           })
-
+          */
         //console.log('activeTasks ------------', activeTasks)
         //const scrollWidthValue = (index - 1) * 420
       }

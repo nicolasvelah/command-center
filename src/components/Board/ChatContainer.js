@@ -318,7 +318,7 @@ class ChatContainer extends React.Component {
       this.setState({ status, openChat: haveToOpen })
     }
     this.props.chatTopPositionTriger()
-    console.log('haveToOpenChat', from)
+    console.log('haveToOpenChat From: '+ from+' statusInit: '+statusInit)
   }
 
   focusChat = id => {
