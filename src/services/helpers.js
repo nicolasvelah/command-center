@@ -231,21 +231,28 @@ export const colorGenerator = () => {
   return color
 }
 export const updateStatus = async (id, cat) => {
-  console.log('Estado actualizado')
-  const accessToken = await getAccessToken()
-  return await axios.post(
-    `${process.env.API_URL}/orders/updateStatus`,
-    {
-      statusName: cat,
-      orderId: id,
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-access-token': accessToken,
+  try {
+    console.log('Estado actualizado')
+    const accessToken = await getAccessToken()
+    const response = await axios.post(
+      `${process.env.API_URL}/orders/updateStatus`,
+      {
+        statusName: cat,
+        orderId: id,
       },
-    }
-  )
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': accessToken,
+        },
+      }
+    )
+    console.log('Respuesta de UpdateStatus: ', response)
+    return true
+  } catch (err) {
+    console.error(err.message)
+    return false
+  }
 }
 
 export const changeOrderProvider = async (orderId, providerId) => {

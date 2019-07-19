@@ -382,7 +382,6 @@ class Board extends Component {
       await this.trigerColumn(column, id)
       console.log('trigerColumn Open Chat ID: ', id)
     }
-   
 
     this.setState({ openChat })
 
@@ -547,7 +546,7 @@ class Board extends Component {
       }
       console.log('newTask:', task)
       if (execute) {
-        await this.openChat(id, 'live','click')
+        await this.openChat(id, 'live', 'click')
         await save('activeTasks', activeTasks)
         await this.setState({
           activeTasks,
@@ -570,7 +569,7 @@ class Board extends Component {
   }
   desactivateTask = async (id, go) => {
     console.log('desactivate Task')
-    //console.log('dasactivar' + id)
+    console.log('dasactivar' + id)
     try {
       let result = true
       if (go) {
