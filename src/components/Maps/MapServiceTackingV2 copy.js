@@ -14,8 +14,9 @@ import { getDistanceInMeters, colorGenerator } from '../../services/helpers'
 import ProviderSearchFilter from '../Tools/ProviderSearchFilter'
 import ProviderItemSearchFilter from '../Tools/ProviderItemSearchFilter'
 
-//import { render } from 'react-dom'
-//import { Map, Marker, Popup, TileLayer } from 'react-leaflet'
+import { render } from 'react-dom'
+import { Marker, Popup, TileLayer, Tooltip, LayerGroup, CircleMarker, FeatureGroup } from 'react-leaflet/es/'
+import MapLeaflet from 'react-leaflet/es/Map'
 
 import '../../assets/css/map.css'
 
@@ -503,6 +504,98 @@ class MapServiceTacking extends Component {
             className="mapSearch"
             placeholder="Introduce una ubicación (Opcional)"
           />*/}
+          <MapLeaflet center={[center.lat, center.lng]} zoom={zoom}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap - Itzam DEV & DESING</a> contributors'
+            />
+            <Marker position={[this.props.lat, this.props.len]} boxZoom={true}>
+              <Popup>
+                <span>{this.props.address}</span>
+              </Popup>
+            </Marker>
+            {/*Punto de destino Modificable desde cc*/ 
+            this.props.serviceDestination ? (
+              <Marker
+                position={[
+                  this.props.serviceDestination.position.latitude,
+                  this.props.serviceDestination.position.longitude,
+                ]}
+              >
+                <Popup className="popup-destination">
+                  <span>{this.props.serviceDestination.address}</span>
+              </Popup>
+              </Marker>
+            ) : (
+              ''
+            )}
+
+            {/*Cliente en vivo con WS*/}
+            {this.props.clientGLData !== '' &&
+            this.props.clientGLData !== null ? (
+              <FeatureGroup color="purple">
+                <Popup>
+                {this.props.clientGLData.info.name} {this.props.clientGLData.info.lastName}
+                </Popup>
+                <CircleMarker
+                  center={[this.props.clientDataLat, this.props.clientDataLng]}
+                  fillColor={this.props.color}
+                  radius={15}
+                />
+
+               </FeatureGroup>
+            ) : (
+              ''
+            )}
+
+            {/*Cli
+            {/*Proveedores en vivo*/}
+            {this.props.providers
+              ? this.props.providers
+                  .filter(item => {
+                    const resp = this.providerFiltering(item)
+                    item.distance = resp.distance
+                    if (resp.response) {
+                      item.classNameLocation = 'inTheRadio'
+                    } else {
+                      item.classNameLocation = 'outTheRadio'
+                    }
+                    return true
+                  })
+                  .map(provider => (
+                    <CircleMarker
+                   
+                  fillColor="red"
+                  radius={10}
+                      key={provider.id}
+                      center={[provider.lat, provider.lng]}
+                    >
+                      <Popup>
+                        
+                        Proveedor {provider.id}<br></br>
+                        {provider.info.name} {provider.info.lastName}<br></br>
+                        <span>{provider.info.description}</span><br></br>
+                        <span style={{color: "#ddd"}}>{provider.info.services.category}</span>
+                      </Popup>
+                    </CircleMarker>
+                  ))
+              : null}
+
+              {this.state.providersOrigins
+              ? this.state.providersOrigins.map(providerOriginAddress => (
+                  <Marker
+                    key={providerOriginAddress.id}
+                    position={[providerOriginAddress.lat,providerOriginAddress.lng]}
+                    
+                  >
+                    <Popup>
+                    providerOriginAddress
+                      </Popup>
+                    </Marker>
+                ))
+              : ''}
+          </MapLeaflet>
+
           <StateContainer>
             <span
               className={

@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { confirmAlert } from 'react-confirm-alert'
 
 import Chat from './ChatV2'
-import MapServiceTacking from '../Maps/MapServiceTackingV2'
+import MapServiceTacking from '../Maps/MapServiceTackingV2 copy'
 import { findUserById } from '../../services/wsConect'
 import {
   geocodeLatLng,
@@ -95,7 +95,7 @@ class ChatContainer extends React.Component {
     //GET USER GEOLOCALIZATION DATA
     const clientGLData = await findUserById(this.props.item.clientId, true)
     console.log('++Iniciando haveToOpenChat ++')
-    await this.haveToOpenChat(this.props.item.status.name, 'init','init')
+    await this.haveToOpenChat(this.props.item.status.name, 'init', 'init')
     let { searchProviderMode } = this.state
     if (this.props.item.provider !== null) {
       if (this.props.item.providerId !== 0) {
@@ -318,7 +318,7 @@ class ChatContainer extends React.Component {
       this.setState({ status, openChat: haveToOpen })
     }
     this.props.chatTopPositionTriger()
-    console.log('haveToOpenChat From: '+ from+' statusInit: '+statusInit)
+    console.log('haveToOpenChat From: ' + from + ' statusInit: ' + statusInit)
   }
 
   focusChat = id => {
@@ -610,7 +610,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'openChat','click')
+                  this.haveToOpenChat(item.status.name, 'openChat', 'click')
                 }}
                 className="openChat"
               >
@@ -619,7 +619,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={async e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'NotAswere','click')
+                  this.haveToOpenChat(item.status.name, 'NotAswere', 'click')
                 }}
                 className="NotAswere"
               >
@@ -631,7 +631,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'closeChat','click')
+                  this.haveToOpenChat(item.status.name, 'closeChat', 'click')
                 }}
                 className="closeChat"
               >

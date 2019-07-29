@@ -78,6 +78,10 @@ export default class Layout extends React.PureComponent {
                 href="https://fonts.googleapis.com/css?family=Roboto+Condensed:700|Yantramanav:300"
                 rel="stylesheet"
               />
+              <link
+                rel="stylesheet"
+                href="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css"
+              />
               <meta name="theme-color" content="#0047b3" />
             </Helmet>
             <Header siteTitle={data.site.siteMetadata.title} />
