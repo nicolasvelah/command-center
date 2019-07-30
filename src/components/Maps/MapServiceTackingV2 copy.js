@@ -97,6 +97,7 @@ class MapServiceTacking extends Component {
         km: null,
       },
       providersOrigins: [],
+      zoomLevel: null,
     }
     this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
     this.centerActor = this.centerActor.bind(this)
@@ -123,10 +124,15 @@ class MapServiceTacking extends Component {
       'this.props.ProvidersActiveServices Map V2',
       this.props.ProvidersActiveServices
     )
+    console.log(
+      'this.map.leafletElement.getZoom()',
+      this.map.leafletElement.getZoom()
+    )
     this.setState({
       unmount: false,
       ProvidersActiveServices,
       service: this.props.service,
+      zoomLevel: this.map.leafletElement.getZoom(),
     })
   }
 
@@ -417,6 +423,23 @@ class MapServiceTacking extends Component {
         }
       })*/
   }
+
+  metersToPixels(latPosition, metres) {
+    var metresPerPixel =
+      (40075016.686 * Math.abs(Math.cos((latPosition * Math.PI) / 180))) /
+      Math.pow(2, this.state.zoomLevel + 8)
+
+    const converterTo = (metres / 10) * metresPerPixel
+    console.log('metresPerPixel', converterTo)
+    return converterTo
+  }
+
+  getMapZoom() {
+    console.log('Zooom Level', this.map.leafletElement.getZoom())
+    this.setState({ zoomLevel: this.map.leafletElement.getZoom() })
+    return this.map && this.map.leafletElement.getZoom()
+  }
+
   render() {
     const { center, zoom } = this.state
     //console.log('+++++++++++++++++++++props.providers', this.props.providers)
@@ -514,10 +537,16 @@ class MapServiceTacking extends Component {
             className="mapSearch"
             placeholder="Introduce una ubicación (Opcional)"
           />*/}
-          <MapLeaflet center={[center.lat, center.lng]} zoom={zoom}>
+          <MapLeaflet
+            ref={ref => {
+              this.map = ref
+            }}
+            center={[center.lat, center.lng]}
+            zoom={zoom}
+          >
             <Circle
               center={[this.props.lat, this.props.len]}
-              radius={200}
+              radius={this.metersToPixels(this.props.lat, this.state.m)}
             />
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -579,11 +608,17 @@ class MapServiceTacking extends Component {
                   })
                   .map(provider => (
                     <CircleMarker
-                      fillColor="red"
+                      fillColor={
+                        provider.classNameLocation === 'inTheRadio'
+                          ? 'blue'
+                          : 'red'
+                      }
+                      fillOpacity={1}
                       radius={10}
                       key={provider.id}
                       center={[provider.lat, provider.lng]}
                     >
+                      {console.log('provider', provider)}
                       <Popup>
                         Proveedor {provider.id}
                         <br />
@@ -607,6 +642,7 @@ class MapServiceTacking extends Component {
                       providerOriginAddress.lat,
                       providerOriginAddress.lng,
                     ]}
+                    color={providerOriginAddress.color}
                   >
                     <Popup>providerOriginAddress</Popup>
                   </Marker>
