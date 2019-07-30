@@ -15,7 +15,17 @@ import ProviderSearchFilter from '../Tools/ProviderSearchFilter'
 import ProviderItemSearchFilter from '../Tools/ProviderItemSearchFilter'
 
 import { render } from 'react-dom'
-import { Marker, Popup, TileLayer, Tooltip, LayerGroup, CircleMarker, FeatureGroup } from 'react-leaflet/es/'
+
+import {
+  Marker,
+  Popup,
+  TileLayer,
+  Tooltip,
+  LayerGroup,
+  CircleMarker,
+  FeatureGroup,
+  Circle,
+} from 'react-leaflet/es/'
 import MapLeaflet from 'react-leaflet/es/Map'
 
 import '../../assets/css/map.css'
@@ -505,6 +515,10 @@ class MapServiceTacking extends Component {
             placeholder="Introduce una ubicación (Opcional)"
           />*/}
           <MapLeaflet center={[center.lat, center.lng]} zoom={zoom}>
+            <Circle
+              center={[this.props.lat, this.props.len]}
+              radius={200}
+            />
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap - Itzam DEV & DESING</a> contributors'
@@ -514,7 +528,8 @@ class MapServiceTacking extends Component {
                 <span>{this.props.address}</span>
               </Popup>
             </Marker>
-            {/*Punto de destino Modificable desde cc*/ 
+            {/*Punto de destino Modificable desde cc*/
+
             this.props.serviceDestination ? (
               <Marker
                 position={[
@@ -524,7 +539,7 @@ class MapServiceTacking extends Component {
               >
                 <Popup className="popup-destination">
                   <span>{this.props.serviceDestination.address}</span>
-              </Popup>
+                </Popup>
               </Marker>
             ) : (
               ''
@@ -535,15 +550,15 @@ class MapServiceTacking extends Component {
             this.props.clientGLData !== null ? (
               <FeatureGroup color="purple">
                 <Popup>
-                {this.props.clientGLData.info.name} {this.props.clientGLData.info.lastName}
+                  {this.props.clientGLData.info.name}{' '}
+                  {this.props.clientGLData.info.lastName}
                 </Popup>
                 <CircleMarker
                   center={[this.props.clientDataLat, this.props.clientDataLng]}
                   fillColor={this.props.color}
                   radius={15}
                 />
-
-               </FeatureGroup>
+              </FeatureGroup>
             ) : (
               ''
             )}
@@ -564,34 +579,37 @@ class MapServiceTacking extends Component {
                   })
                   .map(provider => (
                     <CircleMarker
-                   
-                  fillColor="red"
-                  radius={10}
+                      fillColor="red"
+                      radius={10}
                       key={provider.id}
                       center={[provider.lat, provider.lng]}
                     >
                       <Popup>
-                        
-                        Proveedor {provider.id}<br></br>
-                        {provider.info.name} {provider.info.lastName}<br></br>
-                        <span>{provider.info.description}</span><br></br>
-                        <span style={{color: "#ddd"}}>{provider.info.services.category}</span>
+                        Proveedor {provider.id}
+                        <br />
+                        {provider.info.name} {provider.info.lastName}
+                        <br />
+                        <span>{provider.info.description}</span>
+                        <br />
+                        <span style={{ color: '#ddd' }}>
+                          {provider.info.services.category}
+                        </span>
                       </Popup>
                     </CircleMarker>
                   ))
               : null}
 
-              {this.state.providersOrigins
+            {this.state.providersOrigins
               ? this.state.providersOrigins.map(providerOriginAddress => (
                   <Marker
                     key={providerOriginAddress.id}
-                    position={[providerOriginAddress.lat,providerOriginAddress.lng]}
-                    
+                    position={[
+                      providerOriginAddress.lat,
+                      providerOriginAddress.lng,
+                    ]}
                   >
-                    <Popup>
-                    providerOriginAddress
-                      </Popup>
-                    </Marker>
+                    <Popup>providerOriginAddress</Popup>
+                  </Marker>
                 ))
               : ''}
           </MapLeaflet>
