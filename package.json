@@ -40,6 +40,7 @@
     "react-infinite-scroller": "^1.2.4",
     "react-input-mask": "^2.0.4",
     "react-leaflet": "^2.4.0",
+    "react-leaflet-fullscreen": "^1.0.1",
     "react-scroll-into-view": "^1.5.0",
     "react-select": "^2.2.0",
     "react-toastify": "^4.5.1",

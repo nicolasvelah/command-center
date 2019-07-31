@@ -7,7 +7,7 @@ import CMarkerClientServicePointer from './CMarkerClientServicePointer'
 //import Autocomplete from 'react-google-autocomplete'
 //import io from 'socket.io-client'
 import styled from 'styled-components'
-//import axios from 'axios'
+import axios from 'axios'
 //import { getUser } from '../../services/auth'
 import { getDistanceInMeters, colorGenerator } from '../../services/helpers'
 
@@ -20,13 +20,15 @@ import {
   Marker,
   Popup,
   TileLayer,
-  Tooltip,
-  LayerGroup,
   CircleMarker,
   FeatureGroup,
   Circle,
+  Polyline,
 } from 'react-leaflet/es/'
 import MapLeaflet from 'react-leaflet/es/Map'
+
+import 'react-leaflet-fullscreen/dist/styles.css'
+import FullscreenControl from 'react-leaflet-fullscreen'
 
 import '../../assets/css/map.css'
 
@@ -98,6 +100,7 @@ class MapServiceTacking extends Component {
       },
       providersOrigins: [],
       zoomLevel: null,
+      waypoints: [],
     }
     this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
     this.centerActor = this.centerActor.bind(this)
@@ -305,6 +308,7 @@ class MapServiceTacking extends Component {
         lng: Number(this.props.serviceDestination.position.longitude),
       }
     }
+    console.log('PUNTOSSSS:', destinyCords)
     const data = [{ lat: Number(lat), lng: Number(lng) }, destinyCords]
     const waypoints = data.map(item => {
       return {
@@ -430,7 +434,6 @@ class MapServiceTacking extends Component {
       Math.pow(2, this.state.zoomLevel + 8)
 
     const converterTo = (metres / 10) * metresPerPixel
-    console.log('metresPerPixel', converterTo)
     return converterTo
   }
 
@@ -440,9 +443,72 @@ class MapServiceTacking extends Component {
     return this.map && this.map.leafletElement.getZoom()
   }
 
+  DrawRoute = async (initialPoint, finalPoint) => {
+    try {
+      const response = await axios({
+        url: `https://router.project-osrm.org/route/v1/driving/${
+          initialPoint.lat
+        },${initialPoint.lng};${finalPoint.lat},${finalPoint.lng}`,
+        method: 'get',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      console.log('OSRM', response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  toGeoJSON = function(str) {
+    var index = 0,
+      lat = 0,
+      lng = 0,
+      coordinates = [],
+      shift = 0,
+      result = 0,
+      byte = null,
+      latitude_change,
+      longitude_change,
+      factor = Math.pow(10, 0 || 5)
+
+    // Coordinates have variable length when encoded, so just keep
+    // track of whether we've hit the end of the string. In each
+    // loop iteration, a single coordinate is decoded.
+    while (index < str.length) {
+      // Reset shift, result, and byte
+      byte = null
+      shift = 0
+      result = 0
+
+      do {
+        byte = str.charCodeAt(index++) - 63
+        result |= (byte & 0x1f) << shift
+        shift += 5
+      } while (byte >= 0x20)
+
+      latitude_change = result & 1 ? ~(result >> 1) : result >> 1
+
+      shift = result = 0
+
+      do {
+        byte = str.charCodeAt(index++) - 63
+        result |= (byte & 0x1f) << shift
+        shift += 5
+      } while (byte >= 0x20)
+
+      longitude_change = result & 1 ? ~(result >> 1) : result >> 1
+
+      lat += latitude_change
+      lng += longitude_change
+
+      coordinates.push([lat / factor, lng / factor])
+    }
+
+    return coordinates
+  }
+
   render() {
     const { center, zoom } = this.state
-    //console.log('+++++++++++++++++++++props.providers', this.props.providers)
+    //console.log('toGeoJSON', this.toGeoJSON('yvd|Fh~gqNfEqKzBEkEvKwB?'))
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">
         {this.props.searchProviderMode ? (
@@ -537,119 +603,124 @@ class MapServiceTacking extends Component {
             className="mapSearch"
             placeholder="Introduce una ubicación (Opcional)"
           />*/}
-          <MapLeaflet
-            ref={ref => {
-              this.map = ref
-            }}
-            center={[center.lat, center.lng]}
-            zoom={zoom}
-          >
-            <Circle
-              center={[this.props.lat, this.props.len]}
-              radius={this.metersToPixels(this.props.lat, this.state.m)}
-            />
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap - Itzam DEV & DESING</a> contributors'
-            />
-            <Marker position={[this.props.lat, this.props.len]} boxZoom={true}>
-              <Popup>
-                <span>{this.props.address}</span>
-              </Popup>
-            </Marker>
-            {/*Punto de destino Modificable desde cc*/
-
-            this.props.serviceDestination ? (
+          {center.lat !== null && center.lng !== null ? (
+            <MapLeaflet
+              ref={ref => {
+                this.map = ref
+              }}
+              center={[center.lat, center.lng]}
+              zoom={zoom}
+            >
+              <FullscreenControl position="bottomright" />
+              <Circle
+                center={[this.props.lat, this.props.len]}
+                radius={this.metersToPixels(this.props.lat, this.state.m)}
+              />
               <Marker
-                position={[
-                  this.props.serviceDestination.position.latitude,
-                  this.props.serviceDestination.position.longitude,
-                ]}
+                position={[this.props.lat, this.props.len]}
+                boxZoom={true}
               >
-                <Popup className="popup-destination">
-                  <span>{this.props.serviceDestination.address}</span>
+                <Popup>
+                  <span>{this.props.address}</span>
                 </Popup>
               </Marker>
-            ) : (
-              ''
-            )}
-
-            {/*Cliente en vivo con WS*/}
-            {this.props.clientGLData !== '' &&
-            this.props.clientGLData !== null ? (
-              <FeatureGroup color="purple">
-                <Popup>
-                  {this.props.clientGLData.info.name}{' '}
-                  {this.props.clientGLData.info.lastName}
-                </Popup>
-                <CircleMarker
-                  center={[this.props.clientDataLat, this.props.clientDataLng]}
-                  fillColor={this.props.color}
-                  radius={15}
-                />
-              </FeatureGroup>
-            ) : (
-              ''
-            )}
-
-            {/*Cli
-            {/*Proveedores en vivo*/}
-            {this.props.providers
-              ? this.props.providers
-                  .filter(item => {
-                    const resp = this.providerFiltering(item)
-                    item.distance = resp.distance
-                    if (resp.response) {
-                      item.classNameLocation = 'inTheRadio'
-                    } else {
-                      item.classNameLocation = 'outTheRadio'
-                    }
-                    return true
-                  })
-                  .map(provider => (
-                    <CircleMarker
-                      fillColor={
-                        provider.classNameLocation === 'inTheRadio'
-                          ? 'blue'
-                          : 'red'
-                      }
-                      fillOpacity={1}
-                      radius={10}
-                      key={provider.id}
-                      center={[provider.lat, provider.lng]}
-                    >
-                      {console.log('provider', provider)}
-                      <Popup>
-                        Proveedor {provider.id}
-                        <br />
-                        {provider.info.name} {provider.info.lastName}
-                        <br />
-                        <span>{provider.info.description}</span>
-                        <br />
-                        <span style={{ color: '#ddd' }}>
-                          {provider.info.services.category}
-                        </span>
-                      </Popup>
-                    </CircleMarker>
-                  ))
-              : null}
-
-            {this.state.providersOrigins
-              ? this.state.providersOrigins.map(providerOriginAddress => (
-                  <Marker
-                    key={providerOriginAddress.id}
-                    position={[
-                      providerOriginAddress.lat,
-                      providerOriginAddress.lng,
+              */
+              {/*Punto de destino Modificable desde cc*/}
+              {this.props.serviceDestination ? (
+                <Marker
+                  position={[
+                    this.props.serviceDestination.position.latitude,
+                    this.props.serviceDestination.position.longitude,
+                  ]}
+                >
+                  <Popup className="popup-destination">
+                    <span>{this.props.serviceDestination.address}</span>
+                  </Popup>
+                </Marker>
+              ) : (
+                ''
+              )}
+              }{/*Cliente en vivo con WS*/}
+              {this.props.clientGLData !== '' &&
+              this.props.clientGLData !== null ? (
+                <FeatureGroup color="purple">
+                  <Popup>
+                    {this.props.clientGLData.info.name}{' '}
+                    {this.props.clientGLData.info.lastName}
+                  </Popup>
+                  <CircleMarker
+                    center={[
+                      this.props.clientDataLat,
+                      this.props.clientDataLng,
                     ]}
-                    color={providerOriginAddress.color}
-                  >
-                    <Popup>providerOriginAddress</Popup>
-                  </Marker>
-                ))
-              : ''}
-          </MapLeaflet>
-
+                    fillColor="#000"
+                    radius={15}
+                  />
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution="<b>Tiempo de llegada:</b>"
+                  />
+                </FeatureGroup>
+              ) : (
+                ''
+              )}
+              {/*Proveedores en vivo*/}
+              {this.props.providers
+                ? this.props.providers
+                    .filter(item => {
+                      const resp = this.providerFiltering(item)
+                      item.distance = resp.distance
+                      if (resp.response) {
+                        item.classNameLocation = 'inTheRadio'
+                      } else {
+                        item.classNameLocation = 'outTheRadio'
+                      }
+                      return true
+                    })
+                    .map(provider => (
+                      <CircleMarker
+                        fillColor={
+                          provider.classNameLocation === 'inTheRadio'
+                            ? 'blue'
+                            : 'red'
+                        }
+                        fillOpacity={1}
+                        radius={10}
+                        key={provider.id}
+                        center={[provider.lat, provider.lng]}
+                      >
+                        <Popup>
+                          Proveedor {provider.id}
+                          <br />
+                          {provider.info.name} {provider.info.lastName}
+                          <br />
+                          <span>{provider.info.description}</span>
+                          <br />
+                          <span style={{ color: '#ddd' }}>
+                            {provider.info.services.category}
+                          </span>
+                        </Popup>
+                      </CircleMarker>
+                    ))
+                : null}
+              {this.state.providersOrigins
+                ? this.state.providersOrigins.map(providerOriginAddress => (
+                    <Marker
+                      key={providerOriginAddress.id}
+                      position={[
+                        providerOriginAddress.lat,
+                        providerOriginAddress.lng,
+                      ]}
+                      color={providerOriginAddress.color}
+                    >
+                      <Popup>providerOriginAddress</Popup>
+                    </Marker>
+                  ))
+                : ''}
+            </MapLeaflet>
+          ) : (
+            ''
+          )}
           <StateContainer>
             <span
               className={

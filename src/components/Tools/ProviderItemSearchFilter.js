@@ -25,6 +25,7 @@ export default class ProviderItemSearchFilter extends React.Component {
       setActiveProvider,
       activeProvider,
       activeProviderChat,
+      DrawRoute,
     } = this.props
 
     if (!item.inService) {

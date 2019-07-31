@@ -666,12 +666,16 @@ class ChatContainer extends React.Component {
                   socket={this.props.socket}
                   clientGLData={this.state.clientData}
                   clientDataLat={
-                    this.state.clientData !== null
+                    this.state.clientData !== null &&
+                    this.state.clientData.lat !== undefined &&
+                    this.state.clientData.lat !== null
                       ? this.state.clientData.lat
                       : 0
                   }
                   clientDataLng={
-                    this.state.clientData !== null
+                    this.state.clientData !== null &&
+                    this.state.clientData.lng !== undefined &&
+                    this.state.clientData.lng !== null
                       ? this.state.clientData.lng
                       : 0
                   }
@@ -794,6 +798,11 @@ class ChatContainer extends React.Component {
                               this.state.providerInChat.id,
                               false
                             )
+                            //const origenPoint = {
+                            //lat: this.state.providerInChat.lat,
+                            //lng: this.state.providerInChat.lng
+                            //}
+                            //this.refs.mapa.wrappedInstance.DrawRoute(origenPoint, )
                           }}
                         >
                           Datos de ruta
