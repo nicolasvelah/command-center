@@ -101,6 +101,7 @@ class MapServiceTacking extends Component {
       providersOrigins: [],
       zoomLevel: null,
       waypoints: [],
+      polyline: [],
     }
     this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
     this.centerActor = this.centerActor.bind(this)
@@ -131,6 +132,23 @@ class MapServiceTacking extends Component {
       'this.map.leafletElement.getZoom()',
       this.map.leafletElement.getZoom()
     )
+
+    if (this.props.service === 'Acompañamiento Seguro') {
+      console.log(
+        'Params',
+        this.props.lat,
+        this.props.len,
+        this.props.serviceDestination.position.latitude,
+        this.props.serviceDestination.position.longitude
+      )
+      this.drawRoute(
+        this.props.lat,
+        this.props.len,
+        this.props.serviceDestination.position.latitude,
+        this.props.serviceDestination.position.longitude
+      )
+    }
+
     this.setState({
       unmount: false,
       ProvidersActiveServices,
@@ -443,16 +461,22 @@ class MapServiceTacking extends Component {
     return this.map && this.map.leafletElement.getZoom()
   }
 
-  DrawRoute = async (initialPoint, finalPoint) => {
+  drawRoute = async (
+    initialPointLat,
+    initialPointLng,
+    finalPointLat,
+    finalPointLng
+  ) => {
     try {
-      const response = await axios({
-        url: `https://router.project-osrm.org/route/v1/driving/${
-          initialPoint.lat
-        },${initialPoint.lng};${finalPoint.lat},${finalPoint.lng}`,
-        method: 'get',
-        headers: { 'Content-Type': 'application/json' },
-      })
-      console.log('OSRM', response)
+      //const urlTest = `https://router.project-osrm.org/route/v1/driving/-78.501134,-0.20668;-78.4987360239029,-0.20671740030507826`
+      const urlTest = `https://router.project-osrm.org/route/v1/driving/${initialPointLng},${initialPointLat};${finalPointLng},${finalPointLat}`
+      //console.log('Url ', urlTest)
+      const response = await axios.get(urlTest)
+      console.log('Response ', response.data)
+      console.log('OSRM ', response.data.routes[0].geometry)
+      const resConverted = this.toGeoJSON(response.data.routes[0].geometry)
+      //console.log('OSRM Converted', resConverted)
+      this.setState({ polyline: resConverted })
     } catch (error) {
       console.log(error)
     }
@@ -588,6 +612,7 @@ class MapServiceTacking extends Component {
                           }
                           activeProviderChat={this.props.activeProviderChat}
                           activeProviderCall={this.props.activeProviderCall}
+                          DrawRoute={this.DrawRoute}
                         />
                       )
                     })
@@ -621,7 +646,7 @@ class MapServiceTacking extends Component {
                 boxZoom={true}
               >
                 <Popup>
-                  <span>{this.props.address}</span>
+                  <span>Origen:{this.props.address}</span>
                 </Popup>
               </Marker>
               */
@@ -634,7 +659,7 @@ class MapServiceTacking extends Component {
                   ]}
                 >
                   <Popup className="popup-destination">
-                    <span>{this.props.serviceDestination.address}</span>
+                    <span>Destino{this.props.serviceDestination.address}</span>
                   </Popup>
                 </Marker>
               ) : (
@@ -717,6 +742,9 @@ class MapServiceTacking extends Component {
                     </Marker>
                   ))
                 : ''}
+              {this.props.service === 'Acompañamiento Seguro' && (
+                <Polyline color="lime" positions={this.state.polyline} />
+              )}
             </MapLeaflet>
           ) : (
             ''

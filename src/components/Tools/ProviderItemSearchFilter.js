@@ -81,9 +81,11 @@ export default class ProviderItemSearchFilter extends React.Component {
         </div>
         <div id={'ProviderRouteDataButton_' + item.id} className="GetTheRoute">
           <span
-            onClick={e =>
-              calculateAndDisplayRoute(item.lat, item.lng, item.id, false)
-            }
+            onClick={e => {
+              //calculateAndDisplayRoute(item.lat, item.lng, item.id, false)
+              //this.props.DrawRoute()
+              console.log('Provider')
+            }}
           >
             Datos de ruta
           </span>

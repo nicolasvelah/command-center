@@ -792,17 +792,13 @@ class ChatContainer extends React.Component {
                         <span
                           onClick={e => {
                             e.preventDefault()
+                            
                             this.refs.mapa.wrappedInstance.calculateAndDisplayRoute(
                               this.state.providerInChat.lat,
                               this.state.providerInChat.lng,
                               this.state.providerInChat.id,
                               false
                             )
-                            //const origenPoint = {
-                            //lat: this.state.providerInChat.lat,
-                            //lng: this.state.providerInChat.lng
-                            //}
-                            //this.refs.mapa.wrappedInstance.DrawRoute(origenPoint, )
                           }}
                         >
                           Datos de ruta
