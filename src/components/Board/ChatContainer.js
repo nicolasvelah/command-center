@@ -792,7 +792,7 @@ class ChatContainer extends React.Component {
                         <span
                           onClick={e => {
                             e.preventDefault()
-                            
+
                             this.refs.mapa.wrappedInstance.calculateAndDisplayRoute(
                               this.state.providerInChat.lat,
                               this.state.providerInChat.lng,

@@ -102,6 +102,8 @@ class MapServiceTacking extends Component {
       zoomLevel: null,
       waypoints: [],
       polyline: [],
+      drawRoute: false,
+      drawRoutePoints: [],
     }
     this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
     this.centerActor = this.centerActor.bind(this)
@@ -141,12 +143,13 @@ class MapServiceTacking extends Component {
         this.props.serviceDestination.position.latitude,
         this.props.serviceDestination.position.longitude
       )
-      this.drawRoute(
+      const resConverted = this.drawRoute(
         this.props.lat,
         this.props.len,
         this.props.serviceDestination.position.latitude,
         this.props.serviceDestination.position.longitude
       )
+      this.setState({ polyline: resConverted })
     }
 
     this.setState({
@@ -451,7 +454,7 @@ class MapServiceTacking extends Component {
       (40075016.686 * Math.abs(Math.cos((latPosition * Math.PI) / 180))) /
       Math.pow(2, this.state.zoomLevel + 8)
 
-    const converterTo = (metres / 10) * metresPerPixel
+    const converterTo = (metres / 9.6) * metresPerPixel
     return converterTo
   }
 
@@ -467,6 +470,7 @@ class MapServiceTacking extends Component {
     finalPointLat,
     finalPointLng
   ) => {
+    let resConverted = []
     try {
       //const urlTest = `https://router.project-osrm.org/route/v1/driving/-78.501134,-0.20668;-78.4987360239029,-0.20671740030507826`
       const urlTest = `https://router.project-osrm.org/route/v1/driving/${initialPointLng},${initialPointLat};${finalPointLng},${finalPointLat}`
@@ -474,9 +478,9 @@ class MapServiceTacking extends Component {
       const response = await axios.get(urlTest)
       console.log('Response ', response.data)
       console.log('OSRM ', response.data.routes[0].geometry)
-      const resConverted = this.toGeoJSON(response.data.routes[0].geometry)
-      //console.log('OSRM Converted', resConverted)
-      this.setState({ polyline: resConverted })
+      resConverted = this.toGeoJSON(response.data.routes[0].geometry)
+      console.log('OSRM Converted', resConverted)
+      return resConverted
     } catch (error) {
       console.log(error)
     }
@@ -528,6 +532,22 @@ class MapServiceTacking extends Component {
     }
 
     return coordinates
+  }
+
+  drawRouteSearchFilter = async (
+    initialPointLat,
+    initialPointLng,
+    finalPointLat,
+    finalPointLng
+  ) => {
+    const resConverted = await this.drawRoute(
+      initialPointLat,
+      initialPointLng,
+      finalPointLat,
+      finalPointLng
+    )
+    console.log('drawRouteSearchFilter', resConverted)
+    this.setState({ drawRoutePoints: resConverted, drawRoute: true })
   }
 
   render() {
@@ -589,6 +609,7 @@ class MapServiceTacking extends Component {
                       }
                     })
                     .map(item => {
+                      //this.setState({ drawRoutePoints: [] })
                       return (
                         <ProviderItemSearchFilter
                           key={item.id}
@@ -612,7 +633,9 @@ class MapServiceTacking extends Component {
                           }
                           activeProviderChat={this.props.activeProviderChat}
                           activeProviderCall={this.props.activeProviderCall}
-                          DrawRoute={this.DrawRoute}
+                          originLat={this.props.lat}
+                          originLng={this.props.len}
+                          drawRoute={this.drawRouteSearchFilter}
                         />
                       )
                     })
@@ -649,7 +672,6 @@ class MapServiceTacking extends Component {
                   <span>Origen:{this.props.address}</span>
                 </Popup>
               </Marker>
-              */
               {/*Punto de destino Modificable desde cc*/}
               {this.props.serviceDestination ? (
                 <Marker
@@ -705,7 +727,8 @@ class MapServiceTacking extends Component {
                     .map(provider => (
                       <CircleMarker
                         fillColor={
-                          provider.classNameLocation === 'inTheRadio'
+                          provider.classNameLocation === 'inTheRadio' &&
+                          this.state.activeProvider === provider.id
                             ? 'blue'
                             : 'red'
                         }
@@ -745,10 +768,14 @@ class MapServiceTacking extends Component {
               {this.props.service === 'Acompañamiento Seguro' && (
                 <Polyline color="lime" positions={this.state.polyline} />
               )}
+              {this.state.drawRoute && (
+                <Polyline color="lime" positions={this.state.drawRoutePoints} />
+              )}
             </MapLeaflet>
           ) : (
             ''
           )}
+          {/* 
           <StateContainer>
             <span
               className={
@@ -790,7 +817,7 @@ class MapServiceTacking extends Component {
               }
             }}
           >
-            {/*Punto de Encuentro Modificable desde cc*/}
+            {/*Punto de Encuentro Modificable desde cc/}
             <CMarkerClientServicePointer
               lat={this.props.lat}
               lng={this.props.len}
@@ -800,7 +827,7 @@ class MapServiceTacking extends Component {
               preText="Origen del servicio:"
               destinyData={this.state.destinyData}
             />
-            {/*Punto de destino Modificable desde cc*/ this.props
+            {/*Punto de destino Modificable desde cc/ this.props
               .serviceDestination ? (
               <CMarkerClientServicePointer
                 lat={this.props.serviceDestination.position.latitude}
@@ -814,7 +841,7 @@ class MapServiceTacking extends Component {
             ) : (
               ''
             )}
-            {/*Cliente en vivo con WS*/}
+            {/*Cliente en vivo con WS*}
             {this.props.clientGLData !== '' &&
             this.props.clientGLData !== null ? (
               <CMarker
@@ -830,7 +857,7 @@ class MapServiceTacking extends Component {
             ) : (
               ''
             )}
-            {/*Proveedores en vivo*/}
+            {/*Proveedores en vivo/}
             {this.props.providers
               ? this.props.providers
                   .filter(item => {
@@ -918,6 +945,7 @@ class MapServiceTacking extends Component {
               ''
             )}
           </ButtonContainer>
+        */}
         </div>
       </div>
     ) : null

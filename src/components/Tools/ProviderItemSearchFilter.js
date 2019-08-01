@@ -25,7 +25,9 @@ export default class ProviderItemSearchFilter extends React.Component {
       setActiveProvider,
       activeProvider,
       activeProviderChat,
-      DrawRoute,
+      originLat,
+      originLng,
+      drawRoute,
     } = this.props
 
     if (!item.inService) {
@@ -83,8 +85,8 @@ export default class ProviderItemSearchFilter extends React.Component {
           <span
             onClick={e => {
               //calculateAndDisplayRoute(item.lat, item.lng, item.id, false)
-              //this.props.DrawRoute()
-              console.log('Provider')
+              drawRoute(item.lat, item.lng, originLat, originLng)
+              //console.log('Provider Datos de ruta:', item.info)
             }}
           >
             Datos de ruta
