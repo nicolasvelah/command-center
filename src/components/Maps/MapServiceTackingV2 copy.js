@@ -13,6 +13,11 @@ import { getDistanceInMeters, colorGenerator } from '../../services/helpers'
 
 import ProviderSearchFilter from '../Tools/ProviderSearchFilter'
 import ProviderItemSearchFilter from '../Tools/ProviderItemSearchFilter'
+//import L from 'leaflet/'
+
+//import "leaflet-geotiff"
+//import "leaflet-geotiff/leaflet-geotiff-plotty"
+//import "leaflet-geotiff/leaflet-geotiff-vector-arrows"
 
 import { render } from 'react-dom'
 
@@ -135,21 +140,15 @@ class MapServiceTacking extends Component {
       this.map.leafletElement.getZoom()
     )
 
-    if (this.props.service === 'Acompañamiento Seguro') {
-      console.log(
-        'Params',
-        this.props.lat,
-        this.props.len,
-        this.props.serviceDestination.position.latitude,
-        this.props.serviceDestination.position.longitude
-      )
-      const resConverted = this.drawRoute(
-        this.props.lat,
-        this.props.len,
-        this.props.serviceDestination.position.latitude,
-        this.props.serviceDestination.position.longitude
-      )
-      this.setState({ polyline: resConverted })
+    if (this.props.route) {
+      console.log('Route', this.props.route)
+      const routeConverted = this.toGeoJSON(this.props.route)
+      console.log('Route Converted', routeConverted)
+
+      //const routeLeaflet = L.Polyline.fromEncoded(this.props.route).getLatLngs()
+      const routeConverted2 = this.decode(this.props.route, 5)
+      console.log('Leaflet Route Converted', routeConverted2)
+      this.setState({ polyline: routeConverted2 })
     }
 
     this.setState({
@@ -534,6 +533,43 @@ class MapServiceTacking extends Component {
     return coordinates
   }
 
+  decode = function(encoded, precision) {
+    var len = encoded.length
+    var index = 0
+    var latlngs = []
+    var lat = 0
+    var lng = 0
+
+    precision = Math.pow(10, -(precision || 5))
+
+    while (index < len) {
+      var b
+      var shift = 0
+      var result = 0
+      do {
+        b = encoded.charCodeAt(index++) - 63
+        result |= (b & 0x1f) << shift
+        shift += 5
+      } while (b >= 0x20)
+      var dlat = result & 1 ? ~(result >> 1) : result >> 1
+      lat += dlat
+
+      shift = 0
+      result = 0
+      do {
+        b = encoded.charCodeAt(index++) - 63
+        result |= (b & 0x1f) << shift
+        shift += 5
+      } while (b >= 0x20)
+      var dlng = result & 1 ? ~(result >> 1) : result >> 1
+      lng += dlng
+
+      latlngs.push([lat * precision, lng * precision])
+    }
+
+    return latlngs
+  }
+
   drawRouteSearchFilter = async (
     initialPointLat,
     initialPointLng,
@@ -765,11 +801,11 @@ class MapServiceTacking extends Component {
                     </Marker>
                   ))
                 : ''}
-              {this.props.service === 'Acompañamiento Seguro' && (
+              {this.props.route && (
                 <Polyline color="lime" positions={this.state.polyline} />
               )}
               {this.state.drawRoute && (
-                <Polyline color="lime" positions={this.state.drawRoutePoints} />
+                <Polyline color="#165DE1" positions={this.state.drawRoutePoints} opacity={0.9}/>
               )}
             </MapLeaflet>
           ) : (

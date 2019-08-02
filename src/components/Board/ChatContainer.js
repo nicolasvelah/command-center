@@ -692,6 +692,7 @@ class ChatContainer extends React.Component {
                   ProvidersActiveServices={this.state.ProvidersActiveServices}
                   service={item.service.name}
                   orderId={item.id}
+                  route={item.route}
                   addRemoveFavorite={this.props.addRemoveFavorite}
                   updateProvidersFavorite={this.updateProvidersFavorite}
                   asignProvider={this.asignProvider}
