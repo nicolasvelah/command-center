@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { confirmAlert } from 'react-confirm-alert'
 
 import Chat from './ChatV2'
-import MapServiceTacking from '../Maps/MapServiceTackingV2 copy'
+import MapServiceTacking from '../Maps/MapServiceTackingV3'
 import { findUserById } from '../../services/wsConect'
 import {
   geocodeLatLng,

@@ -13,6 +13,8 @@ import { getDistanceInMeters, colorGenerator } from '../../services/helpers'
 
 import ProviderSearchFilter from '../Tools/ProviderSearchFilter'
 import ProviderItemSearchFilter from '../Tools/ProviderItemSearchFilter'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { divIcon } from 'leaflet'
 //import L from 'leaflet/'
 
 //import "leaflet-geotiff"
@@ -586,9 +588,80 @@ class MapServiceTacking extends Component {
     this.setState({ drawRoutePoints: resConverted, drawRoute: true })
   }
 
+  customMarker = (text, type) => {
+    let iconMarkup
+    if (type === 'origin') {
+      iconMarkup = renderToStaticMarkup(
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            width: 60,
+            height: 20,
+            position: 'absolute',
+            top: '-20px',
+            right: '-25px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'rgba(169,247,121, 0.7)',
+              borderRadius: '5px',
+              textAlign: 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <i style={{ padding: 5 }}>{text}</i>
+          </div>
+          <div
+            style={{
+              margin: 'auto',
+              width: 0,
+              height: 0,
+              borderTop: '5px solid rgba(169,247,121.7)',
+              borderRight: '10px solid transparent',
+              borderLeft: '10px solid transparent',
+            }}
+          />
+        </div>
+      )
+    } else if (type === 'client') {
+      iconMarkup = renderToStaticMarkup(
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            width: 30,
+            height: 30,
+            position: 'absolute',
+            top: '-10px',
+            right: '-10px',
+            backgroundColor: 'rgba(0,0,0, 0.5)',
+            borderRadius: '50%',
+            border: '1px solid #ffff',
+            backgroundColor: '#8E44AD',
+            textAlign: 'center',
+          }}
+        >
+          <i style={{ padding: 5 }}>{text}</i>
+        </div>
+      )
+    }
+    const customMarkerIcon = divIcon({
+      html: iconMarkup,
+    })
+    return customMarkerIcon
+  }
+
   render() {
     const { center, zoom } = this.state
-    //console.log('toGeoJSON', this.toGeoJSON('yvd|Fh~gqNfEqKzBEkEvKwB?'))
+    const customMarkerIconOrigin = this.customMarker('Origen', 'origin')
+    const customMarkerIconDestiny = this.customMarker('Destino', 'origin')
+
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">
         {this.props.searchProviderMode ? (
@@ -702,10 +775,11 @@ class MapServiceTacking extends Component {
               />
               <Marker
                 position={[this.props.lat, this.props.len]}
+                icon={customMarkerIconOrigin}
                 boxZoom={true}
               >
                 <Popup>
-                  <span>Origen:{this.props.address}</span>
+                  <span>:{this.props.address}</span>
                 </Popup>
               </Marker>
               {/*Punto de destino Modificable desde cc*/}
@@ -715,9 +789,10 @@ class MapServiceTacking extends Component {
                     this.props.serviceDestination.position.latitude,
                     this.props.serviceDestination.position.longitude,
                   ]}
+                  icon={customMarkerIconDestiny}
                 >
                   <Popup className="popup-destination">
-                    <span>Destino{this.props.serviceDestination.address}</span>
+                    <span>{this.props.serviceDestination.address}</span>
                   </Popup>
                 </Marker>
               ) : (
@@ -731,13 +806,18 @@ class MapServiceTacking extends Component {
                     {this.props.clientGLData.info.name}{' '}
                     {this.props.clientGLData.info.lastName}
                   </Popup>
-                  <CircleMarker
-                    center={[
+                  <Marker
+                    position={[
                       this.props.clientDataLat,
                       this.props.clientDataLng,
                     ]}
-                    fillColor="#000"
-                    radius={15}
+                    className="icon-client"
+                    icon={this.customMarker(
+                      `${this.props.clientGLData.info.name.charAt(
+                        0
+                      )}${this.props.clientGLData.info.lastName.charAt(0)}`,
+                      'client'
+                    )}
                   />
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -760,32 +840,39 @@ class MapServiceTacking extends Component {
                       }
                       return true
                     })
-                    .map(provider => (
-                      <CircleMarker
-                        fillColor={
-                          provider.classNameLocation === 'inTheRadio' &&
-                          this.state.activeProvider === provider.id
-                            ? 'blue'
-                            : 'red'
-                        }
-                        fillOpacity={1}
-                        radius={10}
-                        key={provider.id}
-                        center={[provider.lat, provider.lng]}
-                      >
-                        <Popup>
-                          Proveedor {provider.id}
-                          <br />
-                          {provider.info.name} {provider.info.lastName}
-                          <br />
-                          <span>{provider.info.description}</span>
-                          <br />
-                          <span style={{ color: '#ddd' }}>
-                            {provider.info.services.category}
-                          </span>
-                        </Popup>
-                      </CircleMarker>
-                    ))
+                    .map(provider => {
+                      if (
+                        provider.lat !== undefined &&
+                        provider.lng !== undefined
+                      ) {
+                        return (
+                          <CircleMarker
+                            fillColor={
+                              provider.classNameLocation === 'inTheRadio' &&
+                              this.state.activeProvider === provider.id
+                                ? 'blue'
+                                : 'red'
+                            }
+                            fillOpacity={1}
+                            radius={10}
+                            key={provider.id}
+                            center={[provider.lat, provider.lng]}
+                          >
+                            <Popup>
+                              Proveedor {provider.id}
+                              <br />
+                              {provider.info.name} {provider.info.lastName}
+                              <br />
+                              <span>{provider.info.description}</span>
+                              <br />
+                              <span style={{ color: '#ddd' }}>
+                                {provider.info.services.category}
+                              </span>
+                            </Popup>
+                          </CircleMarker>
+                        )
+                      }
+                    })
                 : null}
               {this.state.providersOrigins
                 ? this.state.providersOrigins.map(providerOriginAddress => (
@@ -802,10 +889,21 @@ class MapServiceTacking extends Component {
                   ))
                 : ''}
               {this.props.route && (
-                <Polyline color="lime" positions={this.state.polyline} />
+                <Polyline
+                  color="#00FFFF"
+                  weight={10}
+                  opacity={0.5}
+                  positions={this.state.polyline}
+                />
               )}
               {this.state.drawRoute && (
-                <Polyline color="#165DE1" positions={this.state.drawRoutePoints} opacity={0.9}/>
+                <Polyline
+                  color="#00FFFF"
+                  weight={6}
+                  opacity={0.7}
+                  positions={this.state.drawRoutePoints}
+                  opacity={0.9}
+                />
               )}
             </MapLeaflet>
           ) : (

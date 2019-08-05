@@ -220,3 +220,11 @@
   background-color: rgba(80, 142, 224, 0.5);
   color: #fff;
 }
+
+.leaflet-div-icon {
+  background: #6aa7ef;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  border: 1px solid #ffff;
+}
