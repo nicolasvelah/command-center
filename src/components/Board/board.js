@@ -171,6 +171,7 @@ class Board extends Component {
   ) {
     try {
       const dataNotification = data.dat
+      console.log('startNotificationsWs', dataNotification.data.type)
       if (isLoggedIn()) {
         if (dataNotification.data.type === 'chat') {
           chatNotifications(dataNotification.data.content.orderId)
@@ -210,6 +211,7 @@ class Board extends Component {
     })
   }
   providerState = (id, type) => {
+    console.log('providerState')
     const { tasks } = this.state
     var index = tasks
       .map(function(x) {
@@ -240,6 +242,7 @@ class Board extends Component {
 
   //CHAT
   chatNotifications = async id => {
+    console.log('chatNotifications')
     const ExistsInActivatedTasks = await this.checkExistsInActivatedTasks(
       Number(id)
     )
@@ -664,10 +667,22 @@ class Board extends Component {
     return true
   }
   getMyLastTasks = async (desde, orderId) => {
-    let { tasks } = this.state
-    console.log('Trayendo la ultima tarea ' + desde + ' con orderId ' + orderId)
     try {
+      let { tasks } = this.state
+      console.log(
+        'Trayendo la ultima tarea ' + desde + ' con orderId ' + orderId
+      )
+
       const decryptedData = await getOrderById(orderId)
+
+      console.log('decryptedData', decryptedData)
+      tasks.forEach((element, index) => {
+        if (element.id === orderId) {
+          console.log('Tarea repetida')
+          tasks.splice(index, 1)
+        }
+      })
+
       await tasks.push(decryptedData)
       //console.log('new tasks', tasks)
 
