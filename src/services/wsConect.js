@@ -91,7 +91,8 @@ export const onNotification = (
   chatNotifications,
   getMyTasks,
   providerState,
-  getMyLastTasks
+  getMyLastTasks,
+  updateOrder
 ) => {
   socket.on(`on-notification`, data => {
     startNotificationsWs(
@@ -99,7 +100,8 @@ export const onNotification = (
       chatNotifications,
       getMyTasks,
       providerState,
-      getMyLastTasks
+      getMyLastTasks,
+      updateOrder
     )
 
     console.log('<OnNotificationWs>')

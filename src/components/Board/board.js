@@ -100,7 +100,8 @@ class Board extends Component {
       this.chatNotifications,
       this.getMyTasks,
       this.providerState,
-      this.getMyLastTasks
+      this.getMyLastTasks,
+      this.updateOrder
     )
 
     await this.setState({
@@ -167,7 +168,8 @@ class Board extends Component {
     chatNotifications,
     getMyTasks,
     providerState,
-    getMyLastTasks
+    getMyLastTasks,
+    updateOrder
   ) {
     try {
       const dataNotification = data.dat
@@ -183,20 +185,30 @@ class Board extends Component {
             dataNotification.data.content.orderId,
             dataNotification.data.type
           )
-        } else {
-          if (dataNotification.data.type === 'order') {
-            console.log(
-              'LLEGOOOO PANAAAAA orderId',
-              dataNotification.data.content
-            )
-            MsmNewTask(dataNotification.notification.title)
-            getMyLastTasks('websockets', dataNotification.data.content.orderId)
-          } else {
-            //getMyTasks('startNotificactionWs')
-            if (dataNotification.data.type !== 'updateOrder') {
-              MsmNewTask(dataNotification.notification.title)
+        } else if (dataNotification.data.type === 'order') {
+          console.log(
+            'LLEGOOOO PANAAAAA orderId',
+            dataNotification.data.content
+          )
+          MsmNewTask(dataNotification.notification.title)
+          getMyLastTasks('websockets', dataNotification.data.content.orderId)
+        } else if (dataNotification.data.type === 'updateOrder') {
+          console.log('Orden actualizada', dataNotification.data.content)
+          const tareas = get('tasks')
+          tareas.forEach(element => {
+            if(dataNotification.data.content.orderId === element.id) {
+              console.log('Tarea actualizada', element.status.name)
+              element.status.name = 'standby'
+              //element.status.name
             }
-          }
+          });
+          save('tasks', tareas)
+          updateOrder(tareas)
+          console.log('dataNotification', dataNotification.data.content.orderId)
+          //await getMyTasks('onNotification')
+        }
+        if (dataNotification.data.type !== 'updateOrder') {
+          MsmNewTask(dataNotification.notification.title)
         }
       }
     } catch (e) {
@@ -238,6 +250,10 @@ class Board extends Component {
       tasks,
     })
     console.log('Completo providerState')
+  }
+  /// updateOrder
+  updateOrder = (newTasks) => {
+    this.setState({ tasks: newTasks })
   }
 
   //CHAT
@@ -656,7 +672,7 @@ class Board extends Component {
     try {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
-
+      await save('tasks', decryptedData.tasks)
       this.setState({
         tasks: decryptedData.tasks,
       })
@@ -878,6 +894,7 @@ class Board extends Component {
     const context = this
     //TASK ITEMS
 
+    //this.setState({ tasks: get('tasks') })
     this.state.tasks
       .sort(function(a, b) {
         return a.priority - b.priority
