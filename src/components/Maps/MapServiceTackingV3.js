@@ -477,10 +477,9 @@ class MapServiceTacking extends Component {
       const urlTest = `https://router.project-osrm.org/route/v1/driving/${initialPointLng},${initialPointLat};${finalPointLng},${finalPointLat}`
       //console.log('Url ', urlTest)
       const response = await axios.get(urlTest)
-      console.log('Response ', response.data)
-      console.log('OSRM ', response.data.routes[0].geometry)
+      
       resConverted = this.toGeoJSON(response.data.routes[0].geometry)
-      console.log('OSRM Converted', resConverted)
+      
       return resConverted
     } catch (error) {
       console.log(error)
@@ -584,7 +583,6 @@ class MapServiceTacking extends Component {
       finalPointLat,
       finalPointLng
     )
-    console.log('drawRouteSearchFilter', resConverted)
     this.setState({ drawRoutePoints: resConverted, drawRoute: true })
   }
 
@@ -661,6 +659,16 @@ class MapServiceTacking extends Component {
     const { center, zoom } = this.state
     const customMarkerIconOrigin = this.customMarker('Origen', 'origin')
     const customMarkerIconDestiny = this.customMarker('Destino', 'origin')
+
+    if (this.props.drawRoute) {
+      this.drawRouteSearchFilter(
+        this.props.providerInChat.lat,
+        this.props.providerInChat.lng,
+        this.props.lat,
+        this.props.len
+      )
+      this.props.changeStateMap()
+    }
 
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">

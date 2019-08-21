@@ -85,6 +85,7 @@ class ChatContainer extends React.Component {
       city: null,
       providers: [],
       ProvidersActiveServices: [],
+      drawRoute: false,
     }
     this.updateClient = this.updateClient.bind(this)
     this.haveToOpenChat = this.haveToOpenChat.bind(this)
@@ -525,6 +526,11 @@ class ChatContainer extends React.Component {
       //console.log('setChatFav', providers)
     }
   }
+
+  changeStateMap = () => {
+    this.setState({ drawRoute: false })
+  }
+
   render() {
     const { item } = this.props
 
@@ -701,6 +707,10 @@ class ChatContainer extends React.Component {
                   activeProviderCall={this.activeProviderCall}
                   searchProviderMode={this.state.searchProviderMode}
                   updateProvider={this.updateProvider}
+                  changeStateMap={this.changeStateMap}
+                  providerInChat={this.state.providerInChat}
+                  item={item}
+                  drawRoute={this.state.drawRoute}
                 />
               ) : (
                 ''
@@ -793,13 +803,17 @@ class ChatContainer extends React.Component {
                         <span
                           onClick={e => {
                             e.preventDefault()
-
+                           
+                            console.log('Draw Route chatContainer')
+                            this.setState({ drawRoute: true })
+                            /*
                             this.refs.mapa.wrappedInstance.calculateAndDisplayRoute(
                               this.state.providerInChat.lat,
                               this.state.providerInChat.lng,
                               this.state.providerInChat.id,
                               false
                             )
+                            */
                           }}
                         >
                           Datos de ruta
