@@ -194,17 +194,20 @@ class Board extends Component {
           getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
           console.log('Orden actualizada', dataNotification.data.content)
+          /*
           const tareas = get('tasks')
           tareas.forEach(element => {
             if(dataNotification.data.content.orderId === element.id) {
-              console.log('Tarea actualizada', element.status.name)
-              element.status.name = 'standby'
+              console.log('Tarea actualizada', element.status.name, )
+              //element.status.name = 'standby'
+              element.status.name = dataNotification.data.content.state
               //element.status.name
             }
           });
           save('tasks', tareas)
-          updateOrder(tareas)
-          console.log('dataNotification', dataNotification.data.content.orderId)
+          */
+          updateOrder(dataNotification.data.content)
+          //console.log('dataNotification', dataNotification.data.content.orderId)
           //await getMyTasks('onNotification')
         }
         if (dataNotification.data.type !== 'updateOrder') {
@@ -252,8 +255,30 @@ class Board extends Component {
     console.log('Completo providerState')
   }
   /// updateOrder
-  updateOrder = (newTasks) => {
-    this.setState({ tasks: newTasks })
+  updateOrder = dataContent => {
+    let { tasks, activeTasks } = this.state
+
+    tasks.forEach(element => {
+      if (dataContent.orderId === element.id) {
+        console.log('Tarea actualizada', element.status.name, dataContent.state)
+        console.log('Active Task', activeTasks)
+
+        element.status.name = dataContent.state
+        if (dataContent.state === 'complete') {
+          activeTasks.forEach(async (elementActiveTask, index) => {
+            if (element.id === elementActiveTask.task.id) {
+              console.log('Encontro Task', elementActiveTask.task)
+              activeTasks.splice(index, 1)
+              await save('activeTasks', activeTasks)
+            }
+          })
+          console.log('element', element)
+          //activeTasks.push(element)
+        }
+      }
+    })
+
+    this.setState({ tasks })
   }
 
   //CHAT
@@ -672,7 +697,7 @@ class Board extends Component {
     try {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
-      await save('tasks', decryptedData.tasks)
+      //await save('tasks', decryptedData.tasks)
       this.setState({
         tasks: decryptedData.tasks,
       })
