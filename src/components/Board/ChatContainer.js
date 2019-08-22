@@ -95,7 +95,7 @@ class ChatContainer extends React.Component {
   async componentDidMount() {
     //GET USER GEOLOCALIZATION DATA
     const clientGLData = await findUserById(this.props.item.clientId, true)
-    console.log('++Iniciando haveToOpenChat ++')
+    //console.log('++Iniciando haveToOpenChat ++')
     await this.haveToOpenChat(this.props.item.status.name, 'init', 'init')
     let { searchProviderMode } = this.state
     if (this.props.item.provider !== null) {
@@ -142,7 +142,7 @@ class ChatContainer extends React.Component {
       }
       return data
     })
-    console.log('INIT ProvidersActiveServices', ProvidersActiveServices)
+    //console.log('INIT ProvidersActiveServices', ProvidersActiveServices)
     //console.log('this.props.item.providerId', this.props.item)
     if (this.props.item.providerId !== 0) {
       await providers.map(provider => {
@@ -188,7 +188,7 @@ class ChatContainer extends React.Component {
 
     intercept(this.props.mapStore, 'clientsDsWS', change => {
       if (context.props.item.clientId === change.newValue) {
-        console.log('este cliente se Desconecto:', change.newValue)
+        //console.log('este cliente se Desconecto:', change.newValue)
         let { clientData } = this.state
         clientData.connected = false
         context.updateClient(clientData)
@@ -319,7 +319,7 @@ class ChatContainer extends React.Component {
       this.setState({ status, openChat: haveToOpen })
     }
     this.props.chatTopPositionTriger()
-    console.log('haveToOpenChat From: ' + from + ' statusInit: ' + statusInit)
+    //console.log('haveToOpenChat From: ' + from + ' statusInit: ' + statusInit)
   }
 
   focusChat = id => {
@@ -400,7 +400,7 @@ class ChatContainer extends React.Component {
   }
 
   activeProviderChat = async providerId => {
-    console.log('ejecuta cambio de proveedor')
+    //console.log('ejecuta cambio de proveedor')
     try {
       let { providerInChat, providers } = this.state
       const messages = await getMessagesById(this.props.item.id, providerId)
@@ -411,7 +411,7 @@ class ChatContainer extends React.Component {
         }
         return provider
       })
-      console.log('providerInChat salida:', providerInChat)
+      //console.log('providerInChat salida:', providerInChat)
       this.setState({ providerInChat })
     } catch (err) {
       console.error(err.message)
@@ -430,7 +430,7 @@ class ChatContainer extends React.Component {
           label: 'Llamar',
           onClick: async () => {
             try {
-              console.log('Ejecucion de API para llamada IP')
+              //console.log('Ejecucion de API para llamada IP')
             } catch (err) {
               console.error(err.message)
             }
@@ -804,7 +804,7 @@ class ChatContainer extends React.Component {
                           onClick={e => {
                             e.preventDefault()
                            
-                            console.log('Draw Route chatContainer')
+                            //console.log('Draw Route chatContainer')
                             this.setState({ drawRoute: true })
                             /*
                             this.refs.mapa.wrappedInstance.calculateAndDisplayRoute(

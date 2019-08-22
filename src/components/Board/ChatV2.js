@@ -12,7 +12,7 @@ export default class Chat extends React.PureComponent {
     this.props.goBottom('scroll_' + this.props.sid)
   }
   setMessage(e) {
-    console.log(e.target.value)
+    //console.log(e.target.value)
     if (typeof e.target !== undefined) {
       this.setState({
         message: e.target.value,

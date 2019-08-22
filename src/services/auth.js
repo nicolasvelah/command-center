@@ -159,7 +159,7 @@ export async function getAccessToken() {
 
   // console.log('the token will expires soon or is expired', expiresIn - difference);
   const newToken = await refreshToken(user)
-  console.log('new token', newToken)
+  //console.log('new token', newToken)
   return newToken
 }
 

@@ -67,10 +67,10 @@ class MapServiceLocator extends Component {
         },
       })
       const { country } = response.data
-      console.log('geoapi', response.data)
+      //console.log('geoapi', response.data)
       return country
     } catch (error) {
-      console.log('no se pudo desde el backend')
+      //console.log('no se pudo desde el backend')
       //alert(error.message);
     }
   }
@@ -109,9 +109,9 @@ class MapServiceLocator extends Component {
     await this.updateMap()
   }
   async updateMap() {
-    console.log('Updtae map userId', this.props.userId)
-    console.log('Updtae map provider', this.props.providerId)
-    console.log(this.state.providers)
+    //console.log('Updtae map userId', this.props.userId)
+    //console.log('Updtae map provider', this.props.providerId)
+    //console.log(this.state.providers)
     if (typeof this.state.client[0] !== 'undefined') {
       if (this.props.userId !== this.state.client[0].id) {
         const filterC = await this.filterClient(
@@ -135,7 +135,7 @@ class MapServiceLocator extends Component {
         })
       }
     }
-    console.log(
+    //console.log(
       'ejecuta buscar proveedor---------------',
       this.state.provider[0]
     )
@@ -145,7 +145,7 @@ class MapServiceLocator extends Component {
           this.state.providers,
           this.props.providerId
         )
-        console.log('Proveedro a ver en mapa', prov)
+        //console.log('Proveedro a ver en mapa', prov)
         //update the state
         this.setState({ provider: [prov] })
       }
@@ -207,7 +207,7 @@ class MapServiceLocator extends Component {
     return response
   }
   async getProviders(country) {
-    console.log('this.props.providerId', this.props.providerId)
+    //console.log('this.props.providerId', this.props.providerId)
     try {
       const accessToken = await getAccessToken()
       const res = await axios({
@@ -220,18 +220,18 @@ class MapServiceLocator extends Component {
           country,
         },
       })
-      console.log(res.data)
+      //console.log(res.data)
       await this.setState({ providers: res.data })
     } catch (error) {
       console.error(error)
     }
   }
   onProviderLocation = async data => {
-    console.log('this.props.providerId', this.props.providerId)
+    //console.log('this.props.providerId', this.props.providerId)
     if (this.props.providerId !== 0) {
-      console.log('Paso data.id ', data.id)
+      //console.log('Paso data.id ', data.id)
       if (data.id === this.props.providerId) {
-        console.log('provider', data)
+        //console.log('provider', data)
         const provider = {
           id: data.id,
           info: data.info,
@@ -283,12 +283,12 @@ class MapServiceLocator extends Component {
       }
       return user
     })
-    console.log('Proveedor filtrado:', response)
+    //console.log('Proveedor filtrado:', response)
     return response
   }
   // catch when the inService status of a one provider has changed
   onProviderInService = async data => {
-    //console.log('onProviderInService', data)
+    ////console.log('onProviderInService', data)
     // id : provider id
     // inService: it can be a stringNumber or a null, if the value is null the provider is available to new orders
     const { id, inService } = data
@@ -306,7 +306,7 @@ class MapServiceLocator extends Component {
     this.setState({ provider: [tmp] })
   }
   onSockedId = id => {
-    console.log('connected with socketID', id)
+    //console.log('connected with socketID', id)
   }
   onClientLocation = async data => {
     if (data.id === this.state.client[0].id) {

@@ -108,10 +108,6 @@ class MapServiceTacking extends Component {
     const ProvidersActiveServices = await this.selectConstructor(
       this.props.ProvidersActiveServices
     )
-    console.log(
-      'this.props.ProvidersActiveServices Map V2',
-      this.props.ProvidersActiveServices
-    )
     this.setState({
       unmount: false,
       ProvidersActiveServices,
@@ -215,10 +211,10 @@ class MapServiceTacking extends Component {
     })
   }
   selectConstructor = options => {
-    console.log('options -', options)
+    //console.log('options -', options)
     let resp = []
     options.map(item => {
-      console.log('item -', item)
+      //console.log('item -', item)
       resp.push({ label: item, value: item })
       return item
     })
@@ -309,7 +305,7 @@ class MapServiceTacking extends Component {
         if (status === 'OK') {
           this.directionsDisplay.setDirections(response)
         } else {
-          console.log('Directions request failed due to ', status)
+          //console.log('Directions request failed due to ', status)
         }
       }
     )

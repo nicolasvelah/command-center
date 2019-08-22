@@ -18,8 +18,8 @@ export default class Chat extends React.Component {
     })
   }
   componentDidUpdate() {
-    console.log('this.props.messagesTask', this.props.messagesTask)
-    console.log('this.state.messagesTaskTemp', this.state.messagesTaskTemp)
+    //console.log('this.props.messagesTask', this.props.messagesTask)
+    //console.log('this.state.messagesTaskTemp', this.state.messagesTaskTemp)
     if (!this.isEqual(this.props.messagesTask, this.state.messagesTaskTemp)) {
       this.props.scrollToBottom(this.props.id)
       this.setState({

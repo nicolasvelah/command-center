@@ -8,13 +8,12 @@ export default class TaskProviderData extends React.Component {
   }
   saveClientData = e => {
     const data = [this.state]
-    console.log('Emviar esta data', data)
+    //console.log('Emviar esta data', data)
     var CryptoJS = require('crypto-js')
-    var cipherData = CryptoJS.AES.encrypt(
-      JSON.stringify(data),
-      process.env.CRYPTO_SECRET
-    )
-    console.log('Data encriptada', cipherData)
+
+    CryptoJS.AES.encrypt(JSON.stringify(data), process.env.CRYPTO_SECRET)
+
+    //console.log('Data encriptada', cipherData)
   }
   render() {
     return (

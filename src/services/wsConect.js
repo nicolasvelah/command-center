@@ -40,13 +40,14 @@ export const updateMapData = async (socket, APP_ID, country, mapStore) => {
     })*/
   }
   if (newListener) {
+    /*
     console.log(
       '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Nuevo listener APP_ID: ' +
         APP_ID +
         ' / pais: ' +
         country
     )
-
+      */
     mapStoreLocal = mapStore
     const providers = await getProviders(APP_ID, country)
     const clients = await getClients(APP_ID, country)

@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import GoogleMapReact from 'google-map-react'
+//import GoogleMapReact from 'google-map-react'
 //import { inject, observer } from 'mobx-react'
 //import { fitBounds } from 'google-map-react/utils'
-import CMarker from './CMarker'
-import CMarkerClientServicePointer from './CMarkerClientServicePointer'
+//import CMarker from './CMarker'
+//import CMarkerClientServicePointer from './CMarkerClientServicePointer'
 //import Autocomplete from 'react-google-autocomplete'
 //import io from 'socket.io-client'
-import styled from 'styled-components'
+//import styled from 'styled-components'
 import axios from 'axios'
 //import { getUser } from '../../services/auth'
 import { getDistanceInMeters, colorGenerator } from '../../services/helpers'
@@ -21,7 +21,7 @@ import { divIcon } from 'leaflet'
 //import "leaflet-geotiff/leaflet-geotiff-plotty"
 //import "leaflet-geotiff/leaflet-geotiff-vector-arrows"
 
-import { render } from 'react-dom'
+//import { render } from 'react-dom'
 
 import {
   Marker,
@@ -39,6 +39,7 @@ import FullscreenControl from 'react-leaflet-fullscreen'
 
 import '../../assets/css/map.css'
 
+/*
 const ButtonContainer = styled.div`
   display: inline-flex;
   align-items: center;
@@ -80,7 +81,7 @@ const StateContainer = styled.div`
     color: red;
   }
 `
-
+*/
 const WAIT_INTERVAL = 1000
 
 //@inject('mapStore')
@@ -133,23 +134,15 @@ class MapServiceTacking extends Component {
     const ProvidersActiveServices = await this.selectConstructor(
       this.props.ProvidersActiveServices
     )
-    console.log(
-      'this.props.ProvidersActiveServices Map V2',
-      this.props.ProvidersActiveServices
-    )
-    console.log(
-      'this.map.leafletElement.getZoom()',
-      this.map.leafletElement.getZoom()
-    )
 
     if (this.props.route) {
-      console.log('Route', this.props.route)
-      const routeConverted = this.toGeoJSON(this.props.route)
-      console.log('Route Converted', routeConverted)
+      //console.log('Route', this.props.route)
+      this.toGeoJSON(this.props.route)
+      //console.log('Route Converted', routeConverted)
 
       //const routeLeaflet = L.Polyline.fromEncoded(this.props.route).getLatLngs()
       const routeConverted2 = this.decode(this.props.route, 5)
-      console.log('Leaflet Route Converted', routeConverted2)
+      //console.log('Leaflet Route Converted', routeConverted2)
       this.setState({ polyline: routeConverted2 })
     }
 
@@ -257,10 +250,10 @@ class MapServiceTacking extends Component {
     })
   }
   selectConstructor = options => {
-    console.log('options -', options)
+    //console.log('options -', options)
     let resp = []
     options.map(item => {
-      console.log('item -', item)
+      //console.log('item -', item)
       resp.push({ label: item, value: item })
       return item
     })
@@ -330,7 +323,7 @@ class MapServiceTacking extends Component {
         lng: Number(this.props.serviceDestination.position.longitude),
       }
     }
-    console.log('PUNTOSSSS:', destinyCords)
+    //console.log('PUNTOSSSS:', destinyCords)
     const data = [{ lat: Number(lat), lng: Number(lng) }, destinyCords]
     const waypoints = data.map(item => {
       return {
@@ -352,7 +345,7 @@ class MapServiceTacking extends Component {
         if (status === 'OK') {
           this.directionsDisplay.setDirections(response)
         } else {
-          console.log('Directions request failed due to ', status)
+          //console.log('Directions request failed due to ', status)
         }
       }
     )
@@ -477,12 +470,13 @@ class MapServiceTacking extends Component {
       const urlTest = `https://router.project-osrm.org/route/v1/driving/${initialPointLng},${initialPointLat};${finalPointLng},${finalPointLat}`
       //console.log('Url ', urlTest)
       const response = await axios.get(urlTest)
-      
+
       resConverted = this.toGeoJSON(response.data.routes[0].geometry)
-      
+
       return resConverted
     } catch (error) {
       console.log(error)
+      return null
     }
   }
 
@@ -583,7 +577,10 @@ class MapServiceTacking extends Component {
       finalPointLat,
       finalPointLng
     )
-    this.setState({ drawRoutePoints: resConverted, drawRoute: true })
+
+    if (resConverted !== null) {
+      this.setState({ drawRoutePoints: resConverted, drawRoute: true })
+    }
   }
 
   customMarker = (text, type) => {
@@ -641,7 +638,6 @@ class MapServiceTacking extends Component {
             backgroundColor: 'rgba(0,0,0, 0.5)',
             borderRadius: '50%',
             border: '1px solid #ffff',
-            backgroundColor: '#8E44AD',
             textAlign: 'center',
           }}
         >
@@ -725,37 +721,32 @@ class MapServiceTacking extends Component {
                         return b.id - a.id
                       }
                     })
-                    .map(item => {
-                      //this.setState({ drawRoutePoints: [] })
-                      return (
-                        <ProviderItemSearchFilter
-                          key={item.id}
-                          ref={c => this.RefItemSearchFilter.set(item.id, c)}
-                          item={item}
-                          centerActor={this.centerActor}
-                          calculateAndDisplayRoute={
-                            this.calculateAndDisplayRoute
-                          }
-                          addRemoveFavorite={this.props.addRemoveFavorite}
-                          orderId={this.props.orderId}
-                          favorite={item.favorite}
-                          updateProvidersFavorite={
-                            this.props.updateProvidersFavorite
-                          }
-                          setActiveProvider={this.setActiveProvider}
-                          activeProvider={this.state.activeProvider}
-                          asignProvider={this.props.asignProvider}
-                          activeProviderNotification={
-                            this.props.activeProviderNotification
-                          }
-                          activeProviderChat={this.props.activeProviderChat}
-                          activeProviderCall={this.props.activeProviderCall}
-                          originLat={this.props.lat}
-                          originLng={this.props.len}
-                          drawRoute={this.drawRouteSearchFilter}
-                        />
-                      )
-                    })
+                    .map(item => (
+                      <ProviderItemSearchFilter
+                        key={item.id}
+                        ref={c => this.RefItemSearchFilter.set(item.id, c)}
+                        item={item}
+                        centerActor={this.centerActor}
+                        calculateAndDisplayRoute={this.calculateAndDisplayRoute}
+                        addRemoveFavorite={this.props.addRemoveFavorite}
+                        orderId={this.props.orderId}
+                        favorite={item.favorite}
+                        updateProvidersFavorite={
+                          this.props.updateProvidersFavorite
+                        }
+                        setActiveProvider={this.setActiveProvider}
+                        activeProvider={this.state.activeProvider}
+                        asignProvider={this.props.asignProvider}
+                        activeProviderNotification={
+                          this.props.activeProviderNotification
+                        }
+                        activeProviderChat={this.props.activeProviderChat}
+                        activeProviderCall={this.props.activeProviderCall}
+                        originLat={this.props.lat}
+                        originLng={this.props.len}
+                        drawRoute={this.drawRouteSearchFilter}
+                      />
+                    ))
                 : null}
             </div>
           </div>
@@ -848,12 +839,10 @@ class MapServiceTacking extends Component {
                       }
                       return true
                     })
-                    .map(provider => {
-                      if (
+                    .map(
+                      provider =>
                         provider.lat !== undefined &&
-                        provider.lng !== undefined
-                      ) {
-                        return (
+                        provider.lng !== undefined && (
                           <CircleMarker
                             fillColor={
                               provider.classNameLocation === 'inTheRadio' &&
@@ -879,8 +868,7 @@ class MapServiceTacking extends Component {
                             </Popup>
                           </CircleMarker>
                         )
-                      }
-                    })
+                    )
                 : null}
               {this.state.providersOrigins
                 ? this.state.providersOrigins.map(providerOriginAddress => (
@@ -908,7 +896,6 @@ class MapServiceTacking extends Component {
                 <Polyline
                   color="#00FFFF"
                   weight={6}
-                  opacity={0.7}
                   positions={this.state.drawRoutePoints}
                   opacity={0.9}
                 />

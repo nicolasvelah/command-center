@@ -21,7 +21,6 @@ export default class ProviderItemSearchFilter extends React.Component {
     const {
       item,
       centerActor,
-      calculateAndDisplayRoute,
       setActiveProvider,
       activeProvider,
       activeProviderChat,

@@ -122,7 +122,7 @@ export const updateChatState = async orderId => {
         },
       }
     )
-    console.log('Exito en updateChatState')
+    //console.log('Exito en updateChatState')
   } catch (error) {
     console.log('Error en updateChatState', error.message)
   }
@@ -170,7 +170,7 @@ export const getOrderById = async orderId => {
     })
     */
     //console.log('activeTasks', activeTasks)
-    console.log('orderId ', decryptedData.tasks)
+    //console.log('orderId ', decryptedData.tasks)
     return decryptedData.tasks
   } catch (err) {
     console.log(err)
@@ -232,9 +232,9 @@ export const colorGenerator = () => {
 }
 export const updateStatus = async (id, cat) => {
   try {
-    console.log('Estado actualizado')
+    //console.log('Estado actualizado')
     const accessToken = await getAccessToken()
-    const response = await axios.post(
+    await axios.post(
       `${process.env.API_URL}/orders/updateStatus`,
       {
         statusName: cat,
@@ -247,7 +247,7 @@ export const updateStatus = async (id, cat) => {
         },
       }
     )
-    console.log('Respuesta de UpdateStatus: ', response)
+    //console.log('Respuesta de UpdateStatus: ', response)
     return true
   } catch (err) {
     console.error(err.message)
