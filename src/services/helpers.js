@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getUser, logoutLocal } from './auth'
+import { logoutLocal, getAccessToken } from './auth'
 import { toast } from 'react-toastify'
 
 export const sendMessage = async (
@@ -10,6 +10,7 @@ export const sendMessage = async (
   assistanceMode
 ) => {
   try {
+    const accessToken = await getAccessToken()
     const result = await axios.post(
       `${process.env.API_URL}/sendMessage`,
       {
@@ -22,7 +23,7 @@ export const sendMessage = async (
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -34,6 +35,7 @@ export const sendMessage = async (
   }
 }
 export const getMessagesById = async (orderId, to) => {
+  const accessToken = await getAccessToken()
   const messages = await axios.post(
     `${process.env.API_URL}/getMessagesById`,
     {
@@ -43,7 +45,7 @@ export const getMessagesById = async (orderId, to) => {
     {
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
+        'x-access-token': accessToken,
       },
     }
   )
@@ -52,13 +54,14 @@ export const getMessagesById = async (orderId, to) => {
 }
 export const operatorsAll = async () => {
   try {
+    const accessToken = await getAccessToken()
     const data = await axios.post(
       `${process.env.API_URL}/getOperators`,
       {},
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -72,6 +75,7 @@ export const operatorsAll = async () => {
 export const MsmNewTask = title => toast(title)
 
 export const messagesAll = async id => {
+  const accessToken = await getAccessToken()
   const messages = await axios.post(
     `${process.env.API_URL}/getMessages`,
     {
@@ -80,7 +84,7 @@ export const messagesAll = async id => {
     {
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
+        'x-access-token': accessToken,
       },
     }
   )
@@ -89,6 +93,7 @@ export const messagesAll = async id => {
 }
 
 export const notesAll = async id => {
+  const accessToken = await getAccessToken()
   const notes = await axios.post(
     `${process.env.API_URL}/orders/getNotes`,
     {
@@ -97,7 +102,7 @@ export const notesAll = async id => {
     {
       headers: {
         'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
+        'x-access-token': accessToken,
       },
     }
   )
@@ -106,32 +111,83 @@ export const notesAll = async id => {
 
 export const updateChatState = async orderId => {
   try {
+    const accessToken = await getAccessToken()
     await axios.post(
       `${process.env.API_URL}/updateChatState/` + orderId,
       {},
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
-    //console.log('Exito en updateChatState')
+    console.log('Exito en updateChatState')
   } catch (error) {
     console.log('Error en updateChatState', error.message)
   }
   return
 }
 
+export const getOrderById = async orderId => {
+  try {
+    const accessToken = await getAccessToken()
+    const tasks = await axios.post(
+      `${process.env.API_URL}/orders/get-order-by-id/${orderId}`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': accessToken,
+        },
+      }
+    )
+    var CryptoJS = require('crypto-js')
+    let decryptedData = CryptoJS.AES.decrypt(
+      tasks.data,
+      process.env.CRYPTO_SECRET
+    ).toString(CryptoJS.enc.Utf8)
+    decryptedData = JSON.parse(decryptedData)
+
+    //const activeTasks = JSON.parse(window.localStorage.getItem('activeTasks'))
+    /*
+    decryptedData.tasks = decryptedData.tasks.map(item => {
+      let generate = true
+      if (typeof activeTasks !== undefined && activeTasks !== null) {
+        activeTasks.map(itemAc => {
+          if (item.id === itemAc.task.id) {
+            item.color = itemAc.task.color
+            generate = false
+          }
+          return itemAc
+        })
+      }
+      if (generate) {
+        item.color = colorGenerator()
+      }
+
+      return item
+    })
+    */
+    //console.log('activeTasks', activeTasks)
+    console.log('orderId ', decryptedData.tasks)
+    return decryptedData.tasks
+  } catch (err) {
+    console.log(err)
+    return err
+  }
+}
+
 export const getAllTasks = async () => {
   try {
+    const accessToken = await getAccessToken()
     const tasks = await axios.post(
       `${process.env.API_URL}/orders/getOrders`,
       {},
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -162,7 +218,6 @@ export const getAllTasks = async () => {
       return item
     })
 
-    //console.log('tasks ', decryptedData)
     return decryptedData
   } catch (err) {
     console.log(err)
@@ -176,23 +231,33 @@ export const colorGenerator = () => {
   return color
 }
 export const updateStatus = async (id, cat) => {
-  return await axios.post(
-    `${process.env.API_URL}/orders/updateStatus`,
-    {
-      statusName: cat,
-      orderId: id,
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-access-token': getUser().token,
+  try {
+    console.log('Estado actualizado')
+    const accessToken = await getAccessToken()
+    const response = await axios.post(
+      `${process.env.API_URL}/orders/updateStatus`,
+      {
+        statusName: cat,
+        orderId: id,
       },
-    }
-  )
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': accessToken,
+        },
+      }
+    )
+    console.log('Respuesta de UpdateStatus: ', response)
+    return true
+  } catch (err) {
+    console.error(err.message)
+    return false
+  }
 }
 
 export const changeOrderProvider = async (orderId, providerId) => {
   try {
+    const accessToken = await getAccessToken()
     await axios.post(
       `${process.env.API_URL}/orders/changeOrderProvider`,
       {
@@ -202,7 +267,7 @@ export const changeOrderProvider = async (orderId, providerId) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )

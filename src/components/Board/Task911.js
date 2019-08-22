@@ -3,7 +3,7 @@ import MapServiceTacking from '../Maps/MapServiceTacking'
 import Chat from './Chat'
 import phone from '../../images/phone.svg'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getUser, getAccessToken } from '../../services/auth'
 import scrollIntoView from 'scroll-into-view'
 
 import '../../assets/css/task.css'
@@ -34,6 +34,7 @@ export default class Task extends Component {
   sendMenssage = async e => {
     console.log('enviando ms')
     if (this.state.Menssage !== '') {
+      const accessToken = await getAccessToken()
       const result = await axios.post(
         `${process.env.API_URL}/sendMessage`,
         {
@@ -45,7 +46,7 @@ export default class Task extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )

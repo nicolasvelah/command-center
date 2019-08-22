@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getAccessToken } from '../../services/auth'
 import Select from 'react-select'
 import styled from 'styled-components'
 import star from '../../images/star-full.svg'
@@ -30,7 +30,7 @@ const ProviderItemSearch = styled.div`
   }
 `
 const InputContainer = styled.div``
-export default class AsignProvider extends Component {
+export default class AsignProvider extends PureComponent {
   validations = {
     category: { required: true },
     service: { required: true },
@@ -67,6 +67,31 @@ export default class AsignProvider extends Component {
   }
 
   getCategories = async () => {
+    try {
+      const accessToken = await getAccessToken()
+      const response = await axios.get(
+        `${process.env.API_URL}/categories/app-id/${this.props.appId}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': accessToken,
+          },
+        }
+      )
+      const options = await response.data.categories.map(category => {
+        return { id: category.id, label: category.name, value: category.id }
+      })
+
+      this.setState({ categories: options })
+      return response
+    } catch (e) {
+      console.log(e)
+      return e
+    }
+
+    /*
+
     const data = await axios({
       url: `${process.env.API_URL}/categories/app-id/` + this.props.appId,
       method: 'get',
@@ -83,8 +108,36 @@ export default class AsignProvider extends Component {
       })
 
     return data
+    */
   }
+
   getServices = async id => {
+    const accessToken = await getAccessToken()
+
+    try {
+      const response = await axios.get(
+        `${process.env.API_URL}/services/${id}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': accessToken,
+          },
+        }
+      )
+      const options = await response.data.services.map(service => {
+        return { id: service.id, label: service.name, value: service.id }
+      })
+
+      this.setState({ services: options })
+
+      return response
+    } catch (e) {
+      console.log(e)
+      return e
+    }
+
+    /*
     const data = await axios
       .get(
         `${process.env.API_URL}/services/` + id,
@@ -92,7 +145,7 @@ export default class AsignProvider extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -108,8 +161,32 @@ export default class AsignProvider extends Component {
       })
 
     return data
+    */
   }
   getProvider = async id => {
+    try {
+      const accessToken = await getAccessToken()
+      const response = await axios.get(
+        `${process.env.API_URL}/providers/${id}`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': accessToken,
+          },
+        }
+      )
+      console.log('result.data.providers', response.data.providers)
+
+      await this.setState({ providers: response.data.providers })
+
+      return response
+    } catch (e) {
+      console.log(e)
+      return e
+    }
+    /*
+    const accessToken = await getAccessToken()
     const data = await axios
       .get(
         `${process.env.API_URL}/providers/` + id,
@@ -117,7 +194,7 @@ export default class AsignProvider extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -131,6 +208,7 @@ export default class AsignProvider extends Component {
       })
 
     return data
+    */
   }
 
   handleCategoryChange = async option => {

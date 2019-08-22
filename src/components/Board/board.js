@@ -1,8 +1,12 @@
 import React, { Component } from 'react'
-import { getUser, logout, isLoggedIn, logoutLocal } from '../../services/auth'
+import {
+  getUser,
+  logout,
+  isLoggedIn,
+  logoutLocal,
+  getAccessToken,
+} from '../../services/auth'
 import { navigate } from 'gatsby'
-
-import { askForPermissioToReceiveNotifications } from '../../services/push-notification'
 import { ToastContainer } from 'react-toastify'
 import TaskItem from './TaskItem'
 import ChatContainer from './ChatContainer'
@@ -16,13 +20,20 @@ import {
   getAllTasks,
   updateStatus,
   updateChatState,
+  getOrderById,
 } from '../../services/helpers'
 //import Filter from './Filter'
-import { conectSocket, updateMapData } from '../../services/wsConect'
+import {
+  conectSocket,
+  updateMapData,
+  onNotification,
+} from '../../services/wsConect'
 import Loading from '../Tools/Loading'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
+import Masonry from 'react-masonry-css'
+@observer
 @inject('mapStore')
 @observer
 class Board extends Component {
@@ -75,33 +86,38 @@ class Board extends Component {
     } else if (getUser().type === 'provider') {
       logout()
     }
-    const token = await getUser().token
+    //const token = await getUser().token
     const userId = await getUser().userId
     const userType = await getUser().type
     let { socket } = this
-    socket = await conectSocket(token, userId, userType, [1, 2, 3])
+    const accessToken = await getAccessToken()
+    console.log('board')
+    socket = await conectSocket(accessToken, userId, userType, [1, 2, 3])
+
+    await onNotification(
+      socket,
+      this.startNotificationsWs,
+      this.chatNotifications,
+      this.getMyTasks,
+      this.providerState,
+      this.getMyLastTasks,
+      this.updateOrder
+    )
 
     await this.setState({
       socket,
     })
     //Tasks
-    //console.log('init traer ordenes en did mount ')
-    await this.getMyTasks()
-
+    await this.getMyTasks('componenedidmount')
     //Push Notifications
-    const messaging = await askForPermissioToReceiveNotifications()
+
+    /*_________________________________________________________________
     const context = this
-    if (messaging !== false) {
-      this.startNotifications(messaging)
-    } else {
-      const messaging2 = await askForPermissioToReceiveNotifications()
-      this.startNotifications(messaging2)
-    }
     window.addEventListener(
       'focus',
       function(event) {
         if (isLoggedIn()) {
-          context.getMyTasks()
+          context.getMyTasks('addEventlistener')
           if (typeof context.state.curTask[0] !== 'undefined') {
             //console.log('entro para traer mensajes')
             context.chatNotifications(context.state.curTask[0].id)
@@ -110,6 +126,7 @@ class Board extends Component {
       },
       false
     )
+    */
     //OPERADORES
     if (getUser().type !== 'operator') {
       this.getOperators()
@@ -145,28 +162,61 @@ class Board extends Component {
       )
     }
   }
-  //FIREBASE NOTIFICATIONS TRIEGER
-  startNotifications(messaging) {
-    const context = this
-    messaging.onMessage(function(payload) {
+  //WEBSOCKETS NOTIFICATIONS TRIEGER
+  async startNotificationsWs(
+    data,
+    chatNotifications,
+    getMyTasks,
+    providerState,
+    getMyLastTasks,
+    updateOrder
+  ) {
+    try {
+      const dataNotification = data.dat
+      console.log('startNotificationsWs', dataNotification.data.type)
       if (isLoggedIn()) {
-        console.log('Frond Message received.', payload)
-        const notification = JSON.parse(payload.data.content)
-        if (notification.type === 'chat') {
-          context.chatNotifications(notification.orderId)
+        if (dataNotification.data.type === 'chat') {
+          chatNotifications(dataNotification.data.content.orderId)
         } else if (
-          notification.type === 'WORKINPROGRESS' ||
-          notification.type === 'WORKFINISHED'
+          dataNotification.data.type === 'WORKINPROGRESS' ||
+          dataNotification.data.type === 'WORKFINISHED'
         ) {
-          context.providerState(notification.orderId, notification.type)
-        } else {
-          context.getMyTasks()
-          if (notification.type !== 'updateOrder') {
-            MsmNewTask(payload.data.title)
-          }
+          providerState(
+            dataNotification.data.content.orderId,
+            dataNotification.data.type
+          )
+        } else if (dataNotification.data.type === 'order') {
+          console.log(
+            'LLEGOOOO PANAAAAA orderId',
+            dataNotification.data.content
+          )
+          MsmNewTask(dataNotification.notification.title)
+          getMyLastTasks('websockets', dataNotification.data.content.orderId)
+        } else if (dataNotification.data.type === 'updateOrder') {
+          console.log('Orden actualizada', dataNotification.data.content)
+          /*
+          const tareas = get('tasks')
+          tareas.forEach(element => {
+            if(dataNotification.data.content.orderId === element.id) {
+              console.log('Tarea actualizada', element.status.name, )
+              //element.status.name = 'standby'
+              element.status.name = dataNotification.data.content.state
+              //element.status.name
+            }
+          });
+          save('tasks', tareas)
+          */
+          updateOrder(dataNotification.data.content)
+          //console.log('dataNotification', dataNotification.data.content.orderId)
+          //await getMyTasks('onNotification')
+        }
+        if (dataNotification.data.type !== 'updateOrder') {
+          MsmNewTask(dataNotification.notification.title)
         }
       }
-    })
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   //PROVIDER
@@ -176,6 +226,7 @@ class Board extends Component {
     })
   }
   providerState = (id, type) => {
+    console.log('providerState')
     const { tasks } = this.state
     var index = tasks
       .map(function(x) {
@@ -201,15 +252,41 @@ class Board extends Component {
       providerState: 'WIP',
       tasks,
     })
+    console.log('Completo providerState')
+  }
+  /// updateOrder
+  updateOrder = dataContent => {
+    let { tasks, activeTasks } = this.state
+
+    tasks.forEach(element => {
+      if (dataContent.orderId === element.id) {
+        console.log('Tarea actualizada', element.status.name, dataContent.state)
+        console.log('Active Task', activeTasks)
+
+        element.status.name = dataContent.state
+        if (dataContent.state === 'complete') {
+          activeTasks.forEach(async (elementActiveTask, index) => {
+            if (element.id === elementActiveTask.task.id) {
+              console.log('Encontro Task', elementActiveTask.task)
+              activeTasks.splice(index, 1)
+              await save('activeTasks', activeTasks)
+            }
+          })
+          console.log('element', element)
+          //activeTasks.push(element)
+        }
+      }
+    })
+
+    this.setState({ tasks })
   }
 
   //CHAT
   chatNotifications = async id => {
+    console.log('chatNotifications')
     const ExistsInActivatedTasks = await this.checkExistsInActivatedTasks(
       Number(id)
     )
-
-    //console.log('ExistsInActivatedTasks.status', ExistsInActivatedTasks)
     if (ExistsInActivatedTasks[0].exist) {
       this.addNewMessage(id)
     } else {
@@ -305,7 +382,7 @@ class Board extends Component {
     return ''
   }
   notificationOff = async (id, type) => {
-    //console.log('OFF NOT')
+    console.log('OFF NOT')
     document.getElementById('taskid_' + id).classList.remove('haveNotification')
     document.getElementById('taskid_' + id).classList.remove('not_' + type)
     const nodeValue = document
@@ -315,7 +392,7 @@ class Board extends Component {
       nodeValue[0].innerHTML = 0
     }
     await updateChatState(id)
-    await this.getMyTasks()
+    //await this.getMyTasks('notification off')
     return ''
   }
 
@@ -329,10 +406,10 @@ class Board extends Component {
     return messages
   }
   addMensages = (msm, type) => {}
-  openChat = async (id, column) => {
+  openChat = async (id, column, type) => {
     let { openChat } = this.state
     let includesThis = true
-
+    console.log('OpenChat', openChat)
     openChat = openChat.filter(item => {
       let itemResp = item
       if (item === id) {
@@ -345,8 +422,10 @@ class Board extends Component {
     if (includesThis) {
       openChat.push(id)
     }
-
-    await this.trigerColumn(column, id)
+    if (type === 'click') {
+      await this.trigerColumn(column, id)
+      console.log('trigerColumn Open Chat ID: ', id)
+    }
 
     this.setState({ openChat })
 
@@ -415,7 +494,7 @@ class Board extends Component {
     let activetask = get('activeTasks', column)
     let task = null
     if (column === 'provider') {
-      await this.getMyTasks()
+      await this.getMyTasks('updateActivateTask')
       await this.state.tasks.map(item => {
         if (item.id === id) {
           task = item
@@ -459,6 +538,7 @@ class Board extends Component {
     }
   }
   activateTask = async (id, icon) => {
+    console.log('activateTask')
     try {
       let { activeTasks } = this.state
 
@@ -488,10 +568,14 @@ class Board extends Component {
         })
       }
       task.icon = icon
+      //console.log('Entro', task)
+      //console.log('AllTask', this.state.tasks)
 
       if (!includesThis) {
         if (task.status.name !== 'complete') {
+          console.log('Entro 2')
           const messages = await this.getMessages(task.id)
+          console.log('Entro 3')
           task.messagesAll = messages.data
           activeTasks.push({ task })
           execute = true
@@ -504,13 +588,10 @@ class Board extends Component {
       } else if (statusS !== 'live') {
         execute = true
       }
-
+      console.log('newTask:', task)
       if (execute) {
-        //console.log('execute', execute)
-        await this.openChat(id, 'live')
-
+        await this.openChat(id, 'live', 'click')
         await save('activeTasks', activeTasks)
-
         await this.setState({
           activeTasks,
         })
@@ -523,8 +604,6 @@ class Board extends Component {
               node.wrappedInstance.haveToOpenChat('live', 'board')
             }
           })
-
-        //console.log('activeTasks ------------', activeTasks)
         //const scrollWidthValue = (index - 1) * 420
       }
       this.notificationOff(id, 'provider')
@@ -533,7 +612,8 @@ class Board extends Component {
     }
   }
   desactivateTask = async (id, go) => {
-    //console.log('dasactivar' + id)
+    console.log('desactivate Task')
+    console.log('dasactivar' + id)
     try {
       let result = true
       if (go) {
@@ -556,6 +636,7 @@ class Board extends Component {
         //console.log(' des activeTasksFilter', activeTasksFilter)
         if (go) {
           await this.trigerColumn('complete', id)
+          console.log('trigerColumn desactivate')
           //await save('activeTasks', activeTasksFilter)
         }
 
@@ -575,6 +656,7 @@ class Board extends Component {
       console.log('id', id)*/
       await this.updateActivateTask(col, id)
       await updateStatus(id, col)
+      console.log('=======updateStatus triger Column=========')
 
       let { tasks } = this.state
 
@@ -610,13 +692,43 @@ class Board extends Component {
   }
 
   //TASKS
-  getMyTasks = async () => {
+  getMyTasks = async desde => {
+    console.log('Trayendo Tareas desde ' + desde)
     try {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
-
+      //await save('tasks', decryptedData.tasks)
       this.setState({
         tasks: decryptedData.tasks,
+      })
+    } catch (err) {
+      console.log(err)
+      logoutLocal()
+    }
+    return true
+  }
+  getMyLastTasks = async (desde, orderId) => {
+    try {
+      let { tasks } = this.state
+      console.log(
+        'Trayendo la ultima tarea ' + desde + ' con orderId ' + orderId
+      )
+
+      const decryptedData = await getOrderById(orderId)
+
+      console.log('decryptedData', decryptedData)
+      tasks.forEach((element, index) => {
+        if (element.id === orderId) {
+          console.log('Tarea repetida')
+          tasks.splice(index, 1)
+        }
+      })
+
+      await tasks.push(decryptedData)
+      //console.log('new tasks', tasks)
+
+      this.setState({
+        tasks,
       })
     } catch (err) {
       console.log(err)
@@ -664,6 +776,7 @@ class Board extends Component {
         }
         return task
       })
+
       if (cat === 'backlog' && operator !== null) {
         alert(
           'Esta columna es solo para tareas que no tengan asiganado un operador.'
@@ -679,11 +792,13 @@ class Board extends Component {
       id = Number(id[1])
       if (reopenconfirm) {
         await this.trigerColumn(cat, idNumber)
-
+        console.log('trigerColumn Drop')
         if (cat === 'complete') {
           await this.desactivateTask(id, false)
+          console.log('desactivateTask Drop')
         }
       }
+
       if (cat !== 'complete') {
         let icon = service
         icon =
@@ -694,7 +809,11 @@ class Board extends Component {
             .replace(/[^\w]+/g, '')
             .replace(/^-+/, '')
             .replace(/-+$/, '') + '.svg'
-        await this.activateTask(id, icon)
+
+        if (cat === 'live') {
+          await this.activateTask(id, icon)
+          console.log('activateTask Drop')
+        }
       }
 
       Array.from(this.RefChatContainer.values())
@@ -710,6 +829,7 @@ class Board extends Component {
       dragStard: false,
     })
   }
+
   Delivery = async () => {
     this.setState({
       isLoading: true,
@@ -719,7 +839,9 @@ class Board extends Component {
       if (item.status.name === 'complete') {
         try {
           await updateStatus(item.id, 'delivered')
-          this.getMyTasks()
+          console.log('=======updateStatus Delivery=========')
+
+          this.getMyTasks('Delivery')
         } catch (err) {
           console.log(err)
         }
@@ -794,9 +916,10 @@ class Board extends Component {
       notresponse: [],
       complete: [],
     }
-
-    //TASK ITEMS
     const context = this
+    //TASK ITEMS
+
+    //this.setState({ tasks: get('tasks') })
     this.state.tasks
       .sort(function(a, b) {
         return a.priority - b.priority
@@ -901,7 +1024,15 @@ class Board extends Component {
                   style={{ width: '20px', margin: '0px 0px 0px 0px' }}
                 />
               </span>
-              {tasks.notresponse}
+              {
+                <Masonry
+                  breakpointCols={{ default: 2 }}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {tasks.notresponse}
+                </Masonry>
+              }
             </div>
             <div
               className="standby b-row"
@@ -909,7 +1040,15 @@ class Board extends Component {
               onDrop={e => this.onDrop(e, 'standby')}
             >
               <span className="column-header">En Espera</span>
-              {tasks.standby}
+              {
+                <Masonry
+                  breakpointCols={{ default: 2 }}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {tasks.standby}
+                </Masonry>
+              }
             </div>
             <div
               className="live b-row"
@@ -917,7 +1056,15 @@ class Board extends Component {
               onDrop={e => this.onDrop(e, 'live')}
             >
               <span className="column-header">En Vivo</span>
-              {tasks.live}
+              {
+                <Masonry
+                  breakpointCols={{ default: 2 }}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {tasks.live}
+                </Masonry>
+              }
             </div>
           </div>
           <div
@@ -928,7 +1075,6 @@ class Board extends Component {
           >
             <span className="column-header">Resueltos</span>
             {tasks.complete}
-
             {getUser().type !== 'operator' ? (
               <div className="column-footer">
                 <button

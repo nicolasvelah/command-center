@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getAccessToken } from '../../services/auth'
 import Select, { Async } from 'react-select'
 import styled from 'styled-components'
 //import MapServiceLocator from '../Maps/MapServiceLocator'
@@ -58,7 +58,7 @@ const Error = styled.div`
 const InputContainer = styled.div`
   position: relative;
 `
-export default class CreateTask extends Component {
+export default class CreateTask extends React.PureComponent {
   validations = {
     operator: { required: true },
     client: { required: true },
@@ -127,10 +127,57 @@ export default class CreateTask extends Component {
     this.getCategories()
   }
 
-  getClient = (inputValue, callback) => {
+  getClient = async (inputValue, callback) => {
+    try {
+      if (!this.state.isLoading && inputValue) {
+        let options = []
+        if (this.state.keyWord !== '') {
+          const accessToken = await getAccessToken()
+          const response = await axios.post(
+            `${process.env.API_URL}/clients/searchClients`,
+            {
+              searchText: this.state.keyWord,
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': accessToken,
+              },
+            }
+          )
+
+          options = await response.data.clients.map(client => {
+            return {
+              id: client.id,
+              label:
+                client.name +
+                ' ' +
+                client.lastName +
+                ' / Telf: ' +
+                client.phone,
+              value: client.id,
+            }
+          })
+          setTimeout(() => {
+            callback(options)
+            this.setState({ isLoading: false })
+          }, 500)
+        } else {
+          setTimeout(() => {
+            callback(options)
+            this.setState({ isLoading: false })
+          }, 500)
+        }
+      }
+    } catch (e) {
+      console.log(e)
+      return e
+    }
+    /*
     if (!this.state.isLoading && inputValue) {
       let options = []
       if (this.state.keyWord !== '') {
+        const accessToken = await getAccessToken()
         axios
           .post(
             `${process.env.API_URL}/clients/searchClients`,
@@ -140,7 +187,7 @@ export default class CreateTask extends Component {
             {
               headers: {
                 'Content-Type': 'application/json',
-                'x-access-token': getUser().token,
+                'x-access-token': accessToken,
               },
             }
           )
@@ -171,101 +218,101 @@ export default class CreateTask extends Component {
       }
     }
     return
+    */
   }
   getOperators = async () => {
     try {
-      const data = await axios
+      const accessToken = await getAccessToken()
+      const response = await axios
         .post(
           `${process.env.API_URL}/getOperators`,
           {},
           {
             headers: {
               'Content-Type': 'application/json',
-              'x-access-token': getUser().token,
+              'x-access-token': accessToken,
             },
           }
         )
-        .then(async result => {
-          const options = await result.data.users.map(user => {
+          const options = await response.data.users.map(user => {
             return { id: user.id, label: user.name, value: user.id }
           })
 
           this.setState({ operators: options })
-        })
-        .catch(er => {
-          console.log(er)
-        })
 
-      return data
+      return response
     } catch (err) {
       console.log(err.message)
       return []
     }
   }
   getCategories = async () => {
-    const data = await axios
-      .get(
+    try {
+      const accessToken = await getAccessToken()
+      const response = await axios.get(
         `${process.env.API_URL}/categories`,
         {},
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
-      .then(async result => {
-        const options = await result.data.categories.map(category => {
-          return { id: category.id, label: category.name, value: category.id }
-        })
-
-        this.setState({ categories: options })
-      })
-      .catch(er => {
-        console.log(er)
+      const options = await response.data.categories.map(category => {
+        return { id: category.id, label: category.name, value: category.id }
       })
 
-    return data
+      this.setState({ categories: options })
+
+      return response
+    } catch (e) {
+      console.log(e)
+      return e
+    }
   }
+
   getServices = async id => {
-    const data = await axios
-      .get(
-        `${process.env.API_URL}/services/` + id,
+    try {
+      const accessToken = await getAccessToken()
+      const response = await axios.get(
+        `${process.env.API_URL}/services/${id}`,
         {},
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
-      .then(async result => {
-        const options = await result.data.services.map(service => {
-          return { id: service.id, label: service.name, value: service.id }
-        })
-
-        this.setState({ services: options })
-      })
-      .catch(er => {
-        console.log(er)
+      const options = await response.data.services.map(service => {
+        return { id: service.id, label: service.name, value: service.id }
       })
 
-    return data
+      this.setState({ services: options })
+
+      return response
+    } catch (e) {
+      console.log(e)
+      return e
+    }
   }
+
   getProvider = async id => {
-    const data = await axios
+    try {
+      const accessToken = await getAccessToken()
+    const response = await axios
       .get(
-        `${process.env.API_URL}/providers/` + id,
+        `${process.env.API_URL}/providers/${id}`,
         {},
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
-      .then(async result => {
-        const options = await result.data.providers.map(provider => {
+        const options = await response.data.providers.map(provider => {
           return {
             id: provider.providerId,
             label: provider.Provider.busnessName,
@@ -274,13 +321,15 @@ export default class CreateTask extends Component {
         })
 
         this.setState({ providers: options })
-      })
-      .catch(er => {
-        console.log(er)
-      })
 
-    return data
+    return response
+    } catch (e) {
+      console.log(e)
+      return e
+    }
+    
   }
+
   handleClientTypeInputSearch = inputValue => {
     if (this.state.firstTyping) {
       this.setState({ firstTyping: false })
@@ -370,6 +419,7 @@ export default class CreateTask extends Component {
       return
     }
     try {
+      const accessToken = await getAccessToken()
       await axios.post(
         `${process.env.API_URL}/orders/addOrder`,
         {
@@ -383,7 +433,7 @@ export default class CreateTask extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
             lat: this.state.lat.value,
             len: this.state.lnt.value,
           },

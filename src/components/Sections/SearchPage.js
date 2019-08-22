@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getAccessToken } from '../../services/auth'
 
 import '../../assets/css/search.css'
 
@@ -37,6 +37,7 @@ export default class SearchPage extends Component {
     if (this.state.isLoading && this.state.keyWord !== '') {
       console.log('cumple requisitos inicia consulta')
       try {
+        const accessToken = await getAccessToken()
         await axios
           .post(
             `${process.env.API_URL}/gs/${this.state.keyWord}`,
@@ -46,7 +47,7 @@ export default class SearchPage extends Component {
             {
               headers: {
                 'Content-Type': 'application/json',
-                'x-access-token': getUser().token,
+                'x-access-token': accessToken,
               },
             }
           )

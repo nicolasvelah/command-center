@@ -58,7 +58,7 @@ const RouteData = styled.div`
   }
 `
 
-export default class CMarkerClientServicePointer extends React.Component {
+export default class CMarkerClientServicePointer extends React.PureComponent {
   render() {
     return (
       <Wrapper>

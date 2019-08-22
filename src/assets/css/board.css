@@ -518,8 +518,8 @@
   display: block;
 }
 .b-row .task {
-  float: left;
-  width: 48%;
+  /*float: left;*/
+  width: 100%;
   min-height: 160px;
 }
 .b-row .task:nth-child(1n + 1) {
@@ -580,6 +580,26 @@
 .react-confirm-alert-button-group button {
   background: #0047b3;
 }
+
+.my-masonry-grid {
+  display: -webkit-box; /* Not needed if autoprefixing */
+  display: -ms-flexbox; /* Not needed if autoprefixing */
+  display: flex;
+  /*margin-left: -30px;  gutter size offset */
+  width: auto;
+}
+.my-masonry-grid_column {
+  padding-left: 3px; /* gutter size */
+  padding-right: 3px;
+  background-clip: padding-box;
+}
+
+.my-masonry-grid_column > div {
+  /* change div to reference your elements you put in <Masonry> */
+  background: grey;
+  /*margin-bottom: 30px;*/
+}
+
 @media (max-width: 767px) {
   .board {
     display: block;

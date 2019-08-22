@@ -7,15 +7,35 @@ import CMarkerClientServicePointer from './CMarkerClientServicePointer'
 //import Autocomplete from 'react-google-autocomplete'
 //import io from 'socket.io-client'
 import styled from 'styled-components'
-//import axios from 'axios'
+import axios from 'axios'
 //import { getUser } from '../../services/auth'
 import { getDistanceInMeters, colorGenerator } from '../../services/helpers'
 
 import ProviderSearchFilter from '../Tools/ProviderSearchFilter'
 import ProviderItemSearchFilter from '../Tools/ProviderItemSearchFilter'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { divIcon } from 'leaflet'
+//import L from 'leaflet/'
 
-//import { render } from 'react-dom'
-//import { Map, Marker, Popup, TileLayer } from 'react-leaflet'
+//import "leaflet-geotiff"
+//import "leaflet-geotiff/leaflet-geotiff-plotty"
+//import "leaflet-geotiff/leaflet-geotiff-vector-arrows"
+
+import { render } from 'react-dom'
+
+import {
+  Marker,
+  Popup,
+  TileLayer,
+  CircleMarker,
+  FeatureGroup,
+  Circle,
+  Polyline,
+} from 'react-leaflet/es/'
+import MapLeaflet from 'react-leaflet/es/Map'
+
+import 'react-leaflet-fullscreen/dist/styles.css'
+import FullscreenControl from 'react-leaflet-fullscreen'
 
 import '../../assets/css/map.css'
 
@@ -86,6 +106,11 @@ class MapServiceTacking extends Component {
         km: null,
       },
       providersOrigins: [],
+      zoomLevel: null,
+      waypoints: [],
+      polyline: [],
+      drawRoute: false,
+      drawRoutePoints: [],
     }
     this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
     this.centerActor = this.centerActor.bind(this)
@@ -112,10 +137,27 @@ class MapServiceTacking extends Component {
       'this.props.ProvidersActiveServices Map V2',
       this.props.ProvidersActiveServices
     )
+    console.log(
+      'this.map.leafletElement.getZoom()',
+      this.map.leafletElement.getZoom()
+    )
+
+    if (this.props.route) {
+      console.log('Route', this.props.route)
+      const routeConverted = this.toGeoJSON(this.props.route)
+      console.log('Route Converted', routeConverted)
+
+      //const routeLeaflet = L.Polyline.fromEncoded(this.props.route).getLatLngs()
+      const routeConverted2 = this.decode(this.props.route, 5)
+      console.log('Leaflet Route Converted', routeConverted2)
+      this.setState({ polyline: routeConverted2 })
+    }
+
     this.setState({
       unmount: false,
       ProvidersActiveServices,
       service: this.props.service,
+      zoomLevel: this.map.leafletElement.getZoom(),
     })
   }
 
@@ -288,6 +330,7 @@ class MapServiceTacking extends Component {
         lng: Number(this.props.serviceDestination.position.longitude),
       }
     }
+    console.log('PUNTOSSSS:', destinyCords)
     const data = [{ lat: Number(lat), lng: Number(lng) }, destinyCords]
     const waypoints = data.map(item => {
       return {
@@ -406,9 +449,227 @@ class MapServiceTacking extends Component {
         }
       })*/
   }
+
+  metersToPixels(latPosition, metres) {
+    var metresPerPixel =
+      (40075016.686 * Math.abs(Math.cos((latPosition * Math.PI) / 180))) /
+      Math.pow(2, this.state.zoomLevel + 8)
+
+    const converterTo = (metres / 9.6) * metresPerPixel
+    return converterTo
+  }
+
+  getMapZoom() {
+    console.log('Zooom Level', this.map.leafletElement.getZoom())
+    this.setState({ zoomLevel: this.map.leafletElement.getZoom() })
+    return this.map && this.map.leafletElement.getZoom()
+  }
+
+  drawRoute = async (
+    initialPointLat,
+    initialPointLng,
+    finalPointLat,
+    finalPointLng
+  ) => {
+    let resConverted = []
+    try {
+      //const urlTest = `https://router.project-osrm.org/route/v1/driving/-78.501134,-0.20668;-78.4987360239029,-0.20671740030507826`
+      const urlTest = `https://router.project-osrm.org/route/v1/driving/${initialPointLng},${initialPointLat};${finalPointLng},${finalPointLat}`
+      //console.log('Url ', urlTest)
+      const response = await axios.get(urlTest)
+      
+      resConverted = this.toGeoJSON(response.data.routes[0].geometry)
+      
+      return resConverted
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  toGeoJSON = function(str) {
+    var index = 0,
+      lat = 0,
+      lng = 0,
+      coordinates = [],
+      shift = 0,
+      result = 0,
+      byte = null,
+      latitude_change,
+      longitude_change,
+      factor = Math.pow(10, 0 || 5)
+
+    // Coordinates have variable length when encoded, so just keep
+    // track of whether we've hit the end of the string. In each
+    // loop iteration, a single coordinate is decoded.
+    while (index < str.length) {
+      // Reset shift, result, and byte
+      byte = null
+      shift = 0
+      result = 0
+
+      do {
+        byte = str.charCodeAt(index++) - 63
+        result |= (byte & 0x1f) << shift
+        shift += 5
+      } while (byte >= 0x20)
+
+      latitude_change = result & 1 ? ~(result >> 1) : result >> 1
+
+      shift = result = 0
+
+      do {
+        byte = str.charCodeAt(index++) - 63
+        result |= (byte & 0x1f) << shift
+        shift += 5
+      } while (byte >= 0x20)
+
+      longitude_change = result & 1 ? ~(result >> 1) : result >> 1
+
+      lat += latitude_change
+      lng += longitude_change
+
+      coordinates.push([lat / factor, lng / factor])
+    }
+
+    return coordinates
+  }
+
+  decode = function(encoded, precision) {
+    var len = encoded.length
+    var index = 0
+    var latlngs = []
+    var lat = 0
+    var lng = 0
+
+    precision = Math.pow(10, -(precision || 5))
+
+    while (index < len) {
+      var b
+      var shift = 0
+      var result = 0
+      do {
+        b = encoded.charCodeAt(index++) - 63
+        result |= (b & 0x1f) << shift
+        shift += 5
+      } while (b >= 0x20)
+      var dlat = result & 1 ? ~(result >> 1) : result >> 1
+      lat += dlat
+
+      shift = 0
+      result = 0
+      do {
+        b = encoded.charCodeAt(index++) - 63
+        result |= (b & 0x1f) << shift
+        shift += 5
+      } while (b >= 0x20)
+      var dlng = result & 1 ? ~(result >> 1) : result >> 1
+      lng += dlng
+
+      latlngs.push([lat * precision, lng * precision])
+    }
+
+    return latlngs
+  }
+
+  drawRouteSearchFilter = async (
+    initialPointLat,
+    initialPointLng,
+    finalPointLat,
+    finalPointLng
+  ) => {
+    const resConverted = await this.drawRoute(
+      initialPointLat,
+      initialPointLng,
+      finalPointLat,
+      finalPointLng
+    )
+    this.setState({ drawRoutePoints: resConverted, drawRoute: true })
+  }
+
+  customMarker = (text, type) => {
+    let iconMarkup
+    if (type === 'origin') {
+      iconMarkup = renderToStaticMarkup(
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            width: 60,
+            height: 20,
+            position: 'absolute',
+            top: '-20px',
+            right: '-25px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'rgba(169,247,121, 0.7)',
+              borderRadius: '5px',
+              textAlign: 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <i style={{ padding: 5 }}>{text}</i>
+          </div>
+          <div
+            style={{
+              margin: 'auto',
+              width: 0,
+              height: 0,
+              borderTop: '5px solid rgba(169,247,121.7)',
+              borderRight: '10px solid transparent',
+              borderLeft: '10px solid transparent',
+            }}
+          />
+        </div>
+      )
+    } else if (type === 'client') {
+      iconMarkup = renderToStaticMarkup(
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            width: 30,
+            height: 30,
+            position: 'absolute',
+            top: '-10px',
+            right: '-10px',
+            backgroundColor: 'rgba(0,0,0, 0.5)',
+            borderRadius: '50%',
+            border: '1px solid #ffff',
+            backgroundColor: '#8E44AD',
+            textAlign: 'center',
+          }}
+        >
+          <i style={{ padding: 5 }}>{text}</i>
+        </div>
+      )
+    }
+    const customMarkerIcon = divIcon({
+      html: iconMarkup,
+    })
+    return customMarkerIcon
+  }
+
   render() {
     const { center, zoom } = this.state
-    //console.log('+++++++++++++++++++++props.providers', this.props.providers)
+    const customMarkerIconOrigin = this.customMarker('Origen', 'origin')
+    const customMarkerIconDestiny = this.customMarker('Destino', 'origin')
+
+    if (this.props.drawRoute) {
+      this.drawRouteSearchFilter(
+        this.props.providerInChat.lat,
+        this.props.providerInChat.lng,
+        this.props.lat,
+        this.props.len
+      )
+      this.props.changeStateMap()
+    }
+
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">
         {this.props.searchProviderMode ? (
@@ -465,6 +726,7 @@ class MapServiceTacking extends Component {
                       }
                     })
                     .map(item => {
+                      //this.setState({ drawRoutePoints: [] })
                       return (
                         <ProviderItemSearchFilter
                           key={item.id}
@@ -488,6 +750,9 @@ class MapServiceTacking extends Component {
                           }
                           activeProviderChat={this.props.activeProviderChat}
                           activeProviderCall={this.props.activeProviderCall}
+                          originLat={this.props.lat}
+                          originLng={this.props.len}
+                          drawRoute={this.drawRouteSearchFilter}
                         />
                       )
                     })
@@ -503,6 +768,156 @@ class MapServiceTacking extends Component {
             className="mapSearch"
             placeholder="Introduce una ubicación (Opcional)"
           />*/}
+          {center.lat !== null && center.lng !== null ? (
+            <MapLeaflet
+              ref={ref => {
+                this.map = ref
+              }}
+              center={[center.lat, center.lng]}
+              zoom={zoom}
+            >
+              <FullscreenControl position="bottomright" />
+              <Circle
+                center={[this.props.lat, this.props.len]}
+                radius={this.metersToPixels(this.props.lat, this.state.m)}
+              />
+              <Marker
+                position={[this.props.lat, this.props.len]}
+                icon={customMarkerIconOrigin}
+                boxZoom={true}
+              >
+                <Popup>
+                  <span>:{this.props.address}</span>
+                </Popup>
+              </Marker>
+              {/*Punto de destino Modificable desde cc*/}
+              {this.props.serviceDestination ? (
+                <Marker
+                  position={[
+                    this.props.serviceDestination.position.latitude,
+                    this.props.serviceDestination.position.longitude,
+                  ]}
+                  icon={customMarkerIconDestiny}
+                >
+                  <Popup className="popup-destination">
+                    <span>{this.props.serviceDestination.address}</span>
+                  </Popup>
+                </Marker>
+              ) : (
+                ''
+              )}
+              }{/*Cliente en vivo con WS*/}
+              {this.props.clientGLData !== '' &&
+              this.props.clientGLData !== null ? (
+                <FeatureGroup color="purple">
+                  <Popup>
+                    {this.props.clientGLData.info.name}{' '}
+                    {this.props.clientGLData.info.lastName}
+                  </Popup>
+                  <Marker
+                    position={[
+                      this.props.clientDataLat,
+                      this.props.clientDataLng,
+                    ]}
+                    className="icon-client"
+                    icon={this.customMarker(
+                      `${this.props.clientGLData.info.name.charAt(
+                        0
+                      )}${this.props.clientGLData.info.lastName.charAt(0)}`,
+                      'client'
+                    )}
+                  />
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution="<b>Tiempo de llegada:</b>"
+                  />
+                </FeatureGroup>
+              ) : (
+                ''
+              )}
+              {/*Proveedores en vivo*/}
+              {this.props.providers
+                ? this.props.providers
+                    .filter(item => {
+                      const resp = this.providerFiltering(item)
+                      item.distance = resp.distance
+                      if (resp.response) {
+                        item.classNameLocation = 'inTheRadio'
+                      } else {
+                        item.classNameLocation = 'outTheRadio'
+                      }
+                      return true
+                    })
+                    .map(provider => {
+                      if (
+                        provider.lat !== undefined &&
+                        provider.lng !== undefined
+                      ) {
+                        return (
+                          <CircleMarker
+                            fillColor={
+                              provider.classNameLocation === 'inTheRadio' &&
+                              this.state.activeProvider === provider.id
+                                ? 'blue'
+                                : 'red'
+                            }
+                            fillOpacity={1}
+                            radius={10}
+                            key={provider.id}
+                            center={[provider.lat, provider.lng]}
+                          >
+                            <Popup>
+                              Proveedor {provider.id}
+                              <br />
+                              {provider.info.name} {provider.info.lastName}
+                              <br />
+                              <span>{provider.info.description}</span>
+                              <br />
+                              <span style={{ color: '#ddd' }}>
+                                {provider.info.services.category}
+                              </span>
+                            </Popup>
+                          </CircleMarker>
+                        )
+                      }
+                    })
+                : null}
+              {this.state.providersOrigins
+                ? this.state.providersOrigins.map(providerOriginAddress => (
+                    <Marker
+                      key={providerOriginAddress.id}
+                      position={[
+                        providerOriginAddress.lat,
+                        providerOriginAddress.lng,
+                      ]}
+                      color={providerOriginAddress.color}
+                    >
+                      <Popup>providerOriginAddress</Popup>
+                    </Marker>
+                  ))
+                : ''}
+              {this.props.route && (
+                <Polyline
+                  color="#00FFFF"
+                  weight={10}
+                  opacity={0.5}
+                  positions={this.state.polyline}
+                />
+              )}
+              {this.state.drawRoute && (
+                <Polyline
+                  color="#00FFFF"
+                  weight={6}
+                  opacity={0.7}
+                  positions={this.state.drawRoutePoints}
+                  opacity={0.9}
+                />
+              )}
+            </MapLeaflet>
+          ) : (
+            ''
+          )}
+          {/* 
           <StateContainer>
             <span
               className={
@@ -544,7 +959,7 @@ class MapServiceTacking extends Component {
               }
             }}
           >
-            {/*Punto de Encuentro Modificable desde cc*/}
+            {/*Punto de Encuentro Modificable desde cc/}
             <CMarkerClientServicePointer
               lat={this.props.lat}
               lng={this.props.len}
@@ -554,7 +969,7 @@ class MapServiceTacking extends Component {
               preText="Origen del servicio:"
               destinyData={this.state.destinyData}
             />
-            {/*Punto de destino Modificable desde cc*/ this.props
+            {/*Punto de destino Modificable desde cc/ this.props
               .serviceDestination ? (
               <CMarkerClientServicePointer
                 lat={this.props.serviceDestination.position.latitude}
@@ -568,7 +983,7 @@ class MapServiceTacking extends Component {
             ) : (
               ''
             )}
-            {/*Cliente en vivo con WS*/}
+            {/*Cliente en vivo con WS*}
             {this.props.clientGLData !== '' &&
             this.props.clientGLData !== null ? (
               <CMarker
@@ -584,7 +999,7 @@ class MapServiceTacking extends Component {
             ) : (
               ''
             )}
-            {/*Proveedores en vivo*/}
+            {/*Proveedores en vivo/}
             {this.props.providers
               ? this.props.providers
                   .filter(item => {
@@ -672,6 +1087,7 @@ class MapServiceTacking extends Component {
               ''
             )}
           </ButtonContainer>
+        */}
         </div>
       </div>
     ) : null

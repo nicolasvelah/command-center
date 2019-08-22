@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default class Chat extends React.Component {
+export default class Chat extends React.PureComponent {
   render() {
     return (
       <div className="notes">

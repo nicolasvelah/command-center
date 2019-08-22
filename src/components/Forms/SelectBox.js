@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default class SelectBox extends React.Component {
+export default class SelectBox extends React.PureComponent {
   render() {
     return (
       <div>

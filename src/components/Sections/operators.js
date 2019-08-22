@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getUser, getAccessToken } from '../../services/auth'
 import Chart from 'react-google-charts'
 import '../../assets/css/operators.css'
 import flag from '../../images/flag.svg'
 import star from '../../images/star-full.svg'
 
-export default class Operators extends Component {
+export default class Operators extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
@@ -21,13 +21,14 @@ export default class Operators extends Component {
   //OPERATORS
   getOperators = async () => {
     try {
+      const accessToken = await getAccessToken()
       const data = await axios.post(
         `${process.env.API_URL}/getOperators`,
         {},
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -46,13 +47,14 @@ export default class Operators extends Component {
     totalTasks = [{ asignet: 0, incourse: 0, resolve: 0, total: 0 }]
     operators = await operators.map(async item => {
       try {
+        const accessToken = await getAccessToken()
         const data = await axios.post(
           `${process.env.API_URL}/getOperatorsOrdersCount/` + item.id,
           {},
           {
             headers: {
               'Content-Type': 'application/json',
-              'x-access-token': getUser().token,
+              'x-access-token': accessToken,
             },
           }
         )

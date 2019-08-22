@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { confirmAlert } from 'react-confirm-alert'
 
 import Chat from './ChatV2'
-import MapServiceTacking from '../Maps/MapServiceTackingV2'
+import MapServiceTacking from '../Maps/MapServiceTackingV3'
 import { findUserById } from '../../services/wsConect'
 import {
   geocodeLatLng,
@@ -85,6 +85,7 @@ class ChatContainer extends React.Component {
       city: null,
       providers: [],
       ProvidersActiveServices: [],
+      drawRoute: false,
     }
     this.updateClient = this.updateClient.bind(this)
     this.haveToOpenChat = this.haveToOpenChat.bind(this)
@@ -94,8 +95,8 @@ class ChatContainer extends React.Component {
   async componentDidMount() {
     //GET USER GEOLOCALIZATION DATA
     const clientGLData = await findUserById(this.props.item.clientId, true)
-    await this.haveToOpenChat(this.props.item.status.name, 'init')
-
+    console.log('++Iniciando haveToOpenChat ++')
+    await this.haveToOpenChat(this.props.item.status.name, 'init', 'init')
     let { searchProviderMode } = this.state
     if (this.props.item.provider !== null) {
       if (this.props.item.providerId !== 0) {
@@ -163,6 +164,7 @@ class ChatContainer extends React.Component {
 
     intercept(this.props.mapStore, 'clientIdWS', change => {
       if (context.props.item.clientId === change.newValue.id) {
+        /*
         console.log(
           'este actor se esta moviendo:',
           change.newValue.id +
@@ -172,6 +174,7 @@ class ChatContainer extends React.Component {
             this.props.item.client.lastName
         )
         console.log('este actor se esta moviendo xx:', change.newValue)
+        */
 
         let { clientData } = this.state
         const location = change.newValue.location.coordinates
@@ -260,7 +263,7 @@ class ChatContainer extends React.Component {
     }
   }
 
-  haveToOpenChat = async (statusInit, from) => {
+  haveToOpenChat = async (statusInit, from, type) => {
     let haveToOpen = false
 
     let { status } = this.state
@@ -312,10 +315,11 @@ class ChatContainer extends React.Component {
     if (from === 'closeChat') {
       await this.props.desactivateTask(item.id, true)
     } else {
-      await this.props.openChatTriger(item.id, status)
+      await this.props.openChatTriger(item.id, status, type)
       this.setState({ status, openChat: haveToOpen })
     }
     this.props.chatTopPositionTriger()
+    console.log('haveToOpenChat From: ' + from + ' statusInit: ' + statusInit)
   }
 
   focusChat = id => {
@@ -522,6 +526,11 @@ class ChatContainer extends React.Component {
       //console.log('setChatFav', providers)
     }
   }
+
+  changeStateMap = () => {
+    this.setState({ drawRoute: false })
+  }
+
   render() {
     const { item } = this.props
 
@@ -607,7 +616,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'openChat')
+                  this.haveToOpenChat(item.status.name, 'openChat', 'click')
                 }}
                 className="openChat"
               >
@@ -616,7 +625,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={async e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'NotAswere')
+                  this.haveToOpenChat(item.status.name, 'NotAswere', 'click')
                 }}
                 className="NotAswere"
               >
@@ -628,7 +637,7 @@ class ChatContainer extends React.Component {
               <div
                 onClick={e => {
                   e.preventDefault()
-                  this.haveToOpenChat(item.status.name, 'closeChat')
+                  this.haveToOpenChat(item.status.name, 'closeChat', 'click')
                 }}
                 className="closeChat"
               >
@@ -663,12 +672,16 @@ class ChatContainer extends React.Component {
                   socket={this.props.socket}
                   clientGLData={this.state.clientData}
                   clientDataLat={
-                    this.state.clientData !== null
+                    this.state.clientData !== null &&
+                    this.state.clientData.lat !== undefined &&
+                    this.state.clientData.lat !== null
                       ? this.state.clientData.lat
                       : 0
                   }
                   clientDataLng={
-                    this.state.clientData !== null
+                    this.state.clientData !== null &&
+                    this.state.clientData.lng !== undefined &&
+                    this.state.clientData.lng !== null
                       ? this.state.clientData.lng
                       : 0
                   }
@@ -685,6 +698,7 @@ class ChatContainer extends React.Component {
                   ProvidersActiveServices={this.state.ProvidersActiveServices}
                   service={item.service.name}
                   orderId={item.id}
+                  route={item.route}
                   addRemoveFavorite={this.props.addRemoveFavorite}
                   updateProvidersFavorite={this.updateProvidersFavorite}
                   asignProvider={this.asignProvider}
@@ -693,6 +707,10 @@ class ChatContainer extends React.Component {
                   activeProviderCall={this.activeProviderCall}
                   searchProviderMode={this.state.searchProviderMode}
                   updateProvider={this.updateProvider}
+                  changeStateMap={this.changeStateMap}
+                  providerInChat={this.state.providerInChat}
+                  item={item}
+                  drawRoute={this.state.drawRoute}
                 />
               ) : (
                 ''
@@ -785,12 +803,17 @@ class ChatContainer extends React.Component {
                         <span
                           onClick={e => {
                             e.preventDefault()
+                           
+                            console.log('Draw Route chatContainer')
+                            this.setState({ drawRoute: true })
+                            /*
                             this.refs.mapa.wrappedInstance.calculateAndDisplayRoute(
                               this.state.providerInChat.lat,
                               this.state.providerInChat.lng,
                               this.state.providerInChat.id,
                               false
                             )
+                            */
                           }}
                         >
                           Datos de ruta

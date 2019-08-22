@@ -6,7 +6,7 @@ import Notes from '../Sections/Notes'
 import phone from '../../images/phone.svg'
 import circleDown from '../../images/circle-down.svg'
 import axios from 'axios'
-import { getUser } from '../../services/auth'
+import { getUser, getAccessToken } from '../../services/auth'
 import TaskClientData from './TaskClientData'
 import TaskProviderData from './TaskProviderData'
 import scrollIntoView from 'scroll-into-view'
@@ -103,6 +103,7 @@ export default class Task extends Component {
   sendMenssage = async e => {
     console.log('inicai envio')
     if (this.state.Menssage !== '') {
+      const accessToken = await getAccessToken()
       const result = await axios.post(
         `${process.env.API_URL}/sendMessage`,
         {
@@ -114,7 +115,7 @@ export default class Task extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -163,11 +164,13 @@ export default class Task extends Component {
         is911: is911,
       })
     }
+    console.log('Mensaje: ', e.target.value.length)
     this.scrollToBottom(id)
   }
 
   sendNote = async e => {
     try {
+      const accessToken = await getAccessToken()
       await axios.post(
         `${process.env.API_URL}/orders/addNote`,
         {
@@ -177,7 +180,7 @@ export default class Task extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -220,6 +223,7 @@ export default class Task extends Component {
 
   asigne911 = async e => {
     try {
+      const accessToken = await getAccessToken()
       const response = await axios.post(
         `${process.env.API_URL}/orders/assignTo911`,
         {
@@ -229,7 +233,7 @@ export default class Task extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -252,6 +256,7 @@ export default class Task extends Component {
     console.log('orderId', this.props.task[0].id)
     console.log('x-access-token', getUser().token)
     try {
+      const accessToken = await getAccessToken()
       await axios.post(
         `${process.env.API_URL}/orders/updateStatus`,
         {
@@ -261,7 +266,7 @@ export default class Task extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -329,6 +334,7 @@ export default class Task extends Component {
     const birthdayCoverterTxt = yyyy + '-' + mmm + '-' + dd
 
     try {
+      const accessToken = await getAccessToken()
       await axios.post(
         `${process.env.API_URL}/clients/updateInfo`,
         {
@@ -346,7 +352,7 @@ export default class Task extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )

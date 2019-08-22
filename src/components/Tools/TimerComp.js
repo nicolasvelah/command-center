@@ -34,7 +34,7 @@ const TimerContainer = styled.div`
   }
 `
 
-export default class TimerComp extends React.Component {
+export default class TimerComp extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
@@ -42,7 +42,7 @@ export default class TimerComp extends React.Component {
       diffMs: new Date() - new Date(this.props.orderDate),
     }
   }
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let { alertState, diffMs } = this.state
     if (diffMs > 120000) {
       alertState = 2

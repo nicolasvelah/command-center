@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { DatePickerInput } from 'rc-datepicker'
 import InfiniteScroll from 'react-infinite-scroller'
 import axios from 'axios'
 import Select from 'react-select'
-import { getUser, logoutLocal } from '../../services/auth'
+import { logoutLocal, getAccessToken } from '../../services/auth'
 import Modal from '../Tools/modal'
 import Task from '../Board/Task'
 import ExcelDownload from '../Tools/ExcelDownload'
@@ -27,7 +27,7 @@ const columnsAll = [
   { label: 'Ciudad', value: 'Ciudad', id: 8 },
   { label: 'Direccion', value: 'Direccion', id: 9 },
 ]
-export default class Deliveries extends Component {
+export default class Deliveries extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
@@ -102,7 +102,7 @@ export default class Deliveries extends Component {
       } else {
         page = 1
       }
-
+      const accessToken = await getAccessToken()
       const data = await axios.post(
         `${process.env.API_URL}/orders/getOrdersDeliveries/${page}/limit/20`,
         {
@@ -112,7 +112,7 @@ export default class Deliveries extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -163,6 +163,7 @@ export default class Deliveries extends Component {
   reopenTask = async id => {
     console.log('update status for order ID:', id)
     try {
+      const accessToken = await getAccessToken()
       await axios.post(
         `${process.env.API_URL}/orders/updateStatus`,
         {
@@ -172,7 +173,7 @@ export default class Deliveries extends Component {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-access-token': getUser().token,
+            'x-access-token': accessToken,
           },
         }
       )
@@ -214,6 +215,7 @@ export default class Deliveries extends Component {
 
   //CHAT
   getMessages = async id => {
+    const accessToken = await getAccessToken()
     const messages = await axios.post(
       `${process.env.API_URL}/getMessages`,
       {
@@ -222,7 +224,7 @@ export default class Deliveries extends Component {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )
@@ -235,6 +237,7 @@ export default class Deliveries extends Component {
 
   //NOTES
   getNotes = async id => {
+    const accessToken = await getAccessToken()
     const notes = await axios.post(
       `${process.env.API_URL}/orders/getNotes`,
       {
@@ -243,7 +246,7 @@ export default class Deliveries extends Component {
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
         },
       }
     )

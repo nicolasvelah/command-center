@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/messaging'
 import axios from 'axios'
-import { getUser } from '../services/auth'
+import { getAccessToken } from '../services/auth'
 
 export const initializeFirebase = () => {
   if (typeof window !== 'undefined') {
@@ -26,14 +26,14 @@ export const askForPermissioToReceiveNotifications = async () => {
     //console.log('solicito permiso')
     const token = await messaging.getToken()
     //console.log('paso 4 ')
-
+    const accessToken = await getAccessToken()
     await axios.post(
       `${process.env.API_URL}/updateToken`,
       {},
       {
         headers: {
           'Content-Type': 'application/json',
-          'x-access-token': getUser().token,
+          'x-access-token': accessToken,
           token: token,
         },
       }

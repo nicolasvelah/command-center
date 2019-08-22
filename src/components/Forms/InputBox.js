@@ -1,7 +1,7 @@
 import React from 'react'
 import InputMask from 'react-input-mask'
 
-export default class InputBox extends React.Component {
+export default class InputBox extends React.PureComponent {
   render() {
     return (
       <div>
