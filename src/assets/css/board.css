@@ -600,6 +600,23 @@
   /*margin-bottom: 30px;*/
 }
 
+.leaflet-container {
+  position: relative;
+}
+
+.leaflet-pane {
+  z-index: 1;
+}
+
+.button-leaflet {
+  position: absolute;
+  z-index: 500;
+}
+
+.button-leaflet-provider {
+  background-color: rgba(0, 0, 255, 0.7)
+}
+
 @media (max-width: 767px) {
   .board {
     display: block;

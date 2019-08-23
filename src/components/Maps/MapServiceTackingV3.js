@@ -38,6 +38,7 @@ import 'react-leaflet-fullscreen/dist/styles.css'
 import FullscreenControl from 'react-leaflet-fullscreen'
 
 import '../../assets/css/map.css'
+import { Provider } from 'mobx-react'
 
 /*
 const ButtonContainer = styled.div`
@@ -583,7 +584,7 @@ class MapServiceTacking extends Component {
     }
   }
 
-  customMarker = (text, type) => {
+  customMarker = (text, type, activeProvider) => {
     let iconMarkup
     if (type === 'origin') {
       iconMarkup = renderToStaticMarkup(
@@ -644,6 +645,49 @@ class MapServiceTacking extends Component {
           <i style={{ padding: 5 }}>{text}</i>
         </div>
       )
+    } else if (type === 'provider') {
+      if (activeProvider) {
+        iconMarkup = renderToStaticMarkup(
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              width: 40,
+              height: 40,
+              position: 'absolute',
+              top: '-10px',
+              right: '-10px',
+              backgroundColor: 'rgb(0,0,225)',
+              borderRadius: '50%',
+              border: '3px solid #ffff',
+              textAlign: 'center',
+            }}
+          >
+            <i style={{ padding: 5 }}>{text}</i>
+          </div>
+        )
+      } else {
+        console.log('entro noprovider')
+        iconMarkup = renderToStaticMarkup(
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              width: 20,
+              height: 20,
+              position: 'absolute',
+              top: '-10px',
+              right: '-10px',
+              backgroundColor: 'rgb(225, 0, 0)',
+              borderRadius: '50%',
+              border: '3px solid #ffff',
+              textAlign: 'center',
+            }}
+          />
+        )
+      }
     }
     const customMarkerIcon = divIcon({
       html: iconMarkup,
@@ -783,48 +827,88 @@ class MapServiceTacking extends Component {
                   <span>:{this.props.address}</span>
                 </Popup>
               </Marker>
+              <div
+                className="button-leaflet"
+                onClick={e => {
+                  e.preventDefault()
+                  this.centerActor(this.props.lat, this.props.len)
+                }}
+                style={{ background: '#53a93f' }}
+              >
+                <b>Origen</b>
+              </div>
               {/*Punto de destino Modificable desde cc*/}
               {this.props.serviceDestination ? (
-                <Marker
-                  position={[
-                    this.props.serviceDestination.position.latitude,
-                    this.props.serviceDestination.position.longitude,
-                  ]}
-                  icon={customMarkerIconDestiny}
-                >
-                  <Popup className="popup-destination">
-                    <span>{this.props.serviceDestination.address}</span>
-                  </Popup>
-                </Marker>
+                <>
+                  <Marker
+                    position={[
+                      this.props.serviceDestination.position.latitude,
+                      this.props.serviceDestination.position.longitude,
+                    ]}
+                    icon={customMarkerIconDestiny}
+                  >
+                    <Popup className="popup-destination">
+                      <span>{this.props.serviceDestination.address}</span>
+                    </Popup>
+                  </Marker>
+                  <div
+                    className="button-leaflet"
+                    onClick={e => {
+                      e.preventDefault()
+                      this.centerActor(
+                        this.props.serviceDestination.position.latitude,
+                        this.props.serviceDestination.position.longitude
+                      )
+                    }}
+                    style={{ background: '#53a93f' }}
+                  >
+                    <b>Destino</b>
+                  </div>
+                </>
               ) : (
                 ''
               )}
               }{/*Cliente en vivo con WS*/}
               {this.props.clientGLData !== '' &&
               this.props.clientGLData !== null ? (
-                <FeatureGroup color="purple">
-                  <Popup>
-                    {this.props.clientGLData.info.name}{' '}
-                    {this.props.clientGLData.info.lastName}
-                  </Popup>
-                  <Marker
-                    position={[
-                      this.props.clientDataLat,
-                      this.props.clientDataLng,
-                    ]}
-                    className="icon-client"
-                    icon={this.customMarker(
-                      `${this.props.clientGLData.info.name.charAt(
-                        0
-                      )}${this.props.clientGLData.info.lastName.charAt(0)}`,
-                      'client'
-                    )}
-                  />
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution="<b>Tiempo de llegada:</b>"
-                  />
-                </FeatureGroup>
+                <>
+                  <FeatureGroup color="purple">
+                    <Popup>
+                      {this.props.clientGLData.info.name}{' '}
+                      {this.props.clientGLData.info.lastName}
+                    </Popup>
+                    <Marker
+                      position={[
+                        this.props.clientDataLat,
+                        this.props.clientDataLng,
+                      ]}
+                      className="icon-client"
+                      icon={this.customMarker(
+                        `${this.props.clientGLData.info.name.charAt(
+                          0
+                        )}${this.props.clientGLData.info.lastName.charAt(0)}`,
+                        'client'
+                      )}
+                    />
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution="<b>Itzam</b>"
+                    />
+                  </FeatureGroup>
+                  <div
+                    className="button-leaflet"
+                    onClick={e => {
+                      e.preventDefault()
+                      this.centerActor(
+                        this.props.clientDataLat,
+                        this.props.clientDataLng
+                      )
+                    }}
+                    style={{ background: '#53a93f' }}
+                  >
+                    <b>Cliente</b>
+                  </div>
+                </>
               ) : (
                 ''
               )}
@@ -845,30 +929,49 @@ class MapServiceTacking extends Component {
                       provider =>
                         provider.lat !== undefined &&
                         provider.lng !== undefined && (
-                          <CircleMarker
-                            fillColor={
-                              provider.classNameLocation === 'inTheRadio' &&
-                              this.state.activeProvider === provider.id
-                                ? 'blue'
-                                : 'red'
-                            }
-                            fillOpacity={1}
-                            radius={10}
-                            key={provider.id}
-                            center={[provider.lat, provider.lng]}
-                          >
-                            <Popup>
-                              Proveedor {provider.id}
-                              <br />
-                              {provider.info.name} {provider.info.lastName}
-                              <br />
-                              <span>{provider.info.description}</span>
-                              <br />
-                              <span style={{ color: '#ddd' }}>
-                                {provider.info.services.category}
-                              </span>
-                            </Popup>
-                          </CircleMarker>
+                          <>
+                            <Marker
+                              color={
+                                provider.classNameLocation === 'inTheRadio' &&
+                                this.state.activeProvider === provider.id
+                                  ? 'blue'
+                                  : 'red'
+                              }
+                              key={provider.id}
+                              position={[provider.lat, provider.lng]}
+                              className="icon-client"
+                              icon={this.customMarker(
+                                `${provider.info.name.charAt(
+                                  0
+                                )}${provider.info.lastName.charAt(0)}`,
+                                'provider',
+                                provider.classNameLocation === 'inTheRadio' &&
+                                  this.state.activeProvider === provider.id
+                                  ? true
+                                  : false
+                              )}
+                            >
+                              <Popup>
+                                Proveedor {provider.id}
+                                <br />
+                                {provider.info.name} {provider.info.lastName}
+                                <br />
+                                <span>{provider.info.description}</span>
+                                <br />
+                                <span style={{ color: '#ddd' }}>
+                                  {provider.info.services.category}
+                                </span>
+                              </Popup>
+                            </Marker>
+                            {provider.classNameLocation === 'inTheRadio' &&
+                              this.state.activeProvider === provider.id && (
+                                <div
+                                  className="button-leaflet button-leaflet-provider"
+                                >
+                                  HOLAASASDASAA
+                                </div>
+                              )}
+                          </>
                         )
                     )
                 : null}
