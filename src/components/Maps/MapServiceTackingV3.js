@@ -759,7 +759,9 @@ class MapServiceTacking extends Component {
             className="mapSearch"
             placeholder="Introduce una ubicación (Opcional)"
           />*/}
-          {center.lat !== null && center.lng !== null ? (
+          {center.lat !== null &&
+          center.lng !== null &&
+          typeof window !== 'undefined' ? (
             <MapLeaflet
               ref={ref => {
                 this.map = ref
