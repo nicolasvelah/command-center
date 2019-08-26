@@ -609,12 +609,17 @@
 }
 
 .button-leaflet {
+  background: rgb(83, 169, 63, 0.5);
   position: absolute;
   z-index: 500;
-}
-
-.button-leaflet-provider {
-  background-color: rgba(0, 0, 255, 0.7)
+  top: 10px;
+  border: 2px solid #fff;
+  padding: 5px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }
 
 @media (max-width: 767px) {

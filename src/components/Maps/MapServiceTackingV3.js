@@ -27,7 +27,6 @@ import {
   Marker,
   Popup,
   TileLayer,
-  CircleMarker,
   FeatureGroup,
   Circle,
   Polyline,
@@ -38,7 +37,7 @@ import 'react-leaflet-fullscreen/dist/styles.css'
 import FullscreenControl from 'react-leaflet-fullscreen'
 
 import '../../assets/css/map.css'
-import { Provider } from 'mobx-react'
+//import { Provider } from 'mobx-react'
 
 /*
 const ButtonContainer = styled.div`
@@ -146,12 +145,15 @@ class MapServiceTacking extends Component {
       //console.log('Leaflet Route Converted', routeConverted2)
       this.setState({ polyline: routeConverted2 })
     }
-
     this.setState({
       unmount: false,
       ProvidersActiveServices,
       service: this.props.service,
       zoomLevel: this.map.leafletElement.getZoom(),
+      center: {
+        lat: Number(this.props.lat),
+        lng: Number(this.props.len),
+      },
     })
   }
 
@@ -668,7 +670,6 @@ class MapServiceTacking extends Component {
           </div>
         )
       } else {
-        console.log('entro noprovider')
         iconMarkup = renderToStaticMarkup(
           <div
             style={{
@@ -824,7 +825,7 @@ class MapServiceTacking extends Component {
                 boxZoom={true}
               >
                 <Popup>
-                  <span>:{this.props.address}</span>
+                  <span>{this.props.address}</span>
                 </Popup>
               </Marker>
               <div
@@ -833,7 +834,7 @@ class MapServiceTacking extends Component {
                   e.preventDefault()
                   this.centerActor(this.props.lat, this.props.len)
                 }}
-                style={{ background: '#53a93f' }}
+                style={{ left: '10px' }}
               >
                 <b>Origen</b>
               </div>
@@ -860,7 +861,7 @@ class MapServiceTacking extends Component {
                         this.props.serviceDestination.position.longitude
                       )
                     }}
-                    style={{ background: '#53a93f' }}
+                    style={{ left: '110px' }}
                   >
                     <b>Destino</b>
                   </div>
@@ -904,7 +905,7 @@ class MapServiceTacking extends Component {
                         this.props.clientDataLng
                       )
                     }}
-                    style={{ background: '#53a93f' }}
+                    style={{ left: '215px' }}
                   >
                     <b>Cliente</b>
                   </div>
@@ -929,7 +930,7 @@ class MapServiceTacking extends Component {
                       provider =>
                         provider.lat !== undefined &&
                         provider.lng !== undefined && (
-                          <>
+                          <div key={provider.id}>
                             <Marker
                               color={
                                 provider.classNameLocation === 'inTheRadio' &&
@@ -937,7 +938,6 @@ class MapServiceTacking extends Component {
                                   ? 'blue'
                                   : 'red'
                               }
-                              key={provider.id}
                               position={[provider.lat, provider.lng]}
                               className="icon-client"
                               icon={this.customMarker(
@@ -966,12 +966,17 @@ class MapServiceTacking extends Component {
                             {provider.classNameLocation === 'inTheRadio' &&
                               this.state.activeProvider === provider.id && (
                                 <div
-                                  className="button-leaflet button-leaflet-provider"
+                                  className="button-leaflet"
+                                  style={{ left: '310px' }}
+                                  onClick={e => {
+                                    e.preventDefault()
+                                    this.centerActor(provider.lat, provider.lng)
+                                  }}
                                 >
-                                  HOLAASASDASAA
+                                  <span>Proveedor</span>
                                 </div>
                               )}
-                          </>
+                          </div>
                         )
                     )
                 : null}
