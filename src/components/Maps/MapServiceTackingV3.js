@@ -112,6 +112,7 @@ class MapServiceTacking extends Component {
       polyline: [],
       drawRoute: false,
       drawRoutePoints: [],
+      selectedProvider: null,
     }
     this.calculateAndDisplayRoute = this.calculateAndDisplayRoute.bind(this)
     this.centerActor = this.centerActor.bind(this)
@@ -431,7 +432,13 @@ class MapServiceTacking extends Component {
     this.setState({ ActiveSortProv })
   }
   setActiveProvider = activeProvider => {
-    this.setState({ activeProvider })
+    
+    this.props.providers.forEach(provider => {
+      if(activeProvider === provider.id) {
+        this.setState({ activeProvider, selectedProvider: provider })
+      }
+    });
+    
   }
   favioriteInRef(id) {
     /*Array.from(this.RefItemSearchFilter.values())
@@ -664,6 +671,7 @@ class MapServiceTacking extends Component {
               borderRadius: '50%',
               border: '3px solid #ffff',
               textAlign: 'center',
+              zIndex: 500
             }}
           >
             <i style={{ padding: 5 }}>{text}</i>
@@ -828,16 +836,6 @@ class MapServiceTacking extends Component {
                   <span>{this.props.address}</span>
                 </Popup>
               </Marker>
-              <div
-                className="button-leaflet"
-                onClick={e => {
-                  e.preventDefault()
-                  this.centerActor(this.props.lat, this.props.len)
-                }}
-                style={{ left: '10px' }}
-              >
-                <b>Origen</b>
-              </div>
               {/*Punto de destino Modificable desde cc*/}
               {this.props.serviceDestination ? (
                 <>
@@ -852,19 +850,6 @@ class MapServiceTacking extends Component {
                       <span>{this.props.serviceDestination.address}</span>
                     </Popup>
                   </Marker>
-                  <div
-                    className="button-leaflet"
-                    onClick={e => {
-                      e.preventDefault()
-                      this.centerActor(
-                        this.props.serviceDestination.position.latitude,
-                        this.props.serviceDestination.position.longitude
-                      )
-                    }}
-                    style={{ left: '110px' }}
-                  >
-                    <b>Destino</b>
-                  </div>
                 </>
               ) : (
                 ''
@@ -891,24 +876,12 @@ class MapServiceTacking extends Component {
                         'client'
                       )}
                     />
+
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       attribution="<b>Itzam</b>"
                     />
                   </FeatureGroup>
-                  <div
-                    className="button-leaflet"
-                    onClick={e => {
-                      e.preventDefault()
-                      this.centerActor(
-                        this.props.clientDataLat,
-                        this.props.clientDataLng
-                      )
-                    }}
-                    style={{ left: '215px' }}
-                  >
-                    <b>Cliente</b>
-                  </div>
                 </>
               ) : (
                 ''
@@ -963,19 +936,7 @@ class MapServiceTacking extends Component {
                                 </span>
                               </Popup>
                             </Marker>
-                            {provider.classNameLocation === 'inTheRadio' &&
-                              this.state.activeProvider === provider.id && (
-                                <div
-                                  className="button-leaflet"
-                                  style={{ left: '310px' }}
-                                  onClick={e => {
-                                    e.preventDefault()
-                                    this.centerActor(provider.lat, provider.lng)
-                                  }}
-                                >
-                                  <span>Proveedor</span>
-                                </div>
-                              )}
+                            
                           </div>
                         )
                     )
@@ -1010,6 +971,61 @@ class MapServiceTacking extends Component {
                   opacity={0.9}
                 />
               )}
+              <div className="container-button">
+                <div
+                  className="button-leaflet"
+                  onClick={e => {
+                    e.preventDefault()
+                    this.centerActor(this.props.lat, this.props.len)
+                  }}
+                >
+                  <b>Origen</b>
+                </div>
+                {this.props.serviceDestination && (
+                  <div
+                    className="button-leaflet"
+                    onClick={e => {
+                      e.preventDefault()
+                      this.centerActor(
+                        this.props.serviceDestination.position.latitude,
+                        this.props.serviceDestination.position.longitude
+                      )
+                    }}
+                  >
+                    <b>Destino</b>
+                  </div>
+                )}
+                {this.props.clientGLData !== '' &&
+                  this.props.clientGLData !== null && (
+                    <div
+                      className="button-leaflet"
+                      onClick={e => {
+                        e.preventDefault()
+                        this.centerActor(
+                          this.props.clientDataLat,
+                          this.props.clientDataLng
+                        )
+                      }}
+                    >
+                      <b>Cliente</b>
+                    </div>
+                  )}
+
+                {this.state.activeProvider && (
+                  <div
+                    className="button-leaflet"
+                    onClick={e => {
+                      e.preventDefault()
+                      this.centerActor(
+                        this.state.selectedProvider.lat,
+                        this.state.selectedProvider.lng
+                      )
+                    }}
+                  >
+                    <b>Proveedor</b>
+                  </div>
+                )}
+              </div>
             </MapLeaflet>
           ) : (
             ''

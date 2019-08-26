@@ -600,6 +600,14 @@
   /*margin-bottom: 30px;*/
 }
 
+.container-button {
+  position: absolute;
+  z-index: 500;
+  display: flex;
+  margin: 10px;
+  bottom: 0px;
+}
+
 .leaflet-container {
   position: relative;
 }
@@ -609,11 +617,11 @@
 }
 
 .button-leaflet {
-  background: rgb(83, 169, 63, 0.5);
-  position: absolute;
-  z-index: 500;
-  top: 10px;
-  border: 2px solid #fff;
+  background: rgb(83, 169, 63);
+  /*position: absolute;*/
+  /*z-index: 500;*/
+  margin: 0px 5px;
+  /*border: 2px solid #fff;*/
   padding: 5px;
   border-radius: 10px;
   display: flex;

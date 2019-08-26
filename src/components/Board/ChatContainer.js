@@ -249,6 +249,7 @@ class ChatContainer extends React.Component {
   }
   updateProvidersFavorite = async (id, fav) => {
     let { providers } = this.state
+    /*
     providers.map(provider => {
       if (provider.id === id) {
         provider.localFavorite = fav
@@ -256,6 +257,20 @@ class ChatContainer extends React.Component {
       return provider
     })
     this.setState({ providers })
+    if (this.state.providerInChat) {
+      if (id === this.state.providerInChat.id) {
+        this.setChatFav(fav)
+      }
+    }
+    */
+    providers.forEach(provider => {
+      if (provider.id === id) {
+        console.log('Provider', provider, this.state.providerInChat)
+        provider.localFavorite = fav
+      }
+    })
+    this.setState({ providers })
+
     if (this.state.providerInChat) {
       if (id === this.state.providerInChat.id) {
         this.setChatFav(fav)
@@ -400,18 +415,17 @@ class ChatContainer extends React.Component {
   }
 
   activeProviderChat = async providerId => {
-    //console.log('ejecuta cambio de proveedor')
+    console.log('ejecuta cambio de proveedor')
     try {
       let { providerInChat, providers } = this.state
       const messages = await getMessagesById(this.props.item.id, providerId)
-      providers.map(provider => {
+      providers.forEach(provider => {
         if (provider.id === providerId) {
           providerInChat = provider
           providerInChat.messagesAll = messages.data
         }
-        return provider
       })
-      //console.log('providerInChat salida:', providerInChat)
+      console.log('providerInChat salida:', providerInChat)
       this.setState({ providerInChat })
     } catch (err) {
       console.error(err.message)
@@ -768,7 +782,7 @@ class ChatContainer extends React.Component {
                           ' ' +
                           this.state.providerInChat.info.lastName}
                       </b>
-                      {this.state.providerInChat.favorite ? (
+                      {this.state.providerInChat.localFavorite ? (
                         <button
                           onClick={e => {
                             e.preventDefault()
@@ -803,7 +817,7 @@ class ChatContainer extends React.Component {
                         <span
                           onClick={e => {
                             e.preventDefault()
-                           
+
                             //console.log('Draw Route chatContainer')
                             this.setState({ drawRoute: true })
                             /*

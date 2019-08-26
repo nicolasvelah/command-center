@@ -12,6 +12,7 @@ export default class ProviderItemSearchFilter extends React.Component {
 
   setFavorite = async id => {
     const favorite = !this.state.favorite
+    console.log('favorite', favorite)
     this.props.addRemoveFavorite(this.props.orderId, id, favorite)
     this.props.updateProvidersFavorite(id, favorite)
     this.setState({ favorite })
