@@ -1,7 +1,7 @@
 import axios from 'axios'
 import io from 'socket.io-client'
 import { getAccessToken } from '../services/auth'
-import { get } from './Storage'
+import { save, get } from './Storage'
 
 export const conectSocket = async (token, userId, userType, APP_IDs) => {
   try {
@@ -221,12 +221,27 @@ export const getProviders = async (appId, country) => {
     )
     //const result = { data: [] }
     //console.log('getProviders Result', result)
+    saveProviderInLocal(result.data)
     return result
   } catch (err) {
     console.log(err.message)
     return ['Error']
   }
 }
+
+const saveProviderInLocal = async providers => {
+  const myFavoriteProviders = get('myFavoriteProviders')
+  providers.forEach(element => {
+    element.isFavorite = false
+    myFavoriteProviders.forEach(favorite => {
+      if (element.id === favorite) {
+        element.isFavorite = true
+      }
+    })
+  })
+  await save('myProviders', providers)
+}
+
 const getClients = async (appId, country) => {
   try {
     const accessToken = await getAccessToken()
