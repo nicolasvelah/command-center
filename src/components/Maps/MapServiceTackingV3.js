@@ -432,13 +432,11 @@ class MapServiceTacking extends Component {
     this.setState({ ActiveSortProv })
   }
   setActiveProvider = activeProvider => {
-    
     this.props.providers.forEach(provider => {
-      if(activeProvider === provider.id) {
+      if (activeProvider === provider.id) {
         this.setState({ activeProvider, selectedProvider: provider })
       }
-    });
-    
+    })
   }
   favioriteInRef(id) {
     /*Array.from(this.RefItemSearchFilter.values())
@@ -671,7 +669,7 @@ class MapServiceTacking extends Component {
               borderRadius: '50%',
               border: '3px solid #ffff',
               textAlign: 'center',
-              zIndex: 500
+              zIndex: 500,
             }}
           >
             <i style={{ padding: 5 }}>{text}</i>
@@ -763,9 +761,9 @@ class MapServiceTacking extends Component {
                       } else if (this.state.ActiveSortProv === 'rate') {
                         return b.info.rate - a.info.rate
                       } else if (this.state.ActiveSortProv === 'favorite') {
-                        return a.favorite === b.favorite
+                        return a.isFavorite === b.isFavorite
                           ? 0
-                          : a.favorite
+                          : a.isFavorite
                           ? -1
                           : 1
                       } else if (this.state.ActiveSortProv === 'distance') {
@@ -783,7 +781,7 @@ class MapServiceTacking extends Component {
                         calculateAndDisplayRoute={this.calculateAndDisplayRoute}
                         addRemoveFavorite={this.props.addRemoveFavorite}
                         orderId={this.props.orderId}
-                        favorite={item.favorite}
+                        favorite={item.isFavorite}
                         updateProvidersFavorite={
                           this.props.updateProvidersFavorite
                         }
@@ -936,7 +934,6 @@ class MapServiceTacking extends Component {
                                 </span>
                               </Popup>
                             </Marker>
-                            
                           </div>
                         )
                     )

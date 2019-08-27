@@ -1,6 +1,6 @@
 import React from 'react'
 //import ChatNotificationsCounter from './ChatNotificationsCounter'
-//import { save, get } from '../../services/Storage'
+import { save, get } from '../../services/Storage'
 import { inject, observer } from 'mobx-react'
 import { intercept } from 'mobx'
 import styled from 'styled-components'
@@ -86,6 +86,7 @@ class ChatContainer extends React.Component {
       providers: [],
       ProvidersActiveServices: [],
       drawRoute: false,
+      isFavorite: false,
     }
     this.updateClient = this.updateClient.bind(this)
     this.haveToOpenChat = this.haveToOpenChat.bind(this)
@@ -153,7 +154,9 @@ class ChatContainer extends React.Component {
         return provider
       })
     }
-
+    //console.log('providers', providers)
+    //console.log('providerInChat', providerInChat)
+    this.saveProviderInLocal(providers)
     await this.setState({
       searchProviderMode,
       clientData: clientGLData.data,
@@ -212,6 +215,19 @@ class ChatContainer extends React.Component {
 
       return change
     }).bind(this)
+  }
+
+  saveProviderInLocal = async providers => {
+    const myFavoriteProviders = get('myFavoriteProviders')
+    providers.forEach(element => {
+      element.isFavorite = false
+      myFavoriteProviders.forEach(favorite => {
+        if (element.id === favorite) {
+          element.isFavorite = true
+        }
+      })
+    })
+    await save('myProviders', providers)
   }
 
   updateClient(clientData) {
@@ -431,6 +447,7 @@ class ChatContainer extends React.Component {
       console.error(err.message)
     }
   }
+
   activeProviderCall = (name, phone) => {
     confirmAlert({
       title: '',
@@ -543,6 +560,10 @@ class ChatContainer extends React.Component {
 
   changeStateMap = () => {
     this.setState({ drawRoute: false })
+  }
+
+  addRemoveFavorite = isFavoriteProvider => {
+    this.setState({ isFavorite: isFavoriteProvider })
   }
 
   render() {
@@ -708,12 +729,12 @@ class ChatContainer extends React.Component {
                   address={this.state.address}
                   country={this.state.country}
                   city={this.state.city}
-                  providers={this.state.providers}
+                  providers={get('myProviders')}
                   ProvidersActiveServices={this.state.ProvidersActiveServices}
                   service={item.service.name}
                   orderId={item.id}
                   route={item.route}
-                  addRemoveFavorite={this.props.addRemoveFavorite}
+                  addRemoveFavorite={this.addRemoveFavorite}
                   updateProvidersFavorite={this.updateProvidersFavorite}
                   asignProvider={this.asignProvider}
                   activeProviderNotification={this.activeProviderNotification}
@@ -782,7 +803,7 @@ class ChatContainer extends React.Component {
                           ' ' +
                           this.state.providerInChat.info.lastName}
                       </b>
-                      {this.state.providerInChat.localFavorite ? (
+                      {this.state.isFavorite ? (
                         <button
                           onClick={e => {
                             e.preventDefault()

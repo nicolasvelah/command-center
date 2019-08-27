@@ -10,7 +10,7 @@ export default class Svg extends React.PureComponent {
         className={this.props.svgClass}
         onClick={
           this.props.svgOnClick !== undefined
-            ? e => this.props.svgOnClick(this.props.svgOnClickVal)
+            ? async e => await this.props.svgOnClick(this.props.svgOnClickVal)
             : null
         }
       >

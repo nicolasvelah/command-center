@@ -1,5 +1,6 @@
 import React from 'react'
 import Svg from './svg'
+import { save, get } from '../../services/Storage'
 
 export default class ProviderItemSearchFilter extends React.Component {
   constructor(props) {
@@ -11,11 +12,45 @@ export default class ProviderItemSearchFilter extends React.Component {
   }
 
   setFavorite = async id => {
-    const favorite = !this.state.favorite
-    console.log('favorite', favorite)
-    this.props.addRemoveFavorite(this.props.orderId, id, favorite)
-    this.props.updateProvidersFavorite(id, favorite)
-    this.setState({ favorite })
+    let isFavorite = false
+
+    //const favorite = !this.state.favorite
+    //console.log('favorite', favorite)
+    //this.props.addRemoveFavorite(this.props.orderId, id, favorite)
+    //this.props.updateProvidersFavorite(id, favorite)
+
+    let myFavoriteProviders = await get('myFavoriteProviders')
+    let myProviders = await get('myProviders')
+    myFavoriteProviders.forEach((element, index) => {
+      if (element === id) {
+        isFavorite = true
+        myFavoriteProviders.splice(index, 1)
+        myProviders.forEach(elementProvider => {
+          if (elementProvider.id === id) {
+            console.log('eliminado favorito')
+            elementProvider.isFavorite = false
+          }
+        })
+        console.log('Encontro')
+      }
+    })
+
+    if (!isFavorite) {
+      myFavoriteProviders.push(id)
+      myProviders.forEach(element => {
+        if (element.id === id) {
+          console.log('Agregado favorito')
+          element.isFavorite = true
+        }
+      })
+    }
+
+    await save('myFavoriteProviders', myFavoriteProviders)
+    await save('myProviders', myProviders)
+    console.log('isfavorite', isFavorite)
+    console.log('favorite', this.state.favorite)
+    this.props.addRemoveFavorite(!isFavorite)
+    this.setState({ favorite: !isFavorite })
   }
 
   render() {
@@ -28,6 +63,7 @@ export default class ProviderItemSearchFilter extends React.Component {
       originLat,
       originLng,
       drawRoute,
+      addRemoveFavorite,
     } = this.props
 
     if (!item.inService) {
@@ -45,6 +81,7 @@ export default class ProviderItemSearchFilter extends React.Component {
           setActiveProvider(item.id)
           centerActor(item.lat, item.lng)
           activeProviderChat(item.id)
+          addRemoveFavorite(this.state.favorite)
         }}
       >
         <div>
