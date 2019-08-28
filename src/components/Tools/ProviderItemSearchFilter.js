@@ -27,11 +27,11 @@ export default class ProviderItemSearchFilter extends React.Component {
         myFavoriteProviders.splice(index, 1)
         myProviders.forEach(elementProvider => {
           if (elementProvider.id === id) {
-            //console.log('eliminado favorito')
+            console.log('eliminado favorito')
             elementProvider.isFavorite = false
           }
         })
-        //console.log('Encontro')
+        console.log('Encontro')
       }
     })
 
@@ -39,7 +39,7 @@ export default class ProviderItemSearchFilter extends React.Component {
       myFavoriteProviders.push(id)
       myProviders.forEach(element => {
         if (element.id === id) {
-          //console.log('Agregado favorito')
+          console.log('Agregado favorito')
           element.isFavorite = true
         }
       })
@@ -47,8 +47,8 @@ export default class ProviderItemSearchFilter extends React.Component {
 
     await save('myFavoriteProviders', myFavoriteProviders)
     await save('myProviders', myProviders)
-    //console.log('isfavorite', isFavorite)
-    //console.log('favorite', this.state.favorite)
+    console.log('isfavorite', isFavorite)
+    console.log('favorite', this.state.favorite)
     this.props.addRemoveFavorite(!isFavorite)
     this.setState({ favorite: !isFavorite })
   }
