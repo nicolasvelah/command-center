@@ -173,7 +173,7 @@ class Board extends Component {
   ) {
     try {
       const dataNotification = data.dat
-      //console.log('startNotificationsWs', dataNotification.data.type)
+      console.log('startNotificationsWs', dataNotification.data.type)
       if (isLoggedIn()) {
         if (dataNotification.data.type === 'chat') {
           chatNotifications(dataNotification.data.content.orderId)
@@ -189,11 +189,15 @@ class Board extends Component {
           MsmNewTask(dataNotification.notification.title)
           getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
-          //console.log('Orden actualizada', dataNotification.data.content)
-
-          updateOrder(dataNotification.data.content)
-          //console.log('dataNotification', dataNotification.data.content.orderId)
-          //await getMyTasks('onNotification')
+          //console.log('Orden actualizada', dataNotification.data)
+          if (dataNotification.data.content.state !== 'delivered') {
+            await updateOrder(dataNotification.data.content)
+            /*console.log(
+              'dataNotification',
+              dataNotification.data.content.orderId
+            )*/
+            await getMyTasks('onNotification')
+          }
         }
         if (dataNotification.data.type !== 'updateOrder') {
           MsmNewTask(dataNotification.notification.title)
@@ -822,7 +826,6 @@ class Board extends Component {
         try {
           await updateStatus(item.id, 'delivered')
           //console.log('=======updateStatus Delivery=========')
-
           this.getMyTasks('Delivery')
         } catch (err) {
           console.log(err)
