@@ -177,21 +177,11 @@ class Board extends Component {
           MsmNewTask(dataNotification.notification.title)
           getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
-          //console.log('Orden actualizada', dataNotification.data)
           if (dataNotification.data.content.state !== 'delivered') {
             await updateOrder(dataNotification.data.content)
-            /*console.log(
-              'dataNotification',
-              dataNotification.data.content.orderId
-            )*/
-            await getMyTasks('onNotification')
+            //await getMyTasks('onNotification')
           }
         }
-        /*
-        if (dataNotification.data.type !== 'updateOrder') {
-          MsmNewTask(dataNotification.notification.title)
-        }
-        */
       }
     } catch (e) {
       console.log(e)

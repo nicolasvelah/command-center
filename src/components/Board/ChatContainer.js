@@ -1,6 +1,6 @@
 import React from 'react'
 //import ChatNotificationsCounter from './ChatNotificationsCounter'
-import { get } from '../../services/Storage'
+import { save, get } from '../../services/Storage'
 import { inject, observer } from 'mobx-react'
 import { intercept } from 'mobx'
 import styled from 'styled-components'
@@ -156,7 +156,7 @@ class ChatContainer extends React.Component {
     }
     //console.log('providers', providers)
     //console.log('providerInChat', providerInChat)
-    //this.saveProviderInLocal(providers)
+    this.saveProviderInLocal(providers)
     await this.setState({
       searchProviderMode,
       clientData: clientGLData.data,
@@ -217,7 +217,6 @@ class ChatContainer extends React.Component {
     }).bind(this)
   }
 
-  /*
   saveProviderInLocal = async providers => {
     const myFavoriteProviders = get('myFavoriteProviders')
     providers.forEach(element => {
@@ -230,7 +229,7 @@ class ChatContainer extends React.Component {
     })
     await save('myProviders', providers)
   }
-*/
+
   updateClient(clientData) {
     this.setState({ clientData })
   }
@@ -432,7 +431,7 @@ class ChatContainer extends React.Component {
   }
 
   activeProviderChat = async providerId => {
-    //console.log('ejecuta cambio de proveedor')
+    console.log('ejecuta cambio de proveedor')
     try {
       let { providerInChat, providers } = this.state
       const messages = await getMessagesById(this.props.item.id, providerId)
@@ -442,7 +441,7 @@ class ChatContainer extends React.Component {
           providerInChat.messagesAll = messages.data
         }
       })
-      //console.log('providerInChat salida:', providerInChat)
+      console.log('providerInChat salida:', providerInChat)
       this.setState({ providerInChat })
     } catch (err) {
       console.error(err.message)
