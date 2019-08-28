@@ -105,7 +105,7 @@ export const onNotification = (
       updateOrder
     )
 
-    console.log('<OnNotificationWs>')
+    console.log('<OnNotificationWs>', data.dat.data.type)
   })
 }
 
