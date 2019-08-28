@@ -179,7 +179,7 @@ class Board extends Component {
         } else if (dataNotification.data.type === 'updateOrder') {
           if (dataNotification.data.content.state !== 'delivered') {
             await updateOrder(dataNotification.data.content)
-            await getMyTasks('onNotification')
+            //await getMyTasks('onNotification')
           }
         }
       }
