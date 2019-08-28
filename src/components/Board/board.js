@@ -21,6 +21,7 @@ import {
   updateStatus,
   updateChatState,
   getOrderById,
+  colorGenerator,
 } from '../../services/helpers'
 //import Filter from './Filter'
 import {
@@ -33,6 +34,7 @@ import Loading from '../Tools/Loading'
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
 import Masonry from 'react-masonry-css'
+import soundChat from '../../assets/sounds/insight.mp3'
 @observer
 @inject('mapStore')
 @observer
@@ -61,6 +63,7 @@ class Board extends Component {
       socket: null,
       globalMapAppID: null,
       globalMapCountry: null,
+      isMyMessage: false,
     }
     this.getNotes = this.getNotes.bind(this)
     this.chageProvider = this.chageProvider.bind(this)
@@ -110,23 +113,6 @@ class Board extends Component {
     //Tasks
     await this.getMyTasks('componenedidmount')
     //Push Notifications
-
-    /*_________________________________________________________________
-    const context = this
-    window.addEventListener(
-      'focus',
-      function(event) {
-        if (isLoggedIn()) {
-          context.getMyTasks('addEventlistener')
-          if (typeof context.state.curTask[0] !== 'undefined') {
-            //console.log('entro para traer mensajes')
-            context.chatNotifications(context.state.curTask[0].id)
-          }
-        }
-      },
-      false
-    )
-    */
     //OPERADORES
     if (getUser().type !== 'operator') {
       this.getOperators()
@@ -173,7 +159,7 @@ class Board extends Component {
   ) {
     try {
       const dataNotification = data.dat
-      console.log('startNotificationsWs', dataNotification.data.type)
+      const audioChat = new Audio(soundChat)
       if (isLoggedIn()) {
         if (dataNotification.data.type === 'chat') {
           chatNotifications(dataNotification.data.content.orderId)
@@ -186,6 +172,8 @@ class Board extends Component {
             dataNotification.data.type
           )
         } else if (dataNotification.data.type === 'order') {
+          audioChat.play()
+          console.log('Mensaje Chat')
           MsmNewTask(dataNotification.notification.title)
           getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
@@ -199,13 +187,23 @@ class Board extends Component {
             await getMyTasks('onNotification')
           }
         }
+        /*
         if (dataNotification.data.type !== 'updateOrder') {
           MsmNewTask(dataNotification.notification.title)
         }
+        */
       }
     } catch (e) {
       console.log(e)
     }
+  }
+  isMyMessage = () => {
+    console.log('isMyMessage')
+    /*
+    this.setState({
+      isMyMessage: true,
+    })
+    */
   }
 
   //PROVIDER
@@ -272,7 +270,7 @@ class Board extends Component {
 
   //CHAT
   chatNotifications = async id => {
-    //console.log('chatNotifications')
+    console.log('chatNotifications')
     const ExistsInActivatedTasks = await this.checkExistsInActivatedTasks(
       Number(id)
     )
@@ -282,6 +280,7 @@ class Board extends Component {
       this.notificationMessages(id, 'provider')
     }
   }
+
   checkExistsInActivatedTasks = async id => {
     let exist = false
     let status = null
@@ -709,7 +708,7 @@ class Board extends Component {
           tasks.splice(index, 1)
         }
       })
-
+      decryptedData.color = colorGenerator()
       await tasks.push(decryptedData)
       //console.log('new tasks', tasks)
 
@@ -1117,6 +1116,7 @@ class Board extends Component {
                   favoritesProviders={
                     item.task.favorites ? item.task.favorites : null
                   }
+                  isMyMessage={this.isMyMessage}
                 />
               ))}
           </div>
