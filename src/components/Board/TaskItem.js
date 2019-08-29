@@ -6,7 +6,7 @@ import TimerComp from '../Tools/TimerComp'
 
 import { getUser } from '../../services/auth'
 
-export default class TaskItem extends React.PureComponent {
+export default class TaskItem extends React.Component {
   constructor(props) {
     super(props)
     this.state = {}
