@@ -579,7 +579,8 @@ class Board extends Component {
         await this.setState({
           activeTasks,
         })
-
+        //console.log('click', this.state.activeTasks)
+        /*
         await Array.from(this.RefChatContainer.values())
           .filter(node => node != null)
           .forEach(node => {
@@ -588,6 +589,7 @@ class Board extends Component {
               node.wrappedInstance.haveToOpenChat('live', 'board')
             }
           })
+          */
         //const scrollWidthValue = (index - 1) * 420
       }
       this.notificationOff(id, 'provider')
@@ -1114,7 +1116,40 @@ class Board extends Component {
                     width: this.state.activeTasks.length * 300 + 'px',
                   }}
                 >
-                  {this.state.activeTasks
+                  {this.state.activeTasks.length !== 0 && (
+                    <ChatContainer
+                      ref={c =>
+                        this.RefChatContainer.set(
+                          this.state.activeTasks[0].task.id,
+                          c
+                        )
+                      }
+                      item={this.state.activeTasks[0].task}
+                      desactivateTask={this.desactivateTask}
+                      key={this.state.activeTasks[0].task.id}
+                      openChatTriger={this.openChat}
+                      chatTopPositionTriger={this.chatTopPositionTriger}
+                      whoFocus={this.whoFocus}
+                      whoFocusItem={this.state.whoFocusItem}
+                      addNewMessage={this.addNewMessage}
+                      updateActivateTask={this.updateActivateTask}
+                      socket={this.state.socket}
+                      color={this.state.activeTasks[0].task.color}
+                      change={this.state.activeTasks[0].task.change}
+                      appID={this.state.activeTasks[0].task.client.aplicationId}
+                      updateGlobalMapVars={this.updateGlobalMapVars}
+                      addRemoveFavorite={this.addRemoveFavorite}
+                      notificationOff={this.notificationOff}
+                      favoritesProviders={
+                        this.state.activeTasks[0].task.favorites
+                          ? this.state.activeTasks[0].task.favorites
+                          : null
+                      }
+                      isMyMessage={this.isMyMessage}
+                    />
+                  )}
+
+                  {/*this.state.activeTasks
                     .sort(function(a, b) {
                       return ('' + a.task.status.name).localeCompare(
                         b.task.status.name
@@ -1150,7 +1185,7 @@ class Board extends Component {
                         }
                         isMyMessage={this.isMyMessage}
                       />
-                    ))}
+                      ))*/}
                 </div>
               </div>
             </div>
