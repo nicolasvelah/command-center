@@ -302,7 +302,7 @@
   color: #fff;
   font-size: 10px;
   margin: 0px 0.1%;
-  display: inline-block;
+  /*display: inline-block;*/
   vertical-align: bottom;
   position: relative;
   width: 420px;
@@ -555,7 +555,7 @@
   text-align: left;
   background: #eee;
   border: 1px solid #ddd;
-  width: 31.5%;
+  width: 100%;
 }
 
 .complete.b-column .column-header {
@@ -653,5 +653,3 @@
     width: 100%;
   }
 }
-
-

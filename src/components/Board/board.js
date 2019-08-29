@@ -1080,7 +1080,16 @@ class Board extends Component {
                   style={getUser().type === 'operator' ? {} : {}}
                 >
                   <span className="column-header">Resueltos</span>
-                  {tasks.complete}
+                  <Masonry
+                    breakpointCols={{
+                      default: this.state.activeTasks.length > 0 ? 4 : 8,
+                    }}
+                    className="my-masonry-grid"
+                    columnClassName="my-masonry-grid_column"
+                  >
+                    {tasks.complete}
+                  </Masonry>
+
                   {getUser().type !== 'operator' ? (
                     <div className="column-footer">
                       <button
