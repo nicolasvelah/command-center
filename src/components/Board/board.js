@@ -34,7 +34,7 @@ import Loading from '../Tools/Loading'
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
 import Masonry from 'react-masonry-css'
-import soundChat from '../../assets/sounds/insight.mp3'
+import soundOrden from '../../assets/sounds/insight.mp3'
 @observer
 @inject('mapStore')
 @observer
@@ -159,7 +159,8 @@ class Board extends Component {
   ) {
     try {
       const dataNotification = data.dat
-      const audioChat = new Audio(soundChat)
+      const audioOrden = new Audio(soundOrden)
+      console.log('dataNotification', dataNotification)
       if (isLoggedIn()) {
         if (dataNotification.data.type === 'chat') {
           chatNotifications(dataNotification.data.content.orderId)
@@ -172,8 +173,9 @@ class Board extends Component {
             dataNotification.data.type
           )
         } else if (dataNotification.data.type === 'order') {
-          audioChat.play()
-          console.log('Mensaje Chat')
+          console.log('New Order')
+          audioOrden.play()
+          console.log('dataNotification en New Order', dataNotification)
           MsmNewTask(dataNotification.notification.title)
           getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
@@ -215,6 +217,7 @@ class Board extends Component {
     if (type === 'WORKINPROGRESS' || type === 'STARTED') {
       type = 'wip'
       tasks[index].appStatus = 'STARTED'
+
       if (tasks[index].status.name === 'asigned') {
         tasks[index].status.name = 'standby'
       }
@@ -692,12 +695,22 @@ class Board extends Component {
       const decryptedData = await getOrderById(orderId)
 
       //console.log('decryptedData', decryptedData)
+      /*
+      for (const [index, element] of tasks.entries()) {
+        if (element.id === orderId) {
+          //console.log('Tarea repetida')
+          tasks.splice(index, 1)
+        }break;
+      }
+      */
+
       tasks.forEach((element, index) => {
         if (element.id === orderId) {
           //console.log('Tarea repetida')
           tasks.splice(index, 1)
         }
       })
+
       decryptedData.color = colorGenerator()
       await tasks.push(decryptedData)
       //console.log('new tasks', tasks)
