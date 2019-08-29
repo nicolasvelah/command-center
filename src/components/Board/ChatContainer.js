@@ -657,7 +657,7 @@ class ChatContainer extends React.Component {
               >
                 <div className="openBar" />
               </div>
-              <div
+              {/*<div
                 onClick={async e => {
                   e.preventDefault()
                   this.haveToOpenChat(item.status.name, 'NotAswere', 'click')
@@ -668,7 +668,7 @@ class ChatContainer extends React.Component {
                   src={require('../../images/flag-red.svg')}
                   alt="Sin Respuesta"
                 />
-              </div>
+              </div>*/}
               <div
                 onClick={e => {
                   e.preventDefault()

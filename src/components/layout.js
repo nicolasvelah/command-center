@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { StaticQuery, graphql } from 'gatsby'
@@ -6,13 +6,16 @@ import Header from './Tools/header'
 import NavBar from './Tools/navBar'
 import { isLoggedIn } from '../services/auth'
 import { initializeFirebase } from '../services/push-notification'
+import { Provider } from 'mobx-react'
+import stores from '../mobx/'
 
 import '../assets/css/layout.css'
 
 const initFirebase = async () => {
   await initializeFirebase()
 }
-export default class Layout extends React.PureComponent {
+
+export default class Layout extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -85,15 +88,20 @@ export default class Layout extends React.PureComponent {
               <meta name="theme-color" content="#0047b3" />
             </Helmet>
             <Header siteTitle={data.site.siteMetadata.title} />
-            <div className="container">
-              <NavBar setContentPaddingLeft={this.setContentPaddingLeft} />
-              <div
-                className="content"
-                style={{ paddingLeft: this.state.paddingLeftContent }}
-              >
-                {this.props.children}
+            <Provider
+              layoutStore={stores.layoutStore}
+              mapStore={stores.mapStore}
+            >
+              <div className="container">
+                <NavBar setContentPaddingLeft={this.setContentPaddingLeft} />
+                <div
+                  className="content"
+                  style={{ paddingLeft: this.state.paddingLeftContent }}
+                >
+                  {this.props.children}
+                </div>
               </div>
-            </div>
+            </Provider>
           </>
         )}
       />

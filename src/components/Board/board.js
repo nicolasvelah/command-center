@@ -12,6 +12,7 @@ import TaskItem from './TaskItem'
 import ChatContainer from './ChatContainer'
 import { save, get } from '../../services/Storage'
 import { inject, observer } from 'mobx-react'
+//import { intercept } from 'mobx'
 import {
   operatorsAll,
   MsmNewTask,
@@ -30,13 +31,13 @@ import {
   onNotification,
 } from '../../services/wsConect'
 import Loading from '../Tools/Loading'
+import Masonry from 'react-masonry-css'
+import soundChat from '../../assets/sounds/insight.mp3'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
-import Masonry from 'react-masonry-css'
-import soundChat from '../../assets/sounds/insight.mp3'
-@observer
-@inject('mapStore')
+
+@inject('mapStore', 'layoutStore')
 @observer
 class Board extends Component {
   constructor(props) {
@@ -81,6 +82,7 @@ class Board extends Component {
   }
 
   async componentDidMount() {
+    //console.log('state enviado desde padreeeee////////', this.props.layoutStore)
     if (this.props.mapStore.providerWS.length <= 0) {
       await this.props.mapStore.initProvider(1, 'Ecuador')
     }
@@ -944,48 +946,53 @@ class Board extends Component {
         ) : (
           ''
         )*/}
-        <div className="board">
-          {getUser().type !== 'operator' ? (
-            <div
-              className="backlog b-column"
-              onDragOver={e => this.onDragOver(e)}
-              onDrop={e => {
-                this.onDrop(e, 'backlog')
-              }}
-            >
-              <span className="column-header">Backlog</span>
-              {tasks.backlog}
+        <div className="mainBoardContainer">
+          <div className="board">
+            {getUser().type !== 'operator' ? (
+              <div
+                className="backlog b-column"
+                onDragOver={e => this.onDragOver(e)}
+                onDrop={e => {
+                  this.onDrop(e, 'backlog')
+                }}
+              >
+                <span className="column-header">Backlog</span>
+                {tasks.backlog}
+              </div>
+            ) : (
+              <div />
+            )}
+            <div className="asignetOverflow">
+              <div
+                className="asigned b-column"
+                onDragOver={e => this.onDragOver(e)}
+                onDrop={e => this.onDrop(e, 'asigned')}
+                style={{
+                  width: tasks.asigned.length * 180 + 'px',
+                }}
+              >
+                <span className="column-header">Asignados</span>
+                {tasks.asigned.length > 0 ? (
+                  tasks.asigned
+                ) : (
+                  <div className="messageAssignetEmpty">
+                    <p>
+                      Atento!!! en cualquier momento entra una nueva historia...
+                      Podrás verla en esta barra... <br />
+                      Suerte :)
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          ) : (
-            <div />
-          )}
-          <div className="asignetOverflow">
-            <div
-              className="asigned b-column"
-              onDragOver={e => this.onDragOver(e)}
-              onDrop={e => this.onDrop(e, 'asigned')}
-              style={{ width: tasks.asigned.length * 180 + 'px' }}
-            >
-              <span className="column-header">Asignados</span>
-              {tasks.asigned.length > 0 ? (
-                tasks.asigned
-              ) : (
-                <div className="messageAssignetEmpty">
-                  <p>
-                    Atento!!! en cualquier momento entra una nueva historia...
-                    Podrás verla en esta barra... <br />
-                    Suerte :)
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-          <div
-            className="incurse  b-column"
-            style={getUser().type === 'operator' ? {} : {}}
-          >
-            <span className="column-header">En curso</span>
-            <div
+            <div className="workBoard">
+              <div className="middleBoard">
+                <div
+                  className="incurse  b-column"
+                  style={getUser().type === 'operator' ? {} : {}}
+                >
+                  <span className="column-header">En curso</span>
+                  {/*<div
               className="notresponse b-row"
               onDragOver={e => this.onDragOver(e)}
               onDrop={e => this.onDrop(e, 'notresponse')}
@@ -1007,108 +1014,112 @@ class Board extends Component {
                   {tasks.notresponse}
                 </Masonry>
               }
-            </div>
-            <div
-              className="standby b-row"
-              onDragOver={e => this.onDragOver(e)}
-              onDrop={e => this.onDrop(e, 'standby')}
-            >
-              <span className="column-header">En Espera</span>
-              {
-                <Masonry
-                  breakpointCols={{ default: 2 }}
-                  className="my-masonry-grid"
-                  columnClassName="my-masonry-grid_column"
+            </div>*/}
+                  <div
+                    className="standby b-row"
+                    onDragOver={e => this.onDragOver(e)}
+                    onDrop={e => this.onDrop(e, 'standby')}
+                  >
+                    <span className="column-header">En Espera</span>
+                    {
+                      <Masonry
+                        breakpointCols={{ default: 2 }}
+                        className="my-masonry-grid"
+                        columnClassName="my-masonry-grid_column"
+                      >
+                        {tasks.standby}
+                      </Masonry>
+                    }
+                  </div>
+                  <div
+                    className="live b-row"
+                    onDragOver={e => this.onDragOver(e)}
+                    onDrop={e => this.onDrop(e, 'live')}
+                  >
+                    <span className="column-header">En Vivo</span>
+                    {
+                      <Masonry
+                        breakpointCols={{ default: 2 }}
+                        className="my-masonry-grid"
+                        columnClassName="my-masonry-grid_column"
+                      >
+                        {tasks.live}
+                      </Masonry>
+                    }
+                  </div>
+                </div>
+                <div
+                  className="complete b-column"
+                  onDragOver={e => this.onDragOver(e)}
+                  onDrop={e => this.onDrop(e, 'complete')}
+                  style={getUser().type === 'operator' ? {} : {}}
                 >
-                  {tasks.standby}
-                </Masonry>
-              }
-            </div>
-            <div
-              className="live b-row"
-              onDragOver={e => this.onDragOver(e)}
-              onDrop={e => this.onDrop(e, 'live')}
-            >
-              <span className="column-header">En Vivo</span>
-              {
-                <Masonry
-                  breakpointCols={{ default: 2 }}
-                  className="my-masonry-grid"
-                  columnClassName="my-masonry-grid_column"
-                >
-                  {tasks.live}
-                </Masonry>
-              }
-            </div>
-          </div>
-          <div
-            className="complete b-column"
-            onDragOver={e => this.onDragOver(e)}
-            onDrop={e => this.onDrop(e, 'complete')}
-            style={getUser().type === 'operator' ? {} : {}}
-          >
-            <span className="column-header">Resueltos</span>
-            {tasks.complete}
-            {getUser().type !== 'operator' ? (
-              <div className="column-footer">
-                <button
-                  onClick={() => {
-                    this.Delivery()
+                  <span className="column-header">Resueltos</span>
+                  {tasks.complete}
+                  {getUser().type !== 'operator' ? (
+                    <div className="column-footer">
+                      <button
+                        onClick={() => {
+                          this.Delivery()
+                        }}
+                      >
+                        Entregar
+                      </button>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                </div>
+              </div>
+
+              <div className="chatsBarV2" id="chatsBar">
+                <div
+                  className=""
+                  style={{
+                    top: this.state.chatTopPosition,
+                    width: this.state.activeTasks.length * 300 + 'px',
                   }}
                 >
-                  Entregar
-                </button>
+                  {this.state.activeTasks
+                    .sort(function(a, b) {
+                      return ('' + a.task.status.name).localeCompare(
+                        b.task.status.name
+                      )
+                    })
+                    .filter(function(item) {
+                      return (
+                        item.task.status.name !== 'asigned' &&
+                        item.task.status.name !== 'complete'
+                      )
+                    })
+                    .map(item => (
+                      <ChatContainer
+                        ref={c => this.RefChatContainer.set(item.task.id, c)}
+                        item={item.task}
+                        desactivateTask={this.desactivateTask}
+                        key={item.task.id}
+                        openChatTriger={this.openChat}
+                        chatTopPositionTriger={this.chatTopPositionTriger}
+                        whoFocus={this.whoFocus}
+                        whoFocusItem={this.state.whoFocusItem}
+                        addNewMessage={this.addNewMessage}
+                        updateActivateTask={this.updateActivateTask}
+                        socket={this.state.socket}
+                        color={item.task.color}
+                        change={item.task.change}
+                        appID={item.task.client.aplicationId}
+                        updateGlobalMapVars={this.updateGlobalMapVars}
+                        addRemoveFavorite={this.addRemoveFavorite}
+                        notificationOff={this.notificationOff}
+                        favoritesProviders={
+                          item.task.favorites ? item.task.favorites : null
+                        }
+                        isMyMessage={this.isMyMessage}
+                      />
+                    ))}
+                </div>
               </div>
-            ) : (
-              ''
-            )}
-          </div>
-        </div>
-        <div className="chatsBar" id="chatsBar">
-          <div
-            className="absoluteChatBottom"
-            style={{
-              top: this.state.chatTopPosition,
-              width: this.state.activeTasks.length * 300 + 'px',
-            }}
-          >
-            {this.state.activeTasks
-              .sort(function(a, b) {
-                return ('' + a.task.status.name).localeCompare(
-                  b.task.status.name
-                )
-              })
-              .filter(function(item) {
-                return (
-                  item.task.status.name !== 'asigned' &&
-                  item.task.status.name !== 'complete'
-                )
-              })
-              .map(item => (
-                <ChatContainer
-                  ref={c => this.RefChatContainer.set(item.task.id, c)}
-                  item={item.task}
-                  desactivateTask={this.desactivateTask}
-                  key={item.task.id}
-                  openChatTriger={this.openChat}
-                  chatTopPositionTriger={this.chatTopPositionTriger}
-                  whoFocus={this.whoFocus}
-                  whoFocusItem={this.state.whoFocusItem}
-                  addNewMessage={this.addNewMessage}
-                  updateActivateTask={this.updateActivateTask}
-                  socket={this.state.socket}
-                  color={item.task.color}
-                  change={item.task.change}
-                  appID={item.task.client.aplicationId}
-                  updateGlobalMapVars={this.updateGlobalMapVars}
-                  addRemoveFavorite={this.addRemoveFavorite}
-                  notificationOff={this.notificationOff}
-                  favoritesProviders={
-                    item.task.favorites ? item.task.favorites : null
-                  }
-                  isMyMessage={this.isMyMessage}
-                />
-              ))}
+            </div>
           </div>
         </div>
         <ToastContainer position="bottom-right" />

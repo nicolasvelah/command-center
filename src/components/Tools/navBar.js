@@ -4,6 +4,7 @@ import { isLoggedIn, logout, getUser } from '../../services/auth'
 import Modal from './modal'
 import CreateTask from '../Sections/CreateTask'
 import SearchPage from '../Sections/SearchPage'
+import { inject, observer } from 'mobx-react'
 import '../../assets/css/menu.css'
 import searchIcon from '../../images/search.svg'
 import rocket from '../../images/rocket.svg'
@@ -15,7 +16,9 @@ import users from '../../images/users.svg'
 import exit from '../../images/exit.svg'
 import circleRight from '../../images/circle-right.svg'
 
-export default class navBar extends React.PureComponent {
+@inject('layoutStore')
+@observer
+class navBar extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -35,6 +38,7 @@ export default class navBar extends React.PureComponent {
   }
   activeMenu = () => {
     this.props.setContentPaddingLeft()
+    this.props.layoutStore.setGlobalPaddingLeftContent()
     this.setState({ menuActive: !this.state.menuActive })
   }
   render() {
@@ -144,3 +148,5 @@ export default class navBar extends React.PureComponent {
     )
   }
 }
+
+export default navBar
