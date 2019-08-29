@@ -32,12 +32,12 @@ import {
 } from '../../services/wsConect'
 import Loading from '../Tools/Loading'
 import Masonry from 'react-masonry-css'
-import soundChat from '../../assets/sounds/insight.mp3'
 
 import 'react-toastify/dist/ReactToastify.css'
 import '../../assets/css/board.css'
+import soundOrden from '../../assets/sounds/insight.mp3'
 
-@inject('mapStore', 'layoutStore')
+@inject('mapStore')
 @observer
 class Board extends Component {
   constructor(props) {
