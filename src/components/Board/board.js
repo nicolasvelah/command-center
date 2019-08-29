@@ -560,6 +560,7 @@ class Board extends Component {
           const messages = await this.getMessages(task.id)
           //console.log('Entro 3')
           task.messagesAll = messages.data
+          activeTasks = []
           activeTasks.push({ task })
           execute = true
         } else {
@@ -999,13 +1000,22 @@ class Board extends Component {
               </div>
             </div>
             <div className="workBoard">
-              <div className="middleBoard">
+              <div
+                className={
+                  this.state.activeTasks.length > 0
+                    ? 'middleBoard allW'
+                    : 'middleBoard hafW'
+                }
+                style={{
+                  width: this.state.activeTasks.length > 0 ? '50%' : '100%',
+                }}
+              >
                 <div
                   className="incurse  b-column"
                   style={getUser().type === 'operator' ? {} : {}}
                 >
-                  <span className="column-header">En curso</span>
-                  {/*<div
+                  {/*<span className="column-header">En curso</span>
+                  <div
               className="notresponse b-row"
               onDragOver={e => this.onDragOver(e)}
               onDrop={e => this.onDrop(e, 'notresponse')}
@@ -1027,7 +1037,7 @@ class Board extends Component {
                   {tasks.notresponse}
                 </Masonry>
               }
-            </div>*/}
+            </div>
                   <div
                     className="standby b-row"
                     onDragOver={e => this.onDragOver(e)}
@@ -1043,7 +1053,7 @@ class Board extends Component {
                         {tasks.standby}
                       </Masonry>
                     }
-                  </div>
+                  </div>*/}
                   <div
                     className="live b-row"
                     onDragOver={e => this.onDragOver(e)}
@@ -1052,7 +1062,9 @@ class Board extends Component {
                     <span className="column-header">En Vivo</span>
                     {
                       <Masonry
-                        breakpointCols={{ default: 2 }}
+                        breakpointCols={{
+                          default: this.state.activeTasks.length > 0 ? 3 : 6,
+                        }}
                         className="my-masonry-grid"
                         columnClassName="my-masonry-grid_column"
                       >

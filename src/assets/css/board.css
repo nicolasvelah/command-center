@@ -481,6 +481,18 @@
 .asigned.b-column .task.SOS {
   border: 1px solid #c62b20;
 }
+.workBoard {
+  display: inline-block;
+  width: 100%;
+}
+.middleBoard {
+  display: inline-block;
+}
+.chatsBarV2 {
+  width: 50%;
+  display: inline-block;
+}
+
 .asigned.b-column .column-header {
   display: inline-block;
   font-size: 10px;
@@ -498,7 +510,7 @@
 .incurse.b-column .b-row {
   display: inline-block;
   vertical-align: top;
-  width: 49.5%;
+  width: 100%;
   margin: 0px 0%;
   padding: 10px;
   background-color: #eaeaea;
@@ -506,11 +518,8 @@
   border-radius: 5px;
   position: relative;
 }
-.incurse.b-column .b-row.standby {
-  margin-right: 0.5%;
-}
+
 .incurse.b-column .b-row.live {
-  margin-left: 0.5%;
 }
 .incurse.b-column .column-header {
   display: none;
@@ -645,12 +654,4 @@
   }
 }
 
-.workBoard {
-  display: flex;
-}
-.middleBoard {
-  width: 50%;
-}
-.chatsBarV2 {
-  width: 50%;
-}
+
