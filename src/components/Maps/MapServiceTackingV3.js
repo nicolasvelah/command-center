@@ -719,6 +719,7 @@ class MapServiceTacking extends Component {
 
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">
+        
         {this.props.searchProviderMode ? (
           <div className="providersList">
             <ProviderSearchFilter
@@ -1199,7 +1200,9 @@ class MapServiceTacking extends Component {
           </ButtonContainer>
         */}
         </div>
+        
       </div>
+      
     ) : null
   }
 }

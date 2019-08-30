@@ -313,7 +313,11 @@
   padding: 5px 0px 0px;
 }
 .chat-container .live {
+  width: 100%;
   background: #53a93f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .chat-container .standby {
   background: #fdc509;
@@ -333,6 +337,11 @@
 .ChatHeader .clientDataName {
   display: flex;
 }
+.main-chat {
+  display: flex;
+  width: 100%;
+}
+
 .chat-container .ChatNotificationsCounter {
   position: relative;
 }
@@ -499,7 +508,16 @@
 }
 
 .frases-container {
-  width: 30%;
+  width: 25%;
+  background-color: #eaeaea;
+}
+
+.frase {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 5px;
+  color: #333;
+  margin: 5px;
 }
 
 .asigned.b-column .column-header {
@@ -564,6 +582,11 @@
   text-align: left;
   background: #eee;
   border: 1px solid #ddd;
+  width: 100%;
+}
+
+.map-container-traking-Main {
+  display: flex;
   width: 100%;
 }
 

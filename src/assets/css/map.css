@@ -8,6 +8,7 @@
 .map-container-traking {
   height: 300px;
   position: relative;
+  width: 100%;
 }
 .mapSearch {
   z-index: 1;
@@ -50,7 +51,7 @@
 /*PROVIDERS SEARCHS*/
 .providersList {
   position: absolute;
-  /*right: -200px;*/
+  right: 760px;
   width: 200px;
   top: 0px;
   background: #ffffff;

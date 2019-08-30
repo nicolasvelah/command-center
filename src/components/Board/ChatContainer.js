@@ -17,6 +17,7 @@ import {
 import Svg from '../Tools/svg'
 
 import 'react-confirm-alert/src/react-confirm-alert.css'
+import jsonFrases from '../../assets/jsonFrases/jsonFrases'
 
 const SearchProviderModeMarker = styled.div`
   text-align: right;
@@ -87,6 +88,7 @@ class ChatContainer extends React.Component {
       ProvidersActiveServices: [],
       drawRoute: false,
       isFavorite: false,
+      frases: null
     }
     this.updateClient = this.updateClient.bind(this)
     this.haveToOpenChat = this.haveToOpenChat.bind(this)
@@ -157,12 +159,18 @@ class ChatContainer extends React.Component {
     //console.log('providers', providers)
     //console.log('providerInChat', providerInChat)
     this.saveProviderInLocal(providers)
+
+    const frases = jsonFrases[`${this.props.item.service.categories.name}`][`${this.props.item.service.name}`]
+    //console.log('jsonFrases', this.props.item.service.categories.name)
+    //console.log(jsonFrases[`${this.props.item.service.categories.name}`])
+    console.log('frases', frases)
     await this.setState({
       searchProviderMode,
       clientData: clientGLData.data,
       providers,
       ProvidersActiveServices,
       providerInChat,
+      frases
     })
 
     intercept(this.props.mapStore, 'clientIdWS', change => {
@@ -566,6 +574,25 @@ class ChatContainer extends React.Component {
     this.setState({ isFavorite: isFavoriteProvider })
   }
 
+  allowDrop = ev => {
+    ev.preventDefault()
+    //console.log(ev)
+  }
+  
+  drag = ev => {
+    ev.dataTransfer.setData("text/plain", ev.target.innerHTML);
+    //console.log(ev.target.innerHTML)
+  }
+  
+  drop = ev => {
+    ev.preventDefault();
+    const data = ev.dataTransfer.getData("text")
+    //console.log(data)
+    return data
+    //var data = ev.dataTransfer.getData("text");
+    //ev.target.appendChild(document.getElementById(data));
+  }
+
   render() {
     const { item } = this.props
 
@@ -578,11 +605,13 @@ class ChatContainer extends React.Component {
           (this.props.whoFocusItem === item.id ? ' chatFocus' : ' noChatFocus')
         }
         id={'chatTask_' + item.id}
-        onClick={e => this.focusChat(item.id)}
+        //onClick={e => this.focusChat(item.id)}
       >
-        <div className="frases-container">Hola</div>
-        <div>
-          <SearchProviderModeMarker>
+        
+        <>
+          <div className={this.state.status + ' subcontainer '}>
+            <div className="ChatHeader">
+            <SearchProviderModeMarker>
             <div
               className="iconServiceState"
               style={
@@ -631,9 +660,6 @@ class ChatContainer extends React.Component {
               </button>
             </div>
           </SearchProviderModeMarker>
-
-          <div className={this.state.status + ' subcontainer '}>
-            <div className="ChatHeader">
               <div className="clientDataName">
                 <div
                   className={'taskVisualTraking'}
@@ -689,6 +715,41 @@ class ChatContainer extends React.Component {
                   {/*<ChatNotificationsCounter t={item} />*/}
                 </div>
               </div>
+            </div>
+            <div className="main-chat">
+            <div className="frases-container">
+              {this.state.frases && (
+                <>
+                <div>
+                  <span>Saludo</span>
+                  {this.state.frases.Frases.Saludo.map((item, index) => (
+                    <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
+                    ))
+
+                  }
+                
+                </div>
+                <div>
+                <span>Conversacion</span>
+                {this.state.frases.Frases.Conversacion.map((item, index) => (
+                  <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
+                  ))
+
+                }
+              
+              </div>
+              <div>
+              <span>Despedida</span>
+              {this.state.frases.Frases.Despedida.map((item, index) => (
+                <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
+                ))
+
+              }
+            
+            </div>
+                </>
+                
+              )}
             </div>
             {item.status.name === 'live' && this.state.providers.length >= 0 ? (
               <div
@@ -756,11 +817,7 @@ class ChatContainer extends React.Component {
                 ) : (
                   ''
                 )}
-              </div>
-            ) : (
-              ''
-            )}
-            {this.state.openChat ? (
+                {this.state.openChat && (
               <div className="chatTool">
                 <div className="ChatClient chatGeneric">
                   <div className="ChatInfoMain">
@@ -786,6 +843,8 @@ class ChatContainer extends React.Component {
                     isClientTo={true}
                     to={item.client.id}
                     addNewMessage={this.props.addNewMessage}
+                    drop={this.drop}
+                    allowDrop={this.allowDrop}
                   />
                 </div>
                 {this.state.providerInChat !== null ? (
@@ -1025,12 +1084,16 @@ class ChatContainer extends React.Component {
                   </div>
                 )}
               </div>
+            )}
+              </div>
             ) : (
               ''
             )}
+            <div className="frases-container">Holaa2</div>
+            </div>
           </div>
-        </div>
-        <div className="frases-container">Hola 2</div>
+        </>
+        
       </div>
     ) : (
       ''

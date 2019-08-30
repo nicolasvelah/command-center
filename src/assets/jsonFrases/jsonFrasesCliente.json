@@ -1,0 +1,428 @@
+{
+  "Asistencia Vial": {
+    "Cita Taller": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Paso de Combustible": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Mi seguro": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Paso de corriente": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Cambio de llanta": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Cerrajería vial": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Grúa": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Conductor por embriaguez": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    }
+  },
+  "Servicios del Hogar": {
+    "Electricidad": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Plomería": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Cerrajería": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Limpieza": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    }
+  },
+  "SOS": {
+    "SOS": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    }
+  },
+  "Servicios Médicos": {
+    "Doctor en Línea": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    },
+    "Mi Seguro": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    }
+  },
+  "Seguridad": {
+    "Acompañamiento Seguro": {
+      "information": { "title": "Frases Cliente" },
+      "Frases": {
+        "Saludo": [
+          "Hola, como podemos apoyarte ?",
+          "Hola, como estas?",
+          "Hola, cual es tu incoveniente ?"
+        ],
+        "Conversacion": [
+          "Tu posicion es ... ?",
+          "Describe tu problema para poder apoyarte.",
+          "La ayuda esta a ... minutos.",
+          "Tienes a alguien cerca tuyo ?",
+          "Estamos procesando tu peticion. Espera un momento.",
+          "Estamos buscando un proveedor. Espera un momento",
+          "Te hemos designado un proveedor. Sigue en contacto con nosotros."
+        ],
+        "Despedida": [
+          "Adios. Un gusto apoyarte.",
+          "Adios. Esperamos haberte apoyado.",
+          "Adios. Siempre puedes contar con nosotros.",
+          "Un gusto apoyarte. Suerte.",
+          "Saludos cordiales."
+        ]
+      }
+    }
+  }
+}

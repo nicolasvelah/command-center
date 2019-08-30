@@ -6,7 +6,7 @@ import { sendMessage } from '../../services/helpers'
 export default class Chat extends React.PureComponent {
   constructor(props) {
     super(props)
-    this.state = { message: '' }
+    this.state = { message: '', textMessage: '' }
   }
   componentDidMount() {
     this.props.goBottom('scroll_' + this.props.sid)
@@ -100,6 +100,23 @@ export default class Chat extends React.PureComponent {
                   this.sendMenssageByEnter(e)
                 }
               }}
+              onDrop={event => {
+                this.setState({ textMessage: this.props.drop(event) })
+
+                document.getElementById(
+                  'ChatTextarea_' + this.props.sid
+                ).value = event.dataTransfer.getData('text')
+
+                /*
+                const e = {
+                  target: { value: event.dataTransfer.getData('text') },
+                }
+                this.setMessage(e)
+                */
+                //console.log('event', event.dataTransfer.getData('text'))
+              }}
+              onDragOver={event => this.props.allowDrop(event)}
+              //value={`${this.state.textMessage}`}
             />
           </div>
         </div>
