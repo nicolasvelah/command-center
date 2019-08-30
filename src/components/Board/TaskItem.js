@@ -9,7 +9,9 @@ import { getUser } from '../../services/auth'
 export default class TaskItem extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      //activeTaskFocus: false,
+    }
   }
 
   render() {
@@ -40,12 +42,17 @@ export default class TaskItem extends React.Component {
           (this.props.t.message.length > 0
             ? 'haveNotification not_provider'
             : '') +
-          (this.props.whoFocusItem === this.props.t.id
-            ? ' chatFocusBoard'
-            : ' noChatFocus')
+          (this.props.t.active ? ' chatFocusBoard' : ' noChatFocus')
         }
-        onClick={e => {
+        onClick={async e => {
           if (this.props.t.status.name !== 'complete') {
+            /*
+            await this.setState(prevState => {
+              
+              return { activeTaskFocus: !prevState.activeTaskFocus }
+            })
+            */
+            //console.log('activeTaskFocus', this.state.activeTaskFocus)
             this.props.activateTask(this.props.t.id, this.props.icon)
           }
         }}

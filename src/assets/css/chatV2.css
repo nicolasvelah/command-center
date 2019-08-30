@@ -53,8 +53,8 @@
 }
 
 .ChatMap {
-  max-height: 0;
-  overflow: hidden;
+  /*max-height: 0;*/
+  /*overflow: hidden;*/
   transition: 1s all;
   line-height: 14px;
   background: #fff;

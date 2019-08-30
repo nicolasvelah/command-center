@@ -50,7 +50,7 @@
 /*PROVIDERS SEARCHS*/
 .providersList {
   position: absolute;
-  right: -200px;
+  /*right: -200px;*/
   width: 200px;
   top: 0px;
   background: #ffffff;

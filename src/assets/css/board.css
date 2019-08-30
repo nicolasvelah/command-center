@@ -3,7 +3,7 @@
   display: block;
   flex-direction: row;
   font-family: Arial, Helvetica, sans-serif;
-  padding-bottom: 40px;
+  /*padding-bottom: 40px;*/
 }
 .b-column {
   width: 33%;
@@ -305,8 +305,9 @@
   /*display: inline-block;*/
   vertical-align: bottom;
   position: relative;
-  width: 420px;
+  width: 100%;
   visibility: visible;
+  display: flex;
 }
 .chat-container .subcontainer {
   padding: 5px 0px 0px;
@@ -419,10 +420,11 @@
   margin: 1px 0px 0px 5px;
 }
 .live .chatFocusBoard {
-  -webkit-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
-  -moz-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
-  box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
+  -webkit-box-shadow: 0px 0px 10px 3px rgba(125, 123, 125, 1);
+  -moz-box-shadow: 0px 0px 10px 3px rgba (125, 123, 125, 1);
+  box-shadow: 0px 0px 10px 3px rgba(125, 123, 125, 1);
   border: 2px solid #53a93f !important;
+  background-color: honeydew !important;
 }
 .live .timerState {
   display: none;
@@ -482,15 +484,22 @@
   border: 1px solid #c62b20;
 }
 .workBoard {
-  display: inline-block;
+  display: flex;
   width: 100%;
 }
 .middleBoard {
-  display: inline-block;
+  /*display: inline-block;*/
+  display: flex;
+  flex-direction: column;
+  /*justify-content: space-between;*/
 }
 .chatsBarV2 {
   width: 50%;
   display: inline-block;
+}
+
+.frases-container {
+  width: 30%;
 }
 
 .asigned.b-column .column-header {

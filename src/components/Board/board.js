@@ -550,7 +550,12 @@ class Board extends Component {
           return item
         })
       }
+
+      await this.state.tasks.forEach(element => {
+        element.active = false
+      })
       task.icon = icon
+      task.active = true
       //console.log('Entro', task)
       //console.log('AllTask', this.state.tasks)
 
@@ -684,6 +689,16 @@ class Board extends Component {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
       //await save('tasks', decryptedData.tasks)
+      const taskActive = get('activeTasks')
+      if (taskActive.length !== 0) {
+        decryptedData.tasks.forEach(element => {
+          element.active = false
+          if (element.id === taskActive[0].task.id) {
+            element.active = true
+          }
+        })
+      }
+
       this.setState({
         tasks: decryptedData.tasks,
       })
@@ -914,7 +929,7 @@ class Board extends Component {
     //this.setState({ tasks: get('tasks') })
     this.state.tasks
       .sort(function(a, b) {
-        return a.priority - b.priority
+        return b.active - a.active
       })
       .filter(function(c) {
         if (context.state.filterByoperator !== null) {
@@ -1107,16 +1122,15 @@ class Board extends Component {
                   )}
                 </div>
               </div>
-
-              <div className="chatsBarV2" id="chatsBar">
-                <div
-                  className=""
-                  style={{
-                    top: this.state.chatTopPosition,
-                    width: this.state.activeTasks.length * 300 + 'px',
-                  }}
-                >
-                  {this.state.activeTasks.length !== 0 && (
+              {this.state.activeTasks.length !== 0 && (
+                <div className="chatsBarV2" id="chatsBar">
+                  <div
+                    className=""
+                    style={{
+                      top: this.state.chatTopPosition,
+                      width: "100%",
+                    }}
+                  >
                     <ChatContainer
                       ref={c =>
                         this.RefChatContainer.set(
@@ -1147,47 +1161,9 @@ class Board extends Component {
                       }
                       isMyMessage={this.isMyMessage}
                     />
-                  )}
-
-                  {/*this.state.activeTasks
-                    .sort(function(a, b) {
-                      return ('' + a.task.status.name).localeCompare(
-                        b.task.status.name
-                      )
-                    })
-                    .filter(function(item) {
-                      return (
-                        item.task.status.name !== 'asigned' &&
-                        item.task.status.name !== 'complete'
-                      )
-                    })
-                    .map(item => (
-                      <ChatContainer
-                        ref={c => this.RefChatContainer.set(item.task.id, c)}
-                        item={item.task}
-                        desactivateTask={this.desactivateTask}
-                        key={item.task.id}
-                        openChatTriger={this.openChat}
-                        chatTopPositionTriger={this.chatTopPositionTriger}
-                        whoFocus={this.whoFocus}
-                        whoFocusItem={this.state.whoFocusItem}
-                        addNewMessage={this.addNewMessage}
-                        updateActivateTask={this.updateActivateTask}
-                        socket={this.state.socket}
-                        color={item.task.color}
-                        change={item.task.change}
-                        appID={item.task.client.aplicationId}
-                        updateGlobalMapVars={this.updateGlobalMapVars}
-                        addRemoveFavorite={this.addRemoveFavorite}
-                        notificationOff={this.notificationOff}
-                        favoritesProviders={
-                          item.task.favorites ? item.task.favorites : null
-                        }
-                        isMyMessage={this.isMyMessage}
-                      />
-                      ))*/}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
