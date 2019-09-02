@@ -994,14 +994,23 @@ class Board extends Component {
             ) : (
               <div />
             )}
-            <div className="asignetOverflow">
+            
+            <div className="workBoard">
+              <div
+                className={
+                  this.state.activeTasks.length > 0
+                    ? 'middleBoard allW'
+                    : 'middleBoard hafW'
+                }
+                style={{
+                  width: this.state.activeTasks.length > 0 ? '50%' : '100%',
+                }}
+              >
+                <div className="asignetOverflow">
               <div
                 className="asigned b-column"
                 onDragOver={e => this.onDragOver(e)}
                 onDrop={e => this.onDrop(e, 'asigned')}
-                style={{
-                  width: tasks.asigned.length * 180 + 'px',
-                }}
               >
                 <span className="column-header">Asignados</span>
                 {tasks.asigned.length > 0 ? (
@@ -1017,17 +1026,6 @@ class Board extends Component {
                 )}
               </div>
             </div>
-            <div className="workBoard">
-              <div
-                className={
-                  this.state.activeTasks.length > 0
-                    ? 'middleBoard allW'
-                    : 'middleBoard hafW'
-                }
-                style={{
-                  width: this.state.activeTasks.length > 0 ? '50%' : '100%',
-                }}
-              >
                 <div
                   className="incurse  b-column"
                   style={getUser().type === 'operator' ? {} : {}}

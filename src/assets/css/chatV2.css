@@ -123,3 +123,7 @@
   min-width: 150px;
   outline: none;
 }
+
+.dragging {
+  border: 2px dotted #026aa7;
+}

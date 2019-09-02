@@ -88,7 +88,8 @@ class ChatContainer extends React.Component {
       ProvidersActiveServices: [],
       drawRoute: false,
       isFavorite: false,
-      frases: null
+      frases: null,
+      dragStart : false
     }
     this.updateClient = this.updateClient.bind(this)
     this.haveToOpenChat = this.haveToOpenChat.bind(this)
@@ -576,6 +577,7 @@ class ChatContainer extends React.Component {
 
   allowDrop = ev => {
     ev.preventDefault()
+    this.setState({ dragStart : true})
     //console.log(ev)
   }
   
@@ -584,13 +586,14 @@ class ChatContainer extends React.Component {
     //console.log(ev.target.innerHTML)
   }
   
-  drop = ev => {
-    ev.preventDefault();
-    const data = ev.dataTransfer.getData("text")
+  drop = () => {
+    //ev.preventDefault();
+    //const data = ev.dataTransfer.getData("text")
     //console.log(data)
-    return data
+    //return data
     //var data = ev.dataTransfer.getData("text");
     //ev.target.appendChild(document.getElementById(data));
+    this.setState({ dragStart: false })
   }
 
   render() {
@@ -824,6 +827,7 @@ class ChatContainer extends React.Component {
                     to={item.client.id}
                     addNewMessage={this.props.addNewMessage}
                     drop={this.drop}
+                    dragStart={this.state.dragStart}
                     allowDrop={this.allowDrop}
                   />
                 </div>

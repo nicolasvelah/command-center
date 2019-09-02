@@ -471,6 +471,7 @@
   width: 180px;
   background: #fdfdfd;
   min-width: 100%;
+  overflow-x: scroll;
 }
 .incurse.b-column .operator {
   float: none;

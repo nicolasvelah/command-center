@@ -9,6 +9,7 @@ export default class Chat extends React.PureComponent {
     this.state = { message: '', textMessage: '' }
   }
   componentDidMount() {
+    console.log('Drag', this.props.dragStart)
     this.props.goBottom('scroll_' + this.props.sid)
   }
   setMessage(e) {
@@ -38,7 +39,25 @@ export default class Chat extends React.PureComponent {
     //console.log('mesajers para esta tarea', this.props.messagesTask)
     return (
       <div className="chatContainerV2">
-        <div className="chatV2" id={'scroll_' + this.props.sid}>
+        <div
+          className={this.props.dragStart ? 'chatV2 dragging' : 'chatV2'}
+          onDrop={async event => {
+            //this.setState({ textMessage: this.props.drop(event) })
+            this.props.drop()
+            const messageDrop = event.dataTransfer.getData('text')
+            await sendMessage(
+              this.props.to,
+              messageDrop,
+              this.props.orderId,
+              this.props.isClientTo,
+              false
+            )
+          }}
+          onDragOver={event => {
+            this.props.allowDrop(event)
+          }}
+          id={'scroll_' + this.props.sid}
+        >
           <div className="mensagessContainerV2">
             <div className="mensagessV2">
               {this.props.messagesTask.map(item => (
