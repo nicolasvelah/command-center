@@ -51,11 +51,11 @@
 /*PROVIDERS SEARCHS*/
 .providersList {
   position: absolute;
-  right: 760px;
-  width: 200px;
-  top: 0px;
+  right: 0;
+  width: 25%;
+  height: 25%;
+  /* top: 0px; */
   background: #ffffff;
-  border: 2px solid #53a93f;
   padding: 10px 0px 0px;
   border-left: none;
   color: #333;
@@ -168,6 +168,12 @@
 .providersSearchFilters .orderBY .ocupyIcon {
   max-width: 13px;
 }
+
+.avalibleProviders {
+  height: 60%;
+  overflow-y: scroll;
+}
+
 .GetTheRoute {
   margin: 5px 0px;
 }

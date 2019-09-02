@@ -310,11 +310,12 @@
   display: flex;
 }
 .chat-container .subcontainer {
-  padding: 5px 0px 0px;
+  /*padding: 5px 0px 0px;*/
 }
 .chat-container .live {
   width: 100%;
-  background: #53a93f;
+  background-color: #eaeaea;
+  /*background: #53a93f;*/
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -333,6 +334,7 @@
   justify-content: space-between;
   width: 100%;
   padding: 0px 10px;
+  background: #53a93f;
 }
 .ChatHeader .clientDataName {
   display: flex;
@@ -512,6 +514,12 @@
   background-color: #eaeaea;
   line-height: 15px;
   overflow-y: scroll;
+}
+
+.haveProvider {
+  position: absolute;
+  right: 0px;
+  top: 30%;
 }
 
 .section-frases-container {

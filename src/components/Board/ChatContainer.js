@@ -720,35 +720,6 @@ class ChatContainer extends React.Component {
             <div className="frases-container">
               {this.state.frases && (
                 <>
-                {/* 
-                <div>
-                  <span>Saludo</span>
-                  {this.state.frases.Frases.Saludo.map((item, index) => (
-                    <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
-                    ))
-
-                  }
-                
-                </div>
-                <div>
-                <span>Conversacion</span>
-                {this.state.frases.Frases.Conversacion.map((item, index) => (
-                  <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
-                  ))
-
-                }
-              
-              </div>
-              <div>
-              <span>Despedida</span>
-              {this.state.frases.Frases.Despedida.map((item, index) => (
-                <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
-                ))
-
-              }
-            
-            </div>
-          */}
           {
             this.state.frases.Frases.map((itemType, index) => (
               <div className="section-frases-container" key={index}>
@@ -768,11 +739,6 @@ class ChatContainer extends React.Component {
             {item.status.name === 'live' && this.state.providers.length >= 0 ? (
               <div
                 className="ChatMap"
-                style={
-                  this.state.searchProviderMode
-                    ? null
-                    : { borderRight: '3px solid  #53a93f' }
-                }
               >
                 {(this.props.socket !== null &&
                   this.state.ProvidersActiveServices.length > 0) ||
@@ -1103,7 +1069,26 @@ class ChatContainer extends React.Component {
             ) : (
               ''
             )}
-            <div className="frases-container">Holaa2</div>
+          
+            <div className={this.state.searchProviderMode ? "frases-container haveProvider" : "frases-container"}>
+            {this.state.frases && (
+                <>
+          {
+            this.state.frases.Frases.map((itemType, index) => (
+              <div className="section-frases-container" key={index}>
+                <span>{itemType.name}</span>
+                {itemType.lista.map((item, index) => (
+                <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
+                ))
+
+              }
+              </div>
+            ))
+          }
+                </>
+                
+              )}
+            </div>
             </div>
           </div>
         </>

@@ -720,89 +720,7 @@ class MapServiceTacking extends Component {
     return !this.state.unmount ? (
       <div className="map-container-traking-Main">
         
-        {this.props.searchProviderMode ? (
-          <div className="providersList">
-            <ProviderSearchFilter
-              userId={this.props.userId}
-              m={this.state.m}
-              ProvidersActiveServices={this.state.ProvidersActiveServices}
-              handleChange={this.handleChange}
-              handleKeyDown={this.handleKeyDown}
-              handleServiceChange={this.handleServiceChange}
-              SelectDefaultValue={{
-                value: this.props.service,
-                label: this.props.service,
-              }}
-              updateActiveSortProv={this.updateActiveSortProv}
-              ActiveSortProv={this.state.ActiveSortProv}
-            />
-
-            <div className="avalibleProviders">
-              {this.props.providers
-                ? this.props.providers
-                    .filter(item => {
-                      const resp = this.providerFiltering(item)
-                      item.distance = resp.distance
-                      //console.log('item.favorite', item.favorite)
-                      return resp.response
-                    })
-                    .sort((a, b) => {
-                      if (this.state.ActiveSortProv === 'coneccion') {
-                        return a.connected === b.connected
-                          ? 0
-                          : a.connected
-                          ? -1
-                          : 1
-                      } else if (this.state.ActiveSortProv === 'inService') {
-                        return b.inService === a.inService
-                          ? 0
-                          : b.inService
-                          ? -1
-                          : 1
-                      } else if (this.state.ActiveSortProv === 'rate') {
-                        return b.info.rate - a.info.rate
-                      } else if (this.state.ActiveSortProv === 'favorite') {
-                        return a.isFavorite === b.isFavorite
-                          ? 0
-                          : a.isFavorite
-                          ? -1
-                          : 1
-                      } else if (this.state.ActiveSortProv === 'distance') {
-                        return a.distance - b.distance
-                      } else {
-                        return b.id - a.id
-                      }
-                    })
-                    .map(item => (
-                      <ProviderItemSearchFilter
-                        key={item.id}
-                        ref={c => this.RefItemSearchFilter.set(item.id, c)}
-                        item={item}
-                        centerActor={this.centerActor}
-                        calculateAndDisplayRoute={this.calculateAndDisplayRoute}
-                        addRemoveFavorite={this.props.addRemoveFavorite}
-                        orderId={this.props.orderId}
-                        favorite={item.isFavorite}
-                        updateProvidersFavorite={
-                          this.props.updateProvidersFavorite
-                        }
-                        setActiveProvider={this.setActiveProvider}
-                        activeProvider={this.state.activeProvider}
-                        asignProvider={this.props.asignProvider}
-                        activeProviderNotification={
-                          this.props.activeProviderNotification
-                        }
-                        activeProviderChat={this.props.activeProviderChat}
-                        activeProviderCall={this.props.activeProviderCall}
-                        originLat={this.props.lat}
-                        originLng={this.props.len}
-                        drawRoute={this.drawRouteSearchFilter}
-                      />
-                    ))
-                : null}
-            </div>
-          </div>
-        ) : null}
+        
         <div className="map-container-traking">
           {/*<Autocomplete
             onPlaceSelected={this.handlerLocalization}
@@ -1200,7 +1118,89 @@ class MapServiceTacking extends Component {
           </ButtonContainer>
         */}
         </div>
-        
+        {this.props.searchProviderMode ? (
+          <div className="providersList">
+            <ProviderSearchFilter
+              userId={this.props.userId}
+              m={this.state.m}
+              ProvidersActiveServices={this.state.ProvidersActiveServices}
+              handleChange={this.handleChange}
+              handleKeyDown={this.handleKeyDown}
+              handleServiceChange={this.handleServiceChange}
+              SelectDefaultValue={{
+                value: this.props.service,
+                label: this.props.service,
+              }}
+              updateActiveSortProv={this.updateActiveSortProv}
+              ActiveSortProv={this.state.ActiveSortProv}
+            />
+
+            <div className="avalibleProviders">
+              {this.props.providers
+                ? this.props.providers
+                    .filter(item => {
+                      const resp = this.providerFiltering(item)
+                      item.distance = resp.distance
+                      //console.log('item.favorite', item.favorite)
+                      return resp.response
+                    })
+                    .sort((a, b) => {
+                      if (this.state.ActiveSortProv === 'coneccion') {
+                        return a.connected === b.connected
+                          ? 0
+                          : a.connected
+                          ? -1
+                          : 1
+                      } else if (this.state.ActiveSortProv === 'inService') {
+                        return b.inService === a.inService
+                          ? 0
+                          : b.inService
+                          ? -1
+                          : 1
+                      } else if (this.state.ActiveSortProv === 'rate') {
+                        return b.info.rate - a.info.rate
+                      } else if (this.state.ActiveSortProv === 'favorite') {
+                        return a.isFavorite === b.isFavorite
+                          ? 0
+                          : a.isFavorite
+                          ? -1
+                          : 1
+                      } else if (this.state.ActiveSortProv === 'distance') {
+                        return a.distance - b.distance
+                      } else {
+                        return b.id - a.id
+                      }
+                    })
+                    .map(item => (
+                      <ProviderItemSearchFilter
+                        key={item.id}
+                        ref={c => this.RefItemSearchFilter.set(item.id, c)}
+                        item={item}
+                        centerActor={this.centerActor}
+                        calculateAndDisplayRoute={this.calculateAndDisplayRoute}
+                        addRemoveFavorite={this.props.addRemoveFavorite}
+                        orderId={this.props.orderId}
+                        favorite={item.isFavorite}
+                        updateProvidersFavorite={
+                          this.props.updateProvidersFavorite
+                        }
+                        setActiveProvider={this.setActiveProvider}
+                        activeProvider={this.state.activeProvider}
+                        asignProvider={this.props.asignProvider}
+                        activeProviderNotification={
+                          this.props.activeProviderNotification
+                        }
+                        activeProviderChat={this.props.activeProviderChat}
+                        activeProviderCall={this.props.activeProviderCall}
+                        originLat={this.props.lat}
+                        originLng={this.props.len}
+                        drawRoute={this.drawRouteSearchFilter}
+                      />
+                    ))
+                : null}
+            </div>
+          </div>
+        ) : null}
       </div>
       
     ) : null
