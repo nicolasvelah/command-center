@@ -110,7 +110,10 @@ export default class TaskItem extends React.Component {
           </div>
         </div>
         <div className="task-footer">
-          <ChatNotificationsCounter t={this.props.t} />
+          {!this.props.t.active && (
+            <ChatNotificationsCounter t={this.props.t} />
+          )}
+
           {getUser().type !== 'operator' ? (
             <div className="operator">
               {this.props.t.operator !== null ? (

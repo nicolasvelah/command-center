@@ -101,11 +101,16 @@ export default class Chat extends React.PureComponent {
                 }
               }}
               onDrop={event => {
-                this.setState({ textMessage: this.props.drop(event) })
+                //this.setState({ textMessage: this.props.drop(event) })
+                const messageDrop = event.dataTransfer.getData('text')
 
                 document.getElementById(
                   'ChatTextarea_' + this.props.sid
-                ).value = event.dataTransfer.getData('text')
+                ).value = messageDrop
+
+                this.setState({
+                  message: messageDrop,
+                })
 
                 /*
                 const e = {

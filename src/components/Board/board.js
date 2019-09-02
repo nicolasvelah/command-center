@@ -929,7 +929,8 @@ class Board extends Component {
     //this.setState({ tasks: get('tasks') })
     this.state.tasks
       .sort(function(a, b) {
-        return b.active - a.active
+        //return b.active - a.active
+        return a.priority - b.priority
       })
       .filter(function(c) {
         if (context.state.filterByoperator !== null) {

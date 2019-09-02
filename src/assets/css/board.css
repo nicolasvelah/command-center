@@ -510,6 +510,18 @@
 .frases-container {
   width: 25%;
   background-color: #eaeaea;
+  line-height: 15px;
+  overflow-y: scroll;
+}
+
+.section-frases-container {
+  padding: 5px;
+  color: #444;
+}
+
+.section-frases-container span {
+  margin: auto;
+  font-size: 12px;
 }
 
 .frase {
