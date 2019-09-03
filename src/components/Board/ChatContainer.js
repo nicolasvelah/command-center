@@ -98,7 +98,7 @@ class ChatContainer extends React.Component {
   async componentDidMount() {
     //GET USER GEOLOCALIZATION DATA
     const clientGLData = await findUserById(this.props.item.clientId, true)
-    //console.log('++Iniciando haveToOpenChat ++')
+    console.log('clientGLData', clientGLData)
     await this.haveToOpenChat(this.props.item.status.name, 'init', 'init')
     let { searchProviderMode } = this.state
     if (this.props.item.provider !== null) {
@@ -583,9 +583,9 @@ class ChatContainer extends React.Component {
   
   drag = ev => {
     //ev.dataTransfer.setData("text/plain", ev.target.innerHTML);
-    const dataAEnviar = {isClientTo: ev.target.getAttribute("isClientTo"), text: ev.target.innerHTML}
+    const dataAEnviar = {isClientTo: ev.target.getAttribute("isclientto"), text: ev.target.innerHTML}
     ev.dataTransfer.setData("text/plain",  JSON.stringify(dataAEnviar));
-    console.log('isClientTo',ev.target.getAttribute("isClientTo"))
+    console.log('isClientTo',ev.target.getAttribute("isclientto"))
   }
   
   drop = () => {
@@ -730,7 +730,7 @@ class ChatContainer extends React.Component {
               <div className="section-frases-container" key={index}>
                 <span>{itemType.name}</span>
                 {itemType.lista.map((item, index) => (
-                <div className="frase" isClientTo="true" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
+                <div className="frase" isclientto="true" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
                 ))
 
               }
@@ -760,16 +760,15 @@ class ChatContainer extends React.Component {
                     clientGLData={this.state.clientData}
                     clientDataLat={
                       this.state.clientData !== null &&
-                      this.state.clientData.lat !== undefined &&
-                      this.state.clientData.lat !== null
-                        ? this.state.clientData.lat
+                      this.state.clientData.location.coordinates[1] !== undefined &&
+                      this.state.clientData.location.coordinates[1] !== null
+                        ? this.state.clientData.location.coordinates[1]
                         : 0
                     }
                     clientDataLng={
-                      this.state.clientData !== null &&
-                      this.state.clientData.lng !== undefined &&
-                      this.state.clientData.lng !== null
-                        ? this.state.clientData.lng
+                      this.state.clientData.location.coordinates[0] !== null &&
+                      this.state.clientData.location.coordinates[0] !== undefined 
+                        ? this.state.clientData.location.coordinates[0]
                         : 0
                     }
                     clientDataState={
@@ -1090,7 +1089,7 @@ class ChatContainer extends React.Component {
               <div className="section-frases-container" key={index}>
                 <span>{itemType.name}</span>
                 {itemType.lista.map((item, index) => (
-                <div className="frase" isClientTo="false" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
+                <div className="frase" isclientto="false" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
                 ))
 
               }
