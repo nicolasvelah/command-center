@@ -23,9 +23,8 @@ const SearchProviderModeMarker = styled.div`
   text-align: right;
   padding: 0px;
   .iconServiceState {
-    padding: 4px 4px 0px;
+    /*padding: 4px 4px 0px;*/
     display: inline-block;
-    background: #fff;
     border: 2px solid #53a93f;
     border-bottom: none;
     border-right: none;
@@ -316,8 +315,9 @@ class ChatContainer extends React.Component {
         status = 'live'
         haveToOpen = true
       } else if (item.status.name === 'live') {
-        status = 'standby'
-        haveToOpen = false
+        console.log('Cayo aqui')
+        //status = 'standby'
+        //haveToOpen = false
       } else if (item.status.name === 'asigned') {
         status = 'live'
         haveToOpen = true
@@ -582,8 +582,10 @@ class ChatContainer extends React.Component {
   }
   
   drag = ev => {
-    ev.dataTransfer.setData("text/plain", ev.target.innerHTML);
-    //console.log(ev.target.innerHTML)
+    //ev.dataTransfer.setData("text/plain", ev.target.innerHTML);
+    const dataAEnviar = {isClientTo: ev.target.getAttribute("isClientTo"), text: ev.target.innerHTML}
+    ev.dataTransfer.setData("text/plain",  JSON.stringify(dataAEnviar));
+    console.log('isClientTo',ev.target.getAttribute("isClientTo"))
   }
   
   drop = () => {
@@ -728,7 +730,7 @@ class ChatContainer extends React.Component {
               <div className="section-frases-container" key={index}>
                 <span>{itemType.name}</span>
                 {itemType.lista.map((item, index) => (
-                <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
+                <div className="frase" isClientTo="true" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
                 ))
 
               }
@@ -1048,6 +1050,9 @@ class ChatContainer extends React.Component {
                         isClientTo={false}
                         to={this.state.providerInChat.id}
                         addNewMessage={this.props.addNewMessage}
+                        drop={this.drop}
+                    dragStart={this.state.dragStart}
+                    allowDrop={this.allowDrop}
                       />
                     ) : (
                       <Chat
@@ -1058,6 +1063,9 @@ class ChatContainer extends React.Component {
                         isClientTo={false}
                         to={item.provider.user.id}
                         addNewMessage={this.props.addNewMessage}
+                        drop={this.drop}
+                    dragStart={this.state.dragStart}
+                    allowDrop={this.allowDrop}
                       />
                     )}
                   </ChatProviderHeader>
@@ -1082,7 +1090,7 @@ class ChatContainer extends React.Component {
               <div className="section-frases-container" key={index}>
                 <span>{itemType.name}</span>
                 {itemType.lista.map((item, index) => (
-                <div className="frase" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
+                <div className="frase" isClientTo="false" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
                 ))
 
               }

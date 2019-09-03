@@ -45,10 +45,10 @@
   color: #fff;
   text-align: center;
   font-size: 11px;
-  margin-right: 5px;
+  margin: 0px 5px;
 }
 .ChatHeader .taskVisualTraking {
-  margin-bottom: 5px;
+  /*margin-bottom: 5px;*/
 }
 .task {
   margin: 5px 0 0;
@@ -333,11 +333,12 @@
   display: inline-flex;
   justify-content: space-between;
   width: 100%;
-  padding: 0px 10px;
+  padding: 2px 10px;
   background: #53a93f;
 }
 .ChatHeader .clientDataName {
   display: flex;
+  align-items: center;
 }
 .main-chat {
   display: flex;
@@ -416,6 +417,7 @@
 .ChatInfoMain {
   padding: 0px 10px;
   margin-bottom: 10px;
+  height: 100px;
 }
 .ChatClient {
   border-right: 1px solid #ddd;
@@ -447,25 +449,25 @@
   display: none;
 }
 .asignetOverflow {
-  overflow: auto;
-  top: 0;
-  left: 50px;
-  right: 0;
-  width: 101%;
+  /* overflow: auto; */
+  /* top: 0; */
+  /* left: 50px; */
+  /* right: 0; */
+  /* width: 101%; */
   z-index: 2;
-  margin: 0px 0px 0px -20px;
-  padding: 0px;
-  border-radius: 0;
-  min-height: 80px;
-  border-bottom: 1px solid #b4b4b4;
-  text-align: right;
-  background: #fdfdfd;
+  /* margin: 0px 0px 0px -20px; */
+  margin: 10px;
+  border-radius: 10px;
+  /* min-height: 80px; */
+  border: 1px solid #b4b4b4;
+  /* text-align: right; */
+  /* background: #fdfdfd; */
 }
 
 .asigned.b-column {
   margin: 0px;
   padding: 5px 0px 10px 30px;
-  border-radius: 0;
+  border-radius: 10px;
   min-height: 80px;
   display: inline-flex;
   width: 180px;
@@ -521,6 +523,7 @@
   position: absolute;
   right: 0px;
   top: 30%;
+  height: 70%;
 }
 
 .section-frases-container {
@@ -552,7 +555,7 @@
 }
 .incurse.b-column {
   width: 100%;
-  margin: 20px 0 0;
+  margin: 0px;
   background: none;
 }
 .incurse.b-column .b-row {
@@ -696,6 +699,10 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+
+textarea {
+  resize: none;
 }
 
 @media (max-width: 767px) {
