@@ -246,28 +246,27 @@ class Board extends Component {
     //console.log('Completo providerState')
   }
   /// updateOrder
-  updateOrder = dataContent => {
-    let { tasks, activeTasks } = this.state
-
+  updateOrder = async dataContent => {
+    let { tasks } = this.state
+    console.log('updateOrder')
     tasks.forEach(element => {
       if (dataContent.orderId === element.id) {
-        //console.log('Tarea actualizada', element.status.name, dataContent.state)
-        //console.log('Active Task', activeTasks)
-
         element.status.name = dataContent.state
-        if (dataContent.state === 'complete') {
-          activeTasks.forEach(async (elementActiveTask, index) => {
-            if (element.id === elementActiveTask.task.id) {
-              //console.log('Encontro Task', elementActiveTask.task)
-              activeTasks.splice(index, 1)
-              await save('activeTasks', activeTasks)
-            }
-          })
-          //console.log('element', element)
-          //activeTasks.push(element)
-        }
       }
     })
+    if (dataContent.state === 'complete') {
+      await save('activeTasks', [])
+      await this.setState({ activateTask: [] })
+      /*
+      activeTasks.forEach(async (elementActiveTask, index) => {
+        if (element.id === elementActiveTask.task.id) {
+          //console.log('Encontro Task', elementActiveTask.task)
+          activeTasks.splice(index, 1)
+          await save('activeTasks', activeTasks)
+        }
+      })
+      */
+    }
 
     this.setState({ tasks })
   }
@@ -529,6 +528,7 @@ class Board extends Component {
           }
         })
     }
+    /*
     if (column === 'complete') {
       await this.state.tasks.forEach(element => {
         if (element.id === id && element.active === true) {
@@ -536,6 +536,7 @@ class Board extends Component {
         }
       })
     }
+    */
   }
   activateTask = async (id, icon) => {
     //console.log('activateTask')
@@ -1138,48 +1139,46 @@ class Board extends Component {
                   )}
                 </div>
               </div>
-              {this.state.activeTasks.length !== 0 && (
-                <div className="chatsBarV2" id="chatsBar">
-                  <div
-                    className=""
-                    style={{
-                      top: this.state.chatTopPosition,
-                      width: '100%',
-                    }}
-                  >
-                    <ChatContainer
-                      ref={c =>
-                        this.RefChatContainer.set(
-                          this.state.activeTasks[0].task.id,
-                          c
-                        )
-                      }
-                      item={this.state.activeTasks[0].task}
-                      desactivateTask={this.desactivateTask}
-                      key={this.state.activeTasks[0].task.id}
-                      openChatTriger={this.openChat}
-                      chatTopPositionTriger={this.chatTopPositionTriger}
-                      whoFocus={this.whoFocus}
-                      whoFocusItem={this.state.whoFocusItem}
-                      addNewMessage={this.addNewMessage}
-                      updateActivateTask={this.updateActivateTask}
-                      socket={this.state.socket}
-                      color={this.state.activeTasks[0].task.color}
-                      change={this.state.activeTasks[0].task.change}
-                      appID={this.state.activeTasks[0].task.client.aplicationId}
-                      updateGlobalMapVars={this.updateGlobalMapVars}
-                      addRemoveFavorite={this.addRemoveFavorite}
-                      notificationOff={this.notificationOff}
-                      favoritesProviders={
-                        this.state.activeTasks[0].task.favorites
-                          ? this.state.activeTasks[0].task.favorites
-                          : null
-                      }
-                      isMyMessage={this.isMyMessage}
-                    />
+              {this.state.activeTasks.length !== 0 &&
+                this.state.activeTasks !== [] && (
+                  <div className="chatsBarV2" id="chatsBar">
+                    <div
+                      className=""
+                      style={{
+                        top: this.state.chatTopPosition,
+                        width: '100%',
+                      }}
+                    >
+                      <ChatContainer
+                        
+                        item={this.state.activeTasks[0].task}
+                        desactivateTask={this.desactivateTask}
+                        key={this.state.activeTasks[0].task.id}
+                        openChatTriger={this.openChat}
+                        chatTopPositionTriger={this.chatTopPositionTriger}
+                        whoFocus={this.whoFocus}
+                        whoFocusItem={this.state.whoFocusItem}
+                        addNewMessage={this.addNewMessage}
+                        updateActivateTask={this.updateActivateTask}
+                        socket={this.state.socket}
+                        color={this.state.activeTasks[0].task.color}
+                        change={this.state.activeTasks[0].task.change}
+                        appID={
+                          this.state.activeTasks[0].task.client.aplicationId
+                        }
+                        updateGlobalMapVars={this.updateGlobalMapVars}
+                        addRemoveFavorite={this.addRemoveFavorite}
+                        notificationOff={this.notificationOff}
+                        favoritesProviders={
+                          this.state.activeTasks[0].task.favorites
+                            ? this.state.activeTasks[0].task.favorites
+                            : null
+                        }
+                        isMyMessage={this.isMyMessage}
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </div>
         </div>
