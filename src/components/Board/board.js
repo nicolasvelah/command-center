@@ -181,9 +181,17 @@ class Board extends Component {
           MsmNewTask(dataNotification.notification.title)
           getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
-          if (dataNotification.data.content.state !== 'delivered') {
+          //console.log('dataNotification.data.content.state', dataNotification.data.content.state)
+
+          if (
+            dataNotification.data.content.state !== 'delivered' &&
+            dataNotification.data.content.state !== undefined
+          ) {
             await updateOrder(dataNotification.data.content)
             //await getMyTasks('onNotification')
+          } else {
+            console.log('getLastTask')
+            getMyLastTasks('websockets', dataNotification.data.content.orderId)
           }
         }
       }
@@ -219,10 +227,11 @@ class Board extends Component {
     if (type === 'WORKINPROGRESS' || type === 'STARTED') {
       type = 'wip'
       tasks[index].appStatus = 'STARTED'
-
+      /*
       if (tasks[index].status.name === 'asigned') {
         tasks[index].status.name = 'standby'
       }
+      */
     } else if (type === 'WORKFINISHED' || type === 'FINISHED') {
       type = 'wf'
       tasks[index].appStatus = 'FINISHED'
@@ -485,6 +494,7 @@ class Board extends Component {
         return item
       })
     }
+
     activetask = await activetask.filter(item => {
       if (item.task.id === id) {
         item.task.status.name = column
@@ -518,6 +528,13 @@ class Board extends Component {
             node.updatechageProviderVal()
           }
         })
+    }
+    if (column === 'complete') {
+      await this.state.tasks.forEach(element => {
+        if (element.id === id && element.active === true) {
+          this.setState({ activateTask: [] })
+        }
+      })
     }
   }
   activateTask = async (id, icon) => {
@@ -643,8 +660,8 @@ class Board extends Component {
   //COLUMN OR STATUS TRIGER
   trigerColumn = async (col, id) => {
     try {
-      /*console.log('col', col)
-      console.log('id', id)*/
+      /*console.log('col', col)*/
+      console.log('id', id)
       await this.updateActivateTask(col, id)
       await updateStatus(id, col)
       //console.log('=======updateStatus triger Column=========')
@@ -994,7 +1011,7 @@ class Board extends Component {
             ) : (
               <div />
             )}
-            
+
             <div className="workBoard">
               <div
                 className={
@@ -1007,25 +1024,25 @@ class Board extends Component {
                 }}
               >
                 <div className="asignetOverflow">
-              <div
-                className="asigned b-column"
-                onDragOver={e => this.onDragOver(e)}
-                onDrop={e => this.onDrop(e, 'asigned')}
-              >
-                <span className="column-header">Asignados</span>
-                {tasks.asigned.length > 0 ? (
-                  tasks.asigned
-                ) : (
-                  <div className="messageAssignetEmpty">
-                    <p>
-                      Atento!!! en cualquier momento entra una nueva historia...
-                      Podrás verla en esta barra... <br />
-                      Suerte :)
-                    </p>
+                  <div
+                    className="asigned b-column"
+                    onDragOver={e => this.onDragOver(e)}
+                    onDrop={e => this.onDrop(e, 'asigned')}
+                  >
+                    <span className="column-header">Asignados</span>
+                    {tasks.asigned.length > 0 ? (
+                      tasks.asigned
+                    ) : (
+                      <div className="messageAssignetEmpty">
+                        <p>
+                          Atento!!! en cualquier momento entra una nueva
+                          historia... Podrás verla en esta barra... <br />
+                          Suerte :)
+                        </p>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
                 <div
                   className="incurse  b-column"
                   style={getUser().type === 'operator' ? {} : {}}
@@ -1127,7 +1144,7 @@ class Board extends Component {
                     className=""
                     style={{
                       top: this.state.chatTopPosition,
-                      width: "100%",
+                      width: '100%',
                     }}
                   >
                     <ChatContainer
