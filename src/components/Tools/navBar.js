@@ -10,8 +10,8 @@ import searchIcon from '../../images/search.svg'
 import rocket from '../../images/rocket.svg'
 import radar from '../../images/radar.svg'
 import board from '../../images/board.svg'
-import plus from '../../images/plus.svg'
-//import report from '../../images/report.svg'
+//import plus from '../../images/plus.svg'
+import report from '../../images/report.svg'
 import users from '../../images/users.svg'
 import exit from '../../images/exit.svg'
 import circleRight from '../../images/circle-right.svg'
@@ -78,12 +78,12 @@ class navBar extends React.Component {
                     >
                       Tablero <img src={board} alt="" className="icon" />
                     </div>
-                    <div
+                    {/*<div
                       onClick={() => this.setModal('ct')}
                       className="menuItem"
                     >
                       Crear Tarea <img src={plus} alt="" className="icon" />
-                    </div>
+                    </div>*/}
                     {getUser().type === 'supervisor' ? (
                       <div>
                         <div
@@ -95,7 +95,7 @@ class navBar extends React.Component {
                         >
                           Entregas <img src={rocket} alt="" className="icon" />
                         </div>
-                        {/*<div
+                        <div
                           onClick={event => {
                             event.preventDefault()
                             navigate(`/app/reports`)
@@ -103,7 +103,7 @@ class navBar extends React.Component {
                           className="menuItem"
                         >
                           Monitoreo <img src={report} alt="" className="icon" />
-                        </div>*/}
+                        </div>
                         <div
                           onClick={event => {
                             event.preventDefault()
