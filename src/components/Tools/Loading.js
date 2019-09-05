@@ -9,7 +9,7 @@ const LoadingConattainer = styled.div`
     bottom: 0;
     right: 0;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 2;
+    z-index: 600;
     text-align: center;
     padding-top: 200px;
   }
@@ -33,12 +33,13 @@ const LoadingConattainer = styled.div`
 export default class Loading extends React.Component {
   render() {
     return (
-      <LoadingConattainer>
+      <LoadingConattainer className="loadingConattainer">
         <div className="loading">
           <div className="centerAnimation">
             <div className="loaderGif" />
           </div>
           <p>Cargando...</p>
+          <p>{this.props.message}</p>
         </div>
       </LoadingConattainer>
     )

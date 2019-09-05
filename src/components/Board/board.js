@@ -97,7 +97,9 @@ class Board extends Component {
     let { socket } = this
     const accessToken = await getAccessToken()
     //console.log('board')
+    this.setState({ isLoading: true })
     socket = await conectSocket(accessToken, userId, userType, [1, 2, 3])
+    this.setState({ isLoading: false })
 
     await onNotification(
       socket,
@@ -113,7 +115,9 @@ class Board extends Component {
       socket,
     })
     //Tasks
+    this.setState({ isLoading: true })
     await this.getMyTasks('componenedidmount')
+    this.setState({ isLoading: false })
     //Push Notifications
     //OPERADORES
     if (getUser().type !== 'operator') {
@@ -191,7 +195,11 @@ class Board extends Component {
             //await getMyTasks('onNotification')
           } else {
             console.log('getLastTask')
-            getMyLastTasks('websockets', dataNotification.data.content.orderId)
+
+            await getMyLastTasks(
+              'websockets',
+              dataNotification.data.content.orderId
+            )
           }
         }
       }
@@ -580,7 +588,9 @@ class Board extends Component {
       if (!includesThis) {
         if (task.status.name !== 'complete') {
           //console.log('Entro 2')
+          this.setState({ isLoading: true })
           const messages = await this.getMessages(task.id)
+          this.setState({ isLoading: false })
           //console.log('Entro 3')
           task.messagesAll = messages.data
           activeTasks = []
@@ -597,11 +607,13 @@ class Board extends Component {
       }
       //console.log('newTask:', task)
       if (execute) {
+        this.setState({ isLoading: true })
         await this.openChat(id, 'live', 'click')
         await save('activeTasks', activeTasks)
         await this.setState({
           activeTasks,
         })
+        this.setState({ isLoading: false })
         //console.log('click', this.state.activeTasks)
         /*
         await Array.from(this.RefChatContainer.values())
@@ -983,6 +995,7 @@ class Board extends Component {
     //DASHBOARD
     return (
       <div className={this.state.dragStard ? 'dragging' : ''}>
+        {this.state.isLoading === true ? <Loading /> : ''}
         {/*<div className="Welcome">Bienvenido {getUser().name}</div>}
 
         {getUser().type !== 'operator' ? (
@@ -1150,7 +1163,6 @@ class Board extends Component {
                       }}
                     >
                       <ChatContainer
-                        
                         item={this.state.activeTasks[0].task}
                         desactivateTask={this.desactivateTask}
                         key={this.state.activeTasks[0].task.id}
