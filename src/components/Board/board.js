@@ -181,9 +181,17 @@ class Board extends Component {
           MsmNewTask(dataNotification.notification.title)
           getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
-          if (dataNotification.data.content.state !== 'delivered') {
+          //console.log('dataNotification.data.content.state', dataNotification.data.content.state)
+
+          if (
+            dataNotification.data.content.state !== 'delivered' &&
+            dataNotification.data.content.state !== undefined
+          ) {
             await updateOrder(dataNotification.data.content)
             //await getMyTasks('onNotification')
+          } else {
+            console.log('getLastTask')
+            getMyLastTasks('websockets', dataNotification.data.content.orderId)
           }
         }
       }
@@ -219,10 +227,11 @@ class Board extends Component {
     if (type === 'WORKINPROGRESS' || type === 'STARTED') {
       type = 'wip'
       tasks[index].appStatus = 'STARTED'
-
+      /*
       if (tasks[index].status.name === 'asigned') {
         tasks[index].status.name = 'standby'
       }
+      */
     } else if (type === 'WORKFINISHED' || type === 'FINISHED') {
       type = 'wf'
       tasks[index].appStatus = 'FINISHED'
@@ -237,28 +246,27 @@ class Board extends Component {
     //console.log('Completo providerState')
   }
   /// updateOrder
-  updateOrder = dataContent => {
-    let { tasks, activeTasks } = this.state
-
+  updateOrder = async dataContent => {
+    let { tasks } = this.state
+    console.log('updateOrder')
     tasks.forEach(element => {
       if (dataContent.orderId === element.id) {
-        //console.log('Tarea actualizada', element.status.name, dataContent.state)
-        //console.log('Active Task', activeTasks)
-
         element.status.name = dataContent.state
-        if (dataContent.state === 'complete') {
-          activeTasks.forEach(async (elementActiveTask, index) => {
-            if (element.id === elementActiveTask.task.id) {
-              //console.log('Encontro Task', elementActiveTask.task)
-              activeTasks.splice(index, 1)
-              await save('activeTasks', activeTasks)
-            }
-          })
-          //console.log('element', element)
-          //activeTasks.push(element)
-        }
       }
     })
+    if (dataContent.state === 'complete') {
+      await save('activeTasks', [])
+      await this.setState({ activateTask: [] })
+      /*
+      activeTasks.forEach(async (elementActiveTask, index) => {
+        if (element.id === elementActiveTask.task.id) {
+          //console.log('Encontro Task', elementActiveTask.task)
+          activeTasks.splice(index, 1)
+          await save('activeTasks', activeTasks)
+        }
+      })
+      */
+    }
 
     this.setState({ tasks })
   }
@@ -485,6 +493,7 @@ class Board extends Component {
         return item
       })
     }
+
     activetask = await activetask.filter(item => {
       if (item.task.id === id) {
         item.task.status.name = column
@@ -519,6 +528,15 @@ class Board extends Component {
           }
         })
     }
+    /*
+    if (column === 'complete') {
+      await this.state.tasks.forEach(element => {
+        if (element.id === id && element.active === true) {
+          this.setState({ activateTask: [] })
+        }
+      })
+    }
+    */
   }
   activateTask = async (id, icon) => {
     //console.log('activateTask')
@@ -550,7 +568,12 @@ class Board extends Component {
           return item
         })
       }
+
+      await this.state.tasks.forEach(element => {
+        element.active = false
+      })
       task.icon = icon
+      task.active = true
       //console.log('Entro', task)
       //console.log('AllTask', this.state.tasks)
 
@@ -579,7 +602,8 @@ class Board extends Component {
         await this.setState({
           activeTasks,
         })
-
+        //console.log('click', this.state.activeTasks)
+        /*
         await Array.from(this.RefChatContainer.values())
           .filter(node => node != null)
           .forEach(node => {
@@ -588,6 +612,7 @@ class Board extends Component {
               node.wrappedInstance.haveToOpenChat('live', 'board')
             }
           })
+          */
         //const scrollWidthValue = (index - 1) * 420
       }
       this.notificationOff(id, 'provider')
@@ -636,8 +661,8 @@ class Board extends Component {
   //COLUMN OR STATUS TRIGER
   trigerColumn = async (col, id) => {
     try {
-      /*console.log('col', col)
-      console.log('id', id)*/
+      /*console.log('col', col)*/
+      console.log('id', id)
       await this.updateActivateTask(col, id)
       await updateStatus(id, col)
       //console.log('=======updateStatus triger Column=========')
@@ -682,6 +707,16 @@ class Board extends Component {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
       //await save('tasks', decryptedData.tasks)
+      const taskActive = get('activeTasks')
+      if (taskActive.length !== 0) {
+        decryptedData.tasks.forEach(element => {
+          element.active = false
+          if (element.id === taskActive[0].task.id) {
+            element.active = true
+          }
+        })
+      }
+
       this.setState({
         tasks: decryptedData.tasks,
       })
@@ -912,6 +947,7 @@ class Board extends Component {
     //this.setState({ tasks: get('tasks') })
     this.state.tasks
       .sort(function(a, b) {
+        //return b.active - a.active
         return a.priority - b.priority
       })
       .filter(function(c) {
@@ -976,29 +1012,7 @@ class Board extends Component {
             ) : (
               <div />
             )}
-            <div className="asignetOverflow">
-              <div
-                className="asigned b-column"
-                onDragOver={e => this.onDragOver(e)}
-                onDrop={e => this.onDrop(e, 'asigned')}
-                style={{
-                  width: tasks.asigned.length * 180 + 'px',
-                }}
-              >
-                <span className="column-header">Asignados</span>
-                {tasks.asigned.length > 0 ? (
-                  tasks.asigned
-                ) : (
-                  <div className="messageAssignetEmpty">
-                    <p>
-                      Atento!!! en cualquier momento entra una nueva historia...
-                      Podrás verla en esta barra... <br />
-                      Suerte :)
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+
             <div className="workBoard">
               <div
                 className={
@@ -1010,6 +1024,26 @@ class Board extends Component {
                   width: this.state.activeTasks.length > 0 ? '50%' : '100%',
                 }}
               >
+                <div className="asignetOverflow">
+                  <div
+                    className="asigned b-column"
+                    onDragOver={e => this.onDragOver(e)}
+                    onDrop={e => this.onDrop(e, 'asigned')}
+                  >
+                    <span className="column-header">Asignados</span>
+                    {tasks.asigned.length > 0 ? (
+                      tasks.asigned
+                    ) : (
+                      <div className="messageAssignetEmpty">
+                        <p>
+                          Atento!!! en cualquier momento entra una nueva
+                          historia... Podrás verla en esta barra... <br />
+                          Suerte :)
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <div
                   className="incurse  b-column"
                   style={getUser().type === 'operator' ? {} : {}}
@@ -1105,33 +1139,21 @@ class Board extends Component {
                   )}
                 </div>
               </div>
-
-              <div className="chatsBarV2" id="chatsBar">
-                <div
-                  className=""
-                  style={{
-                    top: this.state.chatTopPosition,
-                    width: this.state.activeTasks.length * 300 + 'px',
-                  }}
-                >
-                  {this.state.activeTasks
-                    .sort(function(a, b) {
-                      return ('' + a.task.status.name).localeCompare(
-                        b.task.status.name
-                      )
-                    })
-                    .filter(function(item) {
-                      return (
-                        item.task.status.name !== 'asigned' &&
-                        item.task.status.name !== 'complete'
-                      )
-                    })
-                    .map(item => (
+              {this.state.activeTasks.length !== 0 &&
+                this.state.activeTasks !== [] && (
+                  <div className="chatsBarV2" id="chatsBar">
+                    <div
+                      className=""
+                      style={{
+                        top: this.state.chatTopPosition,
+                        width: '100%',
+                      }}
+                    >
                       <ChatContainer
-                        ref={c => this.RefChatContainer.set(item.task.id, c)}
-                        item={item.task}
+                        
+                        item={this.state.activeTasks[0].task}
                         desactivateTask={this.desactivateTask}
-                        key={item.task.id}
+                        key={this.state.activeTasks[0].task.id}
                         openChatTriger={this.openChat}
                         chatTopPositionTriger={this.chatTopPositionTriger}
                         whoFocus={this.whoFocus}
@@ -1139,20 +1161,24 @@ class Board extends Component {
                         addNewMessage={this.addNewMessage}
                         updateActivateTask={this.updateActivateTask}
                         socket={this.state.socket}
-                        color={item.task.color}
-                        change={item.task.change}
-                        appID={item.task.client.aplicationId}
+                        color={this.state.activeTasks[0].task.color}
+                        change={this.state.activeTasks[0].task.change}
+                        appID={
+                          this.state.activeTasks[0].task.client.aplicationId
+                        }
                         updateGlobalMapVars={this.updateGlobalMapVars}
                         addRemoveFavorite={this.addRemoveFavorite}
                         notificationOff={this.notificationOff}
                         favoritesProviders={
-                          item.task.favorites ? item.task.favorites : null
+                          this.state.activeTasks[0].task.favorites
+                            ? this.state.activeTasks[0].task.favorites
+                            : null
                         }
                         isMyMessage={this.isMyMessage}
                       />
-                    ))}
-                </div>
-              </div>
+                    </div>
+                  </div>
+                )}
             </div>
           </div>
         </div>

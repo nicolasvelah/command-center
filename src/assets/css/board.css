@@ -3,7 +3,7 @@
   display: block;
   flex-direction: row;
   font-family: Arial, Helvetica, sans-serif;
-  padding-bottom: 40px;
+  /*padding-bottom: 40px;*/
 }
 .b-column {
   width: 33%;
@@ -45,10 +45,10 @@
   color: #fff;
   text-align: center;
   font-size: 11px;
-  margin-right: 5px;
+  margin: 0px 5px;
 }
 .ChatHeader .taskVisualTraking {
-  margin-bottom: 5px;
+  /*margin-bottom: 5px;*/
 }
 .task {
   margin: 5px 0 0;
@@ -305,14 +305,20 @@
   /*display: inline-block;*/
   vertical-align: bottom;
   position: relative;
-  width: 420px;
+  width: 100%;
   visibility: visible;
+  display: flex;
 }
 .chat-container .subcontainer {
-  padding: 5px 0px 0px;
+  /*padding: 5px 0px 0px;*/
 }
 .chat-container .live {
-  background: #53a93f;
+  width: 100%;
+  background-color: #eaeaea;
+  /*background: #53a93f;*/
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .chat-container .standby {
   background: #fdc509;
@@ -327,11 +333,18 @@
   display: inline-flex;
   justify-content: space-between;
   width: 100%;
-  padding: 0px 10px;
+  padding: 2px 10px;
+  background: #53a93f;
 }
 .ChatHeader .clientDataName {
   display: flex;
+  align-items: center;
 }
+.main-chat {
+  display: flex;
+  width: 100%;
+}
+
 .chat-container .ChatNotificationsCounter {
   position: relative;
 }
@@ -404,6 +417,7 @@
 .ChatInfoMain {
   padding: 0px 10px;
   margin-bottom: 10px;
+  height: 100px;
 }
 .ChatClient {
   border-right: 1px solid #ddd;
@@ -419,10 +433,11 @@
   margin: 1px 0px 0px 5px;
 }
 .live .chatFocusBoard {
-  -webkit-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
-  -moz-box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
-  box-shadow: -5px -5px 5px -5px rgba(125, 123, 125, 1);
+  -webkit-box-shadow: 0px 0px 10px 3px rgba(125, 123, 125, 1);
+  -moz-box-shadow: 0px 0px 10px 3px rgba (125, 123, 125, 1);
+  box-shadow: 0px 0px 10px 3px rgba(125, 123, 125, 1);
   border: 2px solid #53a93f !important;
+  background-color: honeydew !important;
 }
 .live .timerState {
   display: none;
@@ -434,30 +449,31 @@
   display: none;
 }
 .asignetOverflow {
-  overflow: auto;
-  top: 0;
-  left: 50px;
-  right: 0;
-  width: 101%;
+  /* overflow: auto; */
+  /* top: 0; */
+  /* left: 50px; */
+  /* right: 0; */
+  /* width: 101%; */
   z-index: 2;
-  margin: 0px 0px 0px -20px;
-  padding: 0px;
-  border-radius: 0;
-  min-height: 80px;
-  border-bottom: 1px solid #b4b4b4;
-  text-align: right;
-  background: #fdfdfd;
+  /* margin: 0px 0px 0px -20px; */
+  margin: 10px;
+  border-radius: 10px;
+  /* min-height: 80px; */
+  border: 1px solid #b4b4b4;
+  /* text-align: right; */
+  /* background: #fdfdfd; */
 }
 
 .asigned.b-column {
   margin: 0px;
   padding: 5px 0px 10px 30px;
-  border-radius: 0;
+  border-radius: 10px;
   min-height: 80px;
   display: inline-flex;
   width: 180px;
   background: #fdfdfd;
   min-width: 100%;
+  overflow-x: scroll;
 }
 .incurse.b-column .operator {
   float: none;
@@ -482,15 +498,50 @@
   border: 1px solid #c62b20;
 }
 .workBoard {
-  display: inline-block;
+  display: flex;
   width: 100%;
 }
 .middleBoard {
-  display: inline-block;
+  /*display: inline-block;*/
+  display: flex;
+  flex-direction: column;
+  /*justify-content: space-between;*/
 }
 .chatsBarV2 {
   width: 50%;
   display: inline-block;
+}
+
+.frases-container {
+  width: 25%;
+  background-color: #eaeaea;
+  line-height: 15px;
+  overflow-y: scroll;
+}
+
+.haveProvider {
+  position: absolute;
+  right: 0px;
+  top: 30%;
+  height: 70%;
+}
+
+.section-frases-container {
+  padding: 5px;
+  color: #444;
+}
+
+.section-frases-container span {
+  margin: auto;
+  font-size: 12px;
+}
+
+.frase {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 5px;
+  color: #333;
+  margin: 5px;
 }
 
 .asigned.b-column .column-header {
@@ -504,7 +555,7 @@
 }
 .incurse.b-column {
   width: 100%;
-  margin: 20px 0 0;
+  margin: 0px;
   background: none;
 }
 .incurse.b-column .b-row {
@@ -558,6 +609,11 @@
   width: 100%;
 }
 
+.map-container-traking-Main {
+  display: flex;
+  width: 100%;
+}
+
 .complete.b-column .column-header {
   display: inline-block;
   font-size: 10px;
@@ -595,6 +651,9 @@
 .react-confirm-alert-button-group button {
   background: #0047b3;
 }
+.live.b-row .my-masonry-grid {
+  height: 520px;
+}
 
 .my-masonry-grid {
   display: -webkit-box; /* Not needed if autoprefixing */
@@ -602,6 +661,8 @@
   display: flex;
   /*margin-left: -30px;  gutter size offset */
   width: auto;
+  height: 180px;
+  overflow-y: scroll;
 }
 .my-masonry-grid_column {
   padding-left: 3px; /* gutter size */
@@ -643,6 +704,10 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+
+textarea {
+  resize: none;
 }
 
 @media (max-width: 767px) {

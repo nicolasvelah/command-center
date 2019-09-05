@@ -6,9 +6,10 @@ import { sendMessage } from '../../services/helpers'
 export default class Chat extends React.PureComponent {
   constructor(props) {
     super(props)
-    this.state = { message: '' }
+    this.state = { message: '', textMessage: '' }
   }
   componentDidMount() {
+    console.log('Drag', this.props.dragStart)
     this.props.goBottom('scroll_' + this.props.sid)
   }
   setMessage(e) {
@@ -38,7 +39,31 @@ export default class Chat extends React.PureComponent {
     //console.log('mesajers para esta tarea', this.props.messagesTask)
     return (
       <div className="chatContainerV2">
-        <div className="chatV2" id={'scroll_' + this.props.sid}>
+        <div
+          className={this.props.dragStart ? 'chatV2 dragging' : 'chatV2'}
+          onDrop={async event => {
+            const data = JSON.parse(event.dataTransfer.getData('text'))
+            //console.log('data recuperada', data)
+
+            if (JSON.parse(data.isClientTo) === this.props.isClientTo) {
+              console.log('Si es el mismo tipo')
+              this.props.drop()
+              await sendMessage(
+                this.props.to,
+                data.text,
+                this.props.orderId,
+                this.props.isClientTo,
+                false
+              )
+            } else {
+              console.log('no es el mismo tipo')
+            }
+          }}
+          onDragOver={event => {
+            this.props.allowDrop(event)
+          }}
+          id={'scroll_' + this.props.sid}
+        >
           <div className="mensagessContainerV2">
             <div className="mensagessV2">
               {this.props.messagesTask.map(item => (
@@ -100,6 +125,22 @@ export default class Chat extends React.PureComponent {
                   this.sendMenssageByEnter(e)
                 }
               }}
+              onDrop={event => {
+                const data = JSON.parse(event.dataTransfer.getData('text'))
+            if (JSON.parse(data.isClientTo) === this.props.isClientTo) {
+              document.getElementById(
+                'ChatTextarea_' + this.props.sid
+              ).value = data.text
+
+              this.setState({
+                message: data.text,
+              })
+            }
+
+                
+              }}
+              onDragOver={event => this.props.allowDrop(event)}
+              //value={`${this.state.textMessage}`}
             />
           </div>
         </div>
