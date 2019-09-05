@@ -4,7 +4,7 @@
       "information": { "title": "Frases Cliente" },
       "Frases": {
         "Saludo": [
-          "Hola, como podemos apoyarte ?",
+          "Hola , como podemos apoyarte ?",
           "Hola, como estas?",
           "Hola, cual es tu incoveniente ?"
         ],
@@ -214,9 +214,9 @@
       "information": { "title": "Frases Cliente" },
       "Frases": {
         "Saludo": [
-          "Hola, como podemos apoyarte ?",
-          "Hola, como estas?",
-          "Hola, cual es tu incoveniente ?"
+          "Hola ${name}, como podemos apoyarte ?",
+          "Hola ${name} ${lastName}, como estas?",
+          "Buenos dias ${name} ${lastName}, cual es su incoveniente ?"
         ],
         "Conversacion": [
           "Tu posicion es ... ?",

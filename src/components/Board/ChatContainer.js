@@ -615,7 +615,42 @@ class ChatContainer extends React.Component {
         
         <>
           <div className={this.state.status + ' subcontainer '}>
-            <div className="ChatHeader">
+            <div className="main-chat">
+            <div className="frases-container">
+              {this.state.frases && (
+                <>
+          {
+            this.state.frases.Frases.map((itemType, index) => (
+              <div className="section-frases-container" key={index}>
+                <span>{itemType.name}</span>
+                {itemType.lista.map((item, index) => {
+                  const name = "${name}"
+                  const lastName = "${lastName}"
+                  let itemChange = item
+                  if(item.indexOf(name) > -1){
+                    itemChange = itemChange.replace(name, this.props.item.client.name)
+                  }
+                  if(item.indexOf(lastName) > -1){
+                    itemChange = itemChange.replace(lastName, this.props.item.client.lastName)
+                  }
+                  return (
+                <div className="frase" isclientto="true" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{itemChange}</div>
+                )
+              })
+
+              }
+              </div>
+            ))
+          }
+                </>
+                
+              )}
+            </div>
+            {item.status.name === 'live' && this.state.providers.length >= 0 ? (
+              <div
+                className="ChatMap"
+              >
+                <div className="ChatHeader">
             <SearchProviderModeMarker>
             <div
               className="iconServiceState"
@@ -721,34 +756,12 @@ class ChatContainer extends React.Component {
                 </div>
               </div>
             </div>
-            <div className="main-chat">
-            <div className="frases-container">
-              {this.state.frases && (
-                <>
-          {
-            this.state.frases.Frases.map((itemType, index) => (
-              <div className="section-frases-container" key={index}>
-                <span>{itemType.name}</span>
-                {itemType.lista.map((item, index) => (
-                <div className="frase" isclientto="true" key={index} draggable="true" onDragStart={this.drag} id={`frase_${this.props.item.service.name}_${index}`}>{item}</div>
-                ))
-
-              }
-              </div>
-            ))
-          }
-                </>
-                
-              )}
-            </div>
-            {item.status.name === 'live' && this.state.providers.length >= 0 ? (
-              <div
-                className="ChatMap"
-              >
+            
                 {(this.props.socket !== null &&
                   this.state.ProvidersActiveServices.length > 0) ||
                 (this.state.ProvidersActiveServices.length >= 0 &&
                   item.client.aplicationId === 2) ? (
+                    
                   <MapServiceTacking
                     ref="mapa"
                     userId={item.clientId}
