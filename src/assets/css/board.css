@@ -337,7 +337,7 @@
   justify-content: space-between;
   width: 100%;
   padding: 2px 10px;
-  background: #53a93f;
+  background-color: #6aa7ef;
   align-items: center;
 }
 .ChatHeader .clientDataName {
@@ -385,6 +385,11 @@
 .chat-container .closeChat {
   margin-left: 10px;
   cursor: pointer;
+  font-size: 10px;
+}
+
+.closeChat:hover {
+  border-bottom: 1px solid #fff;
 }
 .openChat {
   margin-top: 10px;
@@ -420,9 +425,11 @@
   padding: 0px;
 }
 .ChatInfoMain {
-  padding: 0px 10px;
-  margin-bottom: 10px;
-  height: 100px;
+  padding: 2px;
+  /* margin-bottom: 10px; */
+  display: flex;
+  flex-direction: column;
+  height: 110px;
 }
 .ChatClient {
   border-right: 1px solid #ddd;
@@ -702,7 +709,7 @@
 }
 
 .button-leaflet {
-  background: rgb(83, 169, 63);
+  background-color: #6aa7ef;
   /*position: absolute;*/
   /*z-index: 500;*/
   margin: 0px 5px;
@@ -717,6 +724,17 @@
 
 textarea {
   resize: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+  padding: 2px;
 }
 
 @media (max-width: 767px) {

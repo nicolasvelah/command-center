@@ -22,10 +22,20 @@ import jsonFrases from '../../assets/jsonFrases/jsonFrases'
 const SearchProviderModeMarker = styled.div`
   text-align: right;
   padding: 0px;
+  text-align: right;
+    padding: 0px;
+    border-radius: 10px;
+    /*border: 2px solid #fff;*/
+    width: 30px;
+    height: 30px;
+    /* background: #fff; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
   .iconServiceState {
     /*padding: 4px 4px 0px;*/
     display: inline-block;
-    border: 2px solid #53a93f;
+    /*border: 2px solid #53a93f;*/
     border-bottom: none;
     border-right: none;
   }
@@ -98,7 +108,7 @@ class ChatContainer extends React.Component {
   async componentDidMount() {
     //GET USER GEOLOCALIZATION DATA
     const clientGLData = await findUserById(this.props.item.clientId, true)
-    console.log('clientGLData', clientGLData)
+    //console.log('clientGLData', clientGLData)
     await this.haveToOpenChat(this.props.item.status.name, 'init', 'init')
     let { searchProviderMode } = this.state
     if (this.props.item.provider !== null) {
@@ -163,7 +173,7 @@ class ChatContainer extends React.Component {
     const frases = jsonFrases[`${this.props.item.service.categories.name}`][`${this.props.item.service.name}`]
     //console.log('jsonFrases', this.props.item.service.categories.name)
     //console.log(jsonFrases[`${this.props.item.service.categories.name}`])
-    console.log('frases', frases)
+    //console.log('frases', frases)
     await this.setState({
       searchProviderMode,
       clientData: clientGLData.data,
@@ -289,7 +299,7 @@ class ChatContainer extends React.Component {
     */
     providers.forEach(provider => {
       if (provider.id === id) {
-        console.log('Provider', provider, this.state.providerInChat)
+        //console.log('Provider', provider, this.state.providerInChat)
         provider.localFavorite = fav
       }
     })
@@ -315,7 +325,7 @@ class ChatContainer extends React.Component {
         status = 'live'
         haveToOpen = true
       } else if (item.status.name === 'live') {
-        console.log('Cayo aqui')
+        //console.log('Cayo aqui')
         //status = 'standby'
         //haveToOpen = false
       } else if (item.status.name === 'asigned') {
@@ -440,17 +450,18 @@ class ChatContainer extends React.Component {
   }
 
   activeProviderChat = async providerId => {
-    console.log('ejecuta cambio de proveedor')
+    //console.log('ejecuta cambio de proveedor')
     try {
       let { providerInChat, providers } = this.state
       const messages = await getMessagesById(this.props.item.id, providerId)
+      //console.log('messages', messages)
       providers.forEach(provider => {
         if (provider.id === providerId) {
           providerInChat = provider
           providerInChat.messagesAll = messages.data
         }
       })
-      console.log('providerInChat salida:', providerInChat)
+      //console.log('providerInChat salida:', providerInChat)
       this.setState({ providerInChat })
     } catch (err) {
       console.error(err.message)
@@ -585,7 +596,7 @@ class ChatContainer extends React.Component {
     //ev.dataTransfer.setData("text/plain", ev.target.innerHTML);
     const dataAEnviar = {isClientTo: ev.target.getAttribute("isclientto"), text: ev.target.innerHTML}
     ev.dataTransfer.setData("text/plain",  JSON.stringify(dataAEnviar));
-    console.log('isClientTo',ev.target.getAttribute("isclientto"))
+    //console.log('isClientTo',ev.target.getAttribute("isclientto"))
   }
   
   drop = () => {
@@ -654,11 +665,7 @@ class ChatContainer extends React.Component {
             <SearchProviderModeMarker>
             <div
               className="iconServiceState"
-              style={
-                this.state.searchProviderMode
-                  ? null
-                  : { borderRight: '2px solid  #53a93f' }
-              }
+              
             >
               <button
                 onClick={e => {
@@ -683,7 +690,7 @@ class ChatContainer extends React.Component {
                   }
                   svgClass="svgIcon"
                   svgFill={
-                    this.state.searchProviderMode ? '#c62b20' : '#53a93f'
+                    this.state.searchProviderMode ? '#ffff' : '#53a93f'
                   }
                   viewBox="0 0 512 512"
                   svgPathOne_d={
@@ -748,7 +755,7 @@ class ChatContainer extends React.Component {
                   }}
                   className="closeChat"
                 >
-                  Cerrar
+                  Resolver Tarea
                 </div>
 
                 <div className="ChatNotificationsCounter">
@@ -1063,8 +1070,8 @@ class ChatContainer extends React.Component {
                         to={this.state.providerInChat.id}
                         addNewMessage={this.props.addNewMessage}
                         drop={this.drop}
-                    dragStart={this.state.dragStart}
-                    allowDrop={this.allowDrop}
+                        dragStart={this.state.dragStart}
+                        allowDrop={this.allowDrop}
                       />
                     ) : (
                       <Chat
@@ -1095,7 +1102,7 @@ class ChatContainer extends React.Component {
             )}
           
             <div className={this.state.searchProviderMode ? "frases-container haveProvider" : "frases-container"}>
-            {this.state.frases && (
+            {this.state.frases && this.state.providerInChat !== null && (
                 <>
           {
             this.state.frases.Frases.map((itemType, index) => (

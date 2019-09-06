@@ -3,14 +3,18 @@ import { getUser } from '../../services/auth'
 import '../../assets/css/chatV2.css'
 import { sendMessage } from '../../services/helpers'
 
+import Loading from '../Tools/Loading'
+
 export default class Chat extends React.PureComponent {
   constructor(props) {
     super(props)
-    this.state = { message: '', textMessage: '' }
+    this.state = { message: '', textMessage: '', isLoading: false }
   }
   componentDidMount() {
-    console.log('Drag', this.props.dragStart)
+    //console.log('Drag', this.props.dragStart)
     this.props.goBottom('scroll_' + this.props.sid)
+    //console.log('PROPS', this.props.to)
+    //console.log('AllMessages', this.props.messagesTask)
   }
   setMessage(e) {
     //console.log(e.target.value)
@@ -22,6 +26,7 @@ export default class Chat extends React.PureComponent {
   }
   sendMenssageByEnter = async e => {
     if (e.key === 'Enter' && this.state.message.length >= 1) {
+      //console.log('this.props', this.props)
       await sendMessage(
         this.props.to,
         this.state.message,
@@ -29,7 +34,6 @@ export default class Chat extends React.PureComponent {
         this.props.isClientTo,
         false
       )
-
       await this.props.addNewMessage(this.props.orderId)
       document.getElementById('ChatTextarea_' + this.props.sid).value = ''
       this.setState({ message: '' })
@@ -39,6 +43,7 @@ export default class Chat extends React.PureComponent {
     //console.log('mesajers para esta tarea', this.props.messagesTask)
     return (
       <div className="chatContainerV2">
+        {this.state.isLoading && <Loading />}
         <div
           className={this.props.dragStart ? 'chatV2 dragging' : 'chatV2'}
           onDrop={async event => {
@@ -46,8 +51,9 @@ export default class Chat extends React.PureComponent {
             //console.log('data recuperada', data)
 
             if (JSON.parse(data.isClientTo) === this.props.isClientTo) {
-              console.log('Si es el mismo tipo')
+              //console.log('Si es el mismo tipo')
               this.props.drop()
+              this.setState({ isLoading: true })
               await sendMessage(
                 this.props.to,
                 data.text,
@@ -55,6 +61,7 @@ export default class Chat extends React.PureComponent {
                 this.props.isClientTo,
                 false
               )
+              this.setState({ isLoading: false })
             } else {
               console.log('no es el mismo tipo')
             }
@@ -107,7 +114,13 @@ export default class Chat extends React.PureComponent {
             </div>
           </div>
         </div>
-        <div className="mensagessFormV2">
+        <div
+          className={
+            this.props.dragStart
+              ? 'mensagessFormV2 dragging'
+              : 'mensagessFormV2'
+          }
+        >
           <div>
             <textarea
               rows="5"
@@ -119,25 +132,27 @@ export default class Chat extends React.PureComponent {
                 this.props.goBottom('scroll_' + this.props.sid)
                 this.setMessage(e)
               }}
-              onKeyPress={e => {
+              onKeyPress={async e => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
-                  this.sendMenssageByEnter(e)
+                  this.props.drop()
+                  this.setState({ isLoading: true })
+                  await this.sendMenssageByEnter(e)
+                  this.setState({ isLoading: false })
                 }
               }}
               onDrop={event => {
                 const data = JSON.parse(event.dataTransfer.getData('text'))
-            if (JSON.parse(data.isClientTo) === this.props.isClientTo) {
-              document.getElementById(
-                'ChatTextarea_' + this.props.sid
-              ).value = data.text
+                this.props.drop()
+                if (JSON.parse(data.isClientTo) === this.props.isClientTo) {
+                  document.getElementById(
+                    'ChatTextarea_' + this.props.sid
+                  ).value = data.text
 
-              this.setState({
-                message: data.text,
-              })
-            }
-
-                
+                  this.setState({
+                    message: data.text,
+                  })
+                }
               }}
               onDragOver={event => this.props.allowDrop(event)}
               //value={`${this.state.textMessage}`}

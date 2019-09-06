@@ -208,7 +208,7 @@ class Board extends Component {
     }
   }
   isMyMessage = () => {
-    console.log('isMyMessage')
+    //console.log('isMyMessage')
     /*
     this.setState({
       isMyMessage: true,
@@ -256,7 +256,7 @@ class Board extends Component {
   /// updateOrder
   updateOrder = async dataContent => {
     let { tasks } = this.state
-    console.log('updateOrder')
+    //console.log('updateOrder')
     tasks.forEach(element => {
       if (dataContent.orderId === element.id) {
         element.status.name = dataContent.state
@@ -281,7 +281,7 @@ class Board extends Component {
 
   //CHAT
   chatNotifications = async id => {
-    console.log('chatNotifications')
+    //console.log('chatNotifications')
     const ExistsInActivatedTasks = await this.checkExistsInActivatedTasks(
       Number(id)
     )
@@ -674,7 +674,7 @@ class Board extends Component {
   trigerColumn = async (col, id) => {
     try {
       /*console.log('col', col)*/
-      console.log('id', id)
+      //console.log('id', id)
       await this.updateActivateTask(col, id)
       await updateStatus(id, col)
       //console.log('=======updateStatus triger Column=========')

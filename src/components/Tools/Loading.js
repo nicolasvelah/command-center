@@ -4,14 +4,16 @@ import styled from 'styled-components'
 const LoadingConattainer = styled.div`
   .loading {
     position: fixed;
+    width: 100vw;
+    height: 100vh;
     top: 0;
     left: 0;
-    bottom: 0;
-    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     background: rgba(0, 0, 0, 0.6);
     z-index: 600;
-    text-align: center;
-    padding-top: 200px;
   }
   .loading p {
     color: #fff;
@@ -20,8 +22,6 @@ const LoadingConattainer = styled.div`
     margin-top: 10px;
   }
   .centerAnimation {
-    position: relative;
-    margin: auto;
     width: 40px;
     height: 40px;
   }

@@ -895,7 +895,7 @@ class MapServiceTacking extends Component {
                     this.centerActor(this.props.lat, this.props.len)
                   }}
                 >
-                  <b>Origen</b>
+                  <span>Origen</span>
                 </div>
                 {this.props.serviceDestination && (
                   <div
@@ -908,7 +908,7 @@ class MapServiceTacking extends Component {
                       )
                     }}
                   >
-                    <b>Destino</b>
+                    <span>Destino</span>
                   </div>
                 )}
                 {this.props.clientGLData !== '' &&
@@ -923,7 +923,7 @@ class MapServiceTacking extends Component {
                         )
                       }}
                     >
-                      <b>Cliente</b>
+                      <span>Cliente</span>
                     </div>
                   )}
 
@@ -938,7 +938,7 @@ class MapServiceTacking extends Component {
                       )
                     }}
                   >
-                    <b>Proveedor</b>
+                    <span>Proveedor</span>
                   </div>
                 )}
               </div>
