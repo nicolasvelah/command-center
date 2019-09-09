@@ -7,7 +7,7 @@ import {
   getAccessToken,
 } from '../../services/auth'
 import { navigate } from 'gatsby'
-import { ToastContainer } from 'react-toastify'
+//import { ToastContainer } from 'react-toastify'
 import TaskItem from './TaskItem'
 import ChatContainer from './ChatContainer'
 import { save, get } from '../../services/Storage'
@@ -121,7 +121,7 @@ class Board extends Component {
     //Push Notifications
     //OPERADORES
     if (getUser().type !== 'operator') {
-      this.getOperators()
+      await this.getOperators()
     }
     let { activeTasks } = this.state
     activeTasks = get('activeTasks')
@@ -169,12 +169,12 @@ class Board extends Component {
       console.log('dataNotification', dataNotification)
       if (isLoggedIn()) {
         if (dataNotification.data.type === 'chat') {
-          chatNotifications(dataNotification.data.content.orderId)
+          await chatNotifications(dataNotification.data.content.orderId)
         } else if (
           dataNotification.data.type === 'WORKINPROGRESS' ||
           dataNotification.data.type === 'WORKFINISHED'
         ) {
-          providerState(
+          await providerState(
             dataNotification.data.content.orderId,
             dataNotification.data.type
           )
@@ -183,7 +183,7 @@ class Board extends Component {
           audioOrden.play()
           console.log('dataNotification en New Order', dataNotification)
           MsmNewTask(dataNotification.notification.title)
-          getMyLastTasks('websockets', dataNotification.data.content.orderId)
+          await getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
           //console.log('dataNotification.data.content.state', dataNotification.data.content.state)
 
@@ -286,9 +286,9 @@ class Board extends Component {
       Number(id)
     )
     if (ExistsInActivatedTasks[0].exist) {
-      this.addNewMessage(id)
+      await this.addNewMessage(id)
     } else {
-      this.notificationMessages(id, 'provider')
+      await this.notificationMessages(id, 'provider')
     }
   }
 
@@ -354,7 +354,7 @@ class Board extends Component {
     }
 
     if (notTriger) {
-      this.notificationMessages(id, 'provider')
+      await this.notificationMessages(id, 'provider')
     }
     return true
   }
@@ -433,7 +433,7 @@ class Board extends Component {
   chatTopPositionTriger = async () => {
     let { chatTopPosition } = this.state
     chatTopPosition = '-37px'
-    let activetask = get('activeTasks')
+    let activetask = await get('activeTasks')
     await activetask.filter(item => {
       if (item.task.status.name === 'live') {
         chatTopPosition = '-188px'
@@ -627,7 +627,7 @@ class Board extends Component {
           */
         //const scrollWidthValue = (index - 1) * 420
       }
-      this.notificationOff(id, 'provider')
+      await this.notificationOff(id, 'provider')
     } catch (err) {
       console.log('error', err.message)
     }
@@ -719,7 +719,7 @@ class Board extends Component {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
       //await save('tasks', decryptedData.tasks)
-      const taskActive = get('activeTasks')
+      const taskActive = await get('activeTasks')
       if (taskActive.length !== 0) {
         decryptedData.tasks.forEach(element => {
           element.active = false
@@ -878,7 +878,7 @@ class Board extends Component {
         try {
           await updateStatus(item.id, 'delivered')
           //console.log('=======updateStatus Delivery=========')
-          this.getMyTasks('Delivery')
+          await this.getMyTasks('Delivery')
         } catch (err) {
           console.log(err)
         }
@@ -1194,7 +1194,7 @@ class Board extends Component {
             </div>
           </div>
         </div>
-        <ToastContainer position="bottom-right" />
+        {/*<ToastContainer position="bottom-right" />*/}
         {this.state.isLoading === true ? <Loading /> : ''}
       </div>
     )

@@ -168,7 +168,7 @@ class ChatContainer extends React.Component {
     }
     //console.log('providers', providers)
     //console.log('providerInChat', providerInChat)
-    this.saveProviderInLocal(providers)
+    await this.saveProviderInLocal(providers)
 
     const frases = jsonFrases[`${this.props.item.service.categories.name}`][`${this.props.item.service.name}`]
     //console.log('jsonFrases', this.props.item.service.categories.name)
@@ -368,11 +368,11 @@ class ChatContainer extends React.Component {
       await this.props.openChatTriger(item.id, status, type)
       this.setState({ status, openChat: haveToOpen })
     }
-    this.props.chatTopPositionTriger()
+    await this.props.chatTopPositionTriger()
     //console.log('haveToOpenChat From: ' + from + ' statusInit: ' + statusInit)
   }
 
-  focusChat = id => {
+  focusChat = async id => {
     //let f = document.getElementById(id).focus()
     if (
       this.props.item.status.name === 'live' &&
@@ -534,13 +534,13 @@ class ChatContainer extends React.Component {
   updateProvider = async (values, providerId) => {
     //console.log('updateProvider ' + providerId, values)
     let { providers, providerInChat } = this.state
-    await providers.map(provider => {
+    await providers.map( async provider => {
       if (provider.id === providerId) {
-        this.mergeObj(provider, values)
+        await this.mergeObj(provider, values)
       }
       if (providerInChat) {
         if (providerInChat.id === providerId) {
-          this.mergeObj(providerInChat, values)
+          await this.mergeObj(providerInChat, values)
         }
       }
       return provider
@@ -668,7 +668,7 @@ class ChatContainer extends React.Component {
               
             >
               <button
-                onClick={e => {
+                onClick={async e => {
                   e.preventDefault()
                   if (
                     !(this.state.searchProviderMode && item.providerId === 0)
@@ -677,7 +677,7 @@ class ChatContainer extends React.Component {
                     if (!this.state.searchProviderMode) {
                       triger = false
                     }
-                    this.searchProviderMode(triger)
+                    await  this.searchProviderMode(triger)
                   }
                 }}
                 className="btnicon"
@@ -690,7 +690,7 @@ class ChatContainer extends React.Component {
                   }
                   svgClass="svgIcon"
                   svgFill={
-                    this.state.searchProviderMode ? '#ffff' : '#53a93f'
+                    this.state.searchProviderMode ? '#ffff' : '#0047b3'
                   }
                   viewBox="0 0 512 512"
                   svgPathOne_d={
@@ -719,9 +719,10 @@ class ChatContainer extends React.Component {
                     {item.client.name.substring(0, 15) +
                       ' ' +
                       item.client.lastName.substring(0, 15) +
-                      '...'}
+                      ' '
+                      }
                     <span className="serviceNameChat">
-                      {item.service.name.substring(0, 25) + '...'}
+                      {item.service.name.substring(0, 25) }
                     </span>
                   </p>
                 </div>
@@ -749,9 +750,9 @@ class ChatContainer extends React.Component {
                 />
               </div>*/}
                 <div
-                  onClick={e => {
+                  onClick={async e => {
                     e.preventDefault()
-                    this.haveToOpenChat(item.status.name, 'closeChat', 'click')
+                    await this.haveToOpenChat(item.status.name, 'closeChat', 'click')
                   }}
                   className="closeChat"
                 >

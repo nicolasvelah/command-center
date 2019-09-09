@@ -33,7 +33,9 @@ const LoadingConattainer = styled.div`
 export default class Loading extends React.Component {
   render() {
     return (
-      <LoadingConattainer className="loadingConattainer">
+      <LoadingConattainer
+        className={this.props.view ? 'loading-Container' : ''}
+      >
         <div className="loading">
           <div className="centerAnimation">
             <div className="loaderGif" />
