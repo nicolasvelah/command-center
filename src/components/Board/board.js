@@ -7,7 +7,7 @@ import {
   getAccessToken,
 } from '../../services/auth'
 import { navigate } from 'gatsby'
-import { ToastContainer } from 'react-toastify'
+//import { ToastContainer } from 'react-toastify'
 import TaskItem from './TaskItem'
 import ChatContainer from './ChatContainer'
 import { save, get } from '../../services/Storage'
@@ -97,7 +97,9 @@ class Board extends Component {
     let { socket } = this
     const accessToken = await getAccessToken()
     //console.log('board')
+    this.setState({ isLoading: true })
     socket = await conectSocket(accessToken, userId, userType, [1, 2, 3])
+    this.setState({ isLoading: false })
 
     await onNotification(
       socket,
@@ -113,11 +115,13 @@ class Board extends Component {
       socket,
     })
     //Tasks
+    this.setState({ isLoading: true })
     await this.getMyTasks('componenedidmount')
+    this.setState({ isLoading: false })
     //Push Notifications
     //OPERADORES
     if (getUser().type !== 'operator') {
-      this.getOperators()
+      await this.getOperators()
     }
     let { activeTasks } = this.state
     activeTasks = get('activeTasks')
@@ -165,12 +169,12 @@ class Board extends Component {
       console.log('dataNotification', dataNotification)
       if (isLoggedIn()) {
         if (dataNotification.data.type === 'chat') {
-          chatNotifications(dataNotification.data.content.orderId)
+          await chatNotifications(dataNotification.data.content.orderId)
         } else if (
           dataNotification.data.type === 'WORKINPROGRESS' ||
           dataNotification.data.type === 'WORKFINISHED'
         ) {
-          providerState(
+          await providerState(
             dataNotification.data.content.orderId,
             dataNotification.data.type
           )
@@ -179,7 +183,7 @@ class Board extends Component {
           audioOrden.play()
           console.log('dataNotification en New Order', dataNotification)
           MsmNewTask(dataNotification.notification.title)
-          getMyLastTasks('websockets', dataNotification.data.content.orderId)
+          await getMyLastTasks('websockets', dataNotification.data.content.orderId)
         } else if (dataNotification.data.type === 'updateOrder') {
           //console.log('dataNotification.data.content.state', dataNotification.data.content.state)
 
@@ -191,7 +195,11 @@ class Board extends Component {
             //await getMyTasks('onNotification')
           } else {
             console.log('getLastTask')
-            getMyLastTasks('websockets', dataNotification.data.content.orderId)
+
+            await getMyLastTasks(
+              'websockets',
+              dataNotification.data.content.orderId
+            )
           }
         }
       }
@@ -200,7 +208,7 @@ class Board extends Component {
     }
   }
   isMyMessage = () => {
-    console.log('isMyMessage')
+    //console.log('isMyMessage')
     /*
     this.setState({
       isMyMessage: true,
@@ -248,7 +256,7 @@ class Board extends Component {
   /// updateOrder
   updateOrder = async dataContent => {
     let { tasks } = this.state
-    console.log('updateOrder')
+    //console.log('updateOrder')
     tasks.forEach(element => {
       if (dataContent.orderId === element.id) {
         element.status.name = dataContent.state
@@ -273,14 +281,14 @@ class Board extends Component {
 
   //CHAT
   chatNotifications = async id => {
-    console.log('chatNotifications')
+    //console.log('chatNotifications')
     const ExistsInActivatedTasks = await this.checkExistsInActivatedTasks(
       Number(id)
     )
     if (ExistsInActivatedTasks[0].exist) {
-      this.addNewMessage(id)
+      await this.addNewMessage(id)
     } else {
-      this.notificationMessages(id, 'provider')
+      await this.notificationMessages(id, 'provider')
     }
   }
 
@@ -346,7 +354,7 @@ class Board extends Component {
     }
 
     if (notTriger) {
-      this.notificationMessages(id, 'provider')
+      await this.notificationMessages(id, 'provider')
     }
     return true
   }
@@ -425,7 +433,7 @@ class Board extends Component {
   chatTopPositionTriger = async () => {
     let { chatTopPosition } = this.state
     chatTopPosition = '-37px'
-    let activetask = get('activeTasks')
+    let activetask = await get('activeTasks')
     await activetask.filter(item => {
       if (item.task.status.name === 'live') {
         chatTopPosition = '-188px'
@@ -580,7 +588,9 @@ class Board extends Component {
       if (!includesThis) {
         if (task.status.name !== 'complete') {
           //console.log('Entro 2')
+          this.setState({ isLoading: true })
           const messages = await this.getMessages(task.id)
+          this.setState({ isLoading: false })
           //console.log('Entro 3')
           task.messagesAll = messages.data
           activeTasks = []
@@ -597,11 +607,13 @@ class Board extends Component {
       }
       //console.log('newTask:', task)
       if (execute) {
+        this.setState({ isLoading: true })
         await this.openChat(id, 'live', 'click')
         await save('activeTasks', activeTasks)
         await this.setState({
           activeTasks,
         })
+        this.setState({ isLoading: false })
         //console.log('click', this.state.activeTasks)
         /*
         await Array.from(this.RefChatContainer.values())
@@ -615,7 +627,7 @@ class Board extends Component {
           */
         //const scrollWidthValue = (index - 1) * 420
       }
-      this.notificationOff(id, 'provider')
+      await this.notificationOff(id, 'provider')
     } catch (err) {
       console.log('error', err.message)
     }
@@ -662,7 +674,7 @@ class Board extends Component {
   trigerColumn = async (col, id) => {
     try {
       /*console.log('col', col)*/
-      console.log('id', id)
+      //console.log('id', id)
       await this.updateActivateTask(col, id)
       await updateStatus(id, col)
       //console.log('=======updateStatus triger Column=========')
@@ -707,7 +719,7 @@ class Board extends Component {
       const decryptedData = await getAllTasks()
       //console.log('tasks ', decryptedData)
       //await save('tasks', decryptedData.tasks)
-      const taskActive = get('activeTasks')
+      const taskActive = await get('activeTasks')
       if (taskActive.length !== 0) {
         decryptedData.tasks.forEach(element => {
           element.active = false
@@ -866,7 +878,7 @@ class Board extends Component {
         try {
           await updateStatus(item.id, 'delivered')
           //console.log('=======updateStatus Delivery=========')
-          this.getMyTasks('Delivery')
+          await this.getMyTasks('Delivery')
         } catch (err) {
           console.log(err)
         }
@@ -983,6 +995,7 @@ class Board extends Component {
     //DASHBOARD
     return (
       <div className={this.state.dragStard ? 'dragging' : ''}>
+        {this.state.isLoading === true ? <Loading /> : ''}
         {/*<div className="Welcome">Bienvenido {getUser().name}</div>}
 
         {getUser().type !== 'operator' ? (
@@ -1150,7 +1163,6 @@ class Board extends Component {
                       }}
                     >
                       <ChatContainer
-                        
                         item={this.state.activeTasks[0].task}
                         desactivateTask={this.desactivateTask}
                         key={this.state.activeTasks[0].task.id}
@@ -1182,7 +1194,7 @@ class Board extends Component {
             </div>
           </div>
         </div>
-        <ToastContainer position="bottom-right" />
+        {/*<ToastContainer position="bottom-right" />*/}
         {this.state.isLoading === true ? <Loading /> : ''}
       </div>
     )

@@ -80,6 +80,7 @@ export default class ProviderItemSearchFilter extends React.Component {
         onClick={e => {
           setActiveProvider(item.id)
           centerActor(item.lat, item.lng)
+          console.log('Provider Id', item.id)
           activeProviderChat(item.id)
           addRemoveFavorite(this.state.favorite)
         }}

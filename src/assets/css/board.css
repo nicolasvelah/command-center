@@ -46,6 +46,9 @@
   text-align: center;
   font-size: 11px;
   margin: 0px 5px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
 }
 .ChatHeader .taskVisualTraking {
   /*margin-bottom: 5px;*/
@@ -67,7 +70,7 @@
   background: #fff;
 }
 .live .task {
-  background: #ecffe1;
+  background: #f9f6dc;
 }
 .standby .task {
   background: #f9f6dc;
@@ -334,7 +337,8 @@
   justify-content: space-between;
   width: 100%;
   padding: 2px 10px;
-  background: #53a93f;
+  background-color: #6aa7ef;
+  align-items: center;
 }
 .ChatHeader .clientDataName {
   display: flex;
@@ -343,6 +347,7 @@
 .main-chat {
   display: flex;
   width: 100%;
+  height: 100vh;
 }
 
 .chat-container .ChatNotificationsCounter {
@@ -380,6 +385,11 @@
 .chat-container .closeChat {
   margin-left: 10px;
   cursor: pointer;
+  font-size: 10px;
+}
+
+.closeChat:hover {
+  border-bottom: 1px solid #fff;
 }
 .openChat {
   margin-top: 10px;
@@ -401,7 +411,7 @@
   background: #f5f5f5;
   border-left: 1px solid #ddd;
   border-right: 1px solid #ddd;
-  height: 391px;
+  height: calc(100% - 50px);
   display: flex;
 }
 .chatFocus .chatTool {
@@ -415,9 +425,11 @@
   padding: 0px;
 }
 .ChatInfoMain {
-  padding: 0px 10px;
-  margin-bottom: 10px;
-  height: 100px;
+  padding: 2px;
+  /* margin-bottom: 10px; */
+  display: flex;
+  flex-direction: column;
+  height: 110px;
 }
 .ChatClient {
   border-right: 1px solid #ddd;
@@ -433,9 +445,9 @@
   margin: 1px 0px 0px 5px;
 }
 .live .chatFocusBoard {
-  -webkit-box-shadow: 0px 0px 10px 3px rgba(125, 123, 125, 1);
-  -moz-box-shadow: 0px 0px 10px 3px rgba (125, 123, 125, 1);
-  box-shadow: 0px 0px 10px 3px rgba(125, 123, 125, 1);
+  -webkit-box-shadow: 0px 0px 4px 1px rgba(125, 123, 125, 0.5);
+  -moz-box-shadow: 0px 0px 4px 1px rgba(125, 123, 125, 0.5);
+  box-shadow: 0px 0px 4px 1px rgba(125, 123, 125, 0.5);
   border: 2px solid #53a93f !important;
   background-color: honeydew !important;
 }
@@ -522,8 +534,8 @@
 .haveProvider {
   position: absolute;
   right: 0px;
-  top: 30%;
-  height: 70%;
+  top: 50vh;
+  height: 50vh;
 }
 
 .section-frases-container {
@@ -652,7 +664,11 @@
   background: #0047b3;
 }
 .live.b-row .my-masonry-grid {
-  height: 520px;
+  /*height: 520px;*/
+}
+
+.complete.b-column .my-masonry-grid {
+  height: 120px;
 }
 
 .my-masonry-grid {
@@ -661,7 +677,7 @@
   display: flex;
   /*margin-left: -30px;  gutter size offset */
   width: auto;
-  height: 180px;
+  /*height: 180px;*/
   overflow-y: scroll;
 }
 .my-masonry-grid_column {
@@ -693,7 +709,7 @@
 }
 
 .button-leaflet {
-  background: rgb(83, 169, 63);
+  background-color: #6aa7ef;
   /*position: absolute;*/
   /*z-index: 500;*/
   margin: 0px 5px;
@@ -708,6 +724,22 @@
 
 textarea {
   resize: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+  padding: 2px;
+}
+
+.loading-Container {
+  width: 100%;
+  height: 100%;
 }
 
 @media (max-width: 767px) {

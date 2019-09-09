@@ -76,20 +76,24 @@ export const MsmNewTask = title => toast(title)
 
 export const messagesAll = async id => {
   const accessToken = await getAccessToken()
-  const messages = await axios.post(
-    `${process.env.API_URL}/getMessages`,
-    {
-      orderId: id,
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-access-token': accessToken,
+  try {
+    const messages = await axios.post(
+      `${process.env.API_URL}/getMessages`,
+      {
+        orderId: id,
       },
-    }
-  )
-
-  return messages
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': accessToken,
+        },
+      }
+    )
+    return messages
+  } catch (error) {
+    console.log('Error:', error)
+    return error
+  }
 }
 
 export const notesAll = async id => {

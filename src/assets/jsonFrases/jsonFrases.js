@@ -288,9 +288,9 @@ export default {
         {
           name: 'Saludo',
           lista: [
-            'Hola, como podemos apoyarte ?',
-            'Hola, como estas?',
-            'Hola, cual es tu incoveniente ?',
+            'Hola ${name}, como podemos apoyarte ?',
+            'Hola ${name} ${lastName}, como estas?',
+            'Buenos dias ${name} ${lastName}, cual es su incoveniente ?',
           ],
         },
         {
