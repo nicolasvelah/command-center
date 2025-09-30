@@ -1,97 +1,147 @@
-<p align="center">
-  <a href="https://www.gatsbyjs.org">
-    <img alt="Gatsby" src="https://www.gatsbyjs.org/monogram.svg" width="60" />
-  </a>
-</p>
-<h1 align="center">
-  Gatsby's default starter
-</h1>
+# Command Center — Emergency Incident Management Board
 
-Kick off your project with this default boilerplate ([live demo](https://gatsby-starter-default-demo.netlify.com/)). This barebones starter ships with the main Gatsby configuration files you might need. 
+> Portfolio project authored by **Nicolás Velah**  
+> A control center application for **managing emergency assistance requests**. Built with **React (Gatsby framework)** but focused on the **incident workflow design** rather than the framework itself.
 
-_Have another more specific idea? You may want to check out our vibrant collection of [official and community-created starters](https://www.gatsbyjs.org/docs/gatsby-starters/)._
+---
 
-## 🚀 Quick start
+## 🚀 Overview
 
-1.  **Create a Gatsby site.**
+The **Command Center** is a **scrum-like management board** adapted to emergency scenarios.  
+It allows operators to receive, organize, and resolve incident reports in real time:
 
-    Use the Gatsby CLI to create a new site, specifying the default starter.
+- Vehicle accidents  
+- Breakdowns (engine failure, towing needs)  
+- Tire changes and roadside repairs  
+- General emergency assistance  
 
-    ```sh
-    # create a new Gatsby site using the default starter
-    npx gatsby new my-default-starter
-    ```
+Each incident is represented as a **card on a board**, progressing through predefined workflow stages until resolution.  
 
-1.  **Start developing.**
+The system integrates **preconfigured response scripts** to streamline operator–client communication, including chat flows that can connect directly with a client app.
 
-    Navigate into your new site’s directory and start it up.
+---
 
-    ```sh
-    cd my-default-starter/
-    gatsby develop
-    ```
+## 🧱 Architecture & Design
 
-1.  **Open the source code and start editing!**
+Although developed with **Gatsby** (React framework for static and dynamic sites), the main focus of the project is the **control board logic and workflows**.  
 
-    Your site is now running at `http://localhost:8000`!
-    
-    *Note: You'll also see a second link: `http://localhost:8000/___graphql`. This is a tool you can use to experiment with querying your data. Learn more about using this tool in the [Gatsby tutorial](https://www.gatsbyjs.org/tutorial/part-five/#introducing-graphiql).*
-    
-    Open the `my-default-starter` directory in your code editor of choice and edit `src/pages/index.js`. Save your changes and the browser will update in real time!
-    
-## 🧐 What's inside?
+The architecture applies concepts of **Clean Architecture** and **Dependency Injection**:
 
-A quick look at the top-level files and directories you'll see in a Gatsby project.
+- **Domain**: Defines core entities like `Incident`, `AssistanceRequest`, and `Operator`.  
+- **Application (Use Cases)**: Encapsulates workflows such as creating incidents, assigning operators, and updating statuses.  
+- **Infrastructure**: Adapters for communication channels (chat API, push notifications).  
+- **Interface (Presentation)**: React/Gatsby components for board UI, operator dashboards, and chat panels.  
 
-    .
-    ├── node_modules
-    ├── src
-    ├── .gitignore
-    ├── .prettierrc
-    ├── gatsby-browser.js
-    ├── gatsby-config.js
-    ├── gatsby-node.js
-    ├── gatsby-ssr.js
-    ├── LICENSE
-    ├── package-lock.json
-    ├── package.json
-    ├── README.md
-    └── yarn.lock
+**Dependency Injection** allows swapping communication adapters (e.g., client app chat vs. SMS integration) without altering the workflows or UI.
 
-  1.  **`/node_modules`**: This directory contains all of the modules of code that your project depends on (npm packages) are automatically installed.  
-  
-  2.  **`/src`**: This directory will contain all of the code related to what you will see on the front-end of your site (what you see in the browser) such as your site header or a page template. `src` is a convention for “source code”.
-  
-  3.  **`.gitignore`**: This file tells git which files it should not track / not maintain a version history for.
-  
-  4.  **`.prettierrc`**: This is a configuration file for [Prettier](https://prettier.io/). Prettier is a tool to help keep the formatting of your code consistent.
-  
-  5.  **`gatsby-browser.js`**: This file is where Gatsby expects to find any usage of the [Gatsby browser APIs](https://www.gatsbyjs.org/docs/browser-apis/) (if any). These allow customization/extension of default Gatsby settings affecting the browser.
-  
-  6.  **`gatsby-config.js`**: This is the main configuration file for a Gatsby site. This is where you can specify information about your site (metadata) like the site title and description, which Gatsby plugins you’d like to include, etc. (Check out the [config docs](https://www.gatsbyjs.org/docs/gatsby-config/) for more detail).
-  
-  7.  **`gatsby-node.js`**: This file is where Gatsby expects to find any usage of the [Gatsby Node APIs](https://www.gatsbyjs.org/docs/node-apis/) (if any). These allow customization/extension of default Gatsby settings affecting pieces of the site build process.
-  
-  8.  **`gatsby-ssr.js`**: This file is where Gatsby expects to find any usage of the [Gatsby server-side rendering APIs](https://www.gatsbyjs.org/docs/ssr-apis/) (if any). These allow customization of default Gatsby settings affecting server-side rendering.
-  
-  9.  **`LICENSE`**: Gatsby is licensed under the MIT license.
-  
-  10.  **`package-lock.json`** (See `package.json` below, first). This is an automatically generated file based on the exact versions of your npm dependencies that were installed for your project. **(You won’t change this file directly).**
-  
-  11.  **`package.json`**: A manifest file for Node.js projects, which includes things like metadata (the project’s name, author, etc). This manifest is how npm knows which packages to install for your project.
-  
-  12.  **`README.md`**: A text file containing useful reference information about your project.
-  
-  13.  **`yarn.lock`**: [Yarn](https://yarnpkg.com/) is a package manager alternative to npm. You can use either yarn or npm, though all of the Gatsby docs reference npm.  This file serves essentially the same purpose as `package-lock.json`, just for a different package management system.
+---
 
-## 🎓 Learning Gatsby
+## 📋 Key Features
 
-Looking for more guidance? Full documentation for Gatsby lives [on the website](https://www.gatsbyjs.org/). Here are some places to start:
+- **Scrum-style incident board**: incidents move across workflow columns (e.g., *New*, *Assigned*, *In Progress*, *Resolved*).  
+- **Preconfigured response scripts**: guides for operators to handle typical roadside assistance scenarios.  
+- **Live chat integration**: operators can communicate directly with clients via the app channel.  
+- **Incident prioritization**: categorize and escalate emergencies by type and severity.  
+- **Multi-role support**: operators, supervisors, and admins.  
+- **Audit trail**: track history of each incident (timestamps, actions taken, operator notes).  
 
--   **For most developers, we recommend starting with our [in-depth tutorial for creating a site with Gatsby](https://www.gatsbyjs.org/tutorial/).** It starts with zero assumptions about your level of ability and walks through every step of the process.
+---
 
--   **To dive straight into code samples, head [to our documentation](https://www.gatsbyjs.org/docs/).** In particular, check out the _Guides_, _API Reference_, and _Advanced Tutorials_ sections in the sidebar.
+## 🔌 Example Workflows
 
-## 💫 Deploy
+1. **Vehicle Breakdown Reported**  
+   - Client submits request → “New” column.  
+   - Operator uses *Breakdown* script → collects vehicle location and condition.  
+   - Incident moves to *Assigned*.  
+   - Assistance dispatched → “In Progress”.  
+   - Operator marks as *Resolved* after confirmation.  
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/gatsbyjs/gatsby-starter-default)
+2. **Tire Change Request**  
+   - Client submits → “New”.  
+   - Operator launches *Tire Change* script (step-by-step questions).  
+   - Assistance team notified.  
+   - Incident tracked until *Resolved*.  
+
+---
+
+## 📁 Suggested Folder Structure
+
+```
+src/
+├── components/           # React UI components (board, cards, chat panel)
+├── containers/           # State management and orchestration of workflows
+├── context/              # App contexts (auth, operator session, incident state)
+├── pages/                # Gatsby pages and routes
+├── scripts/              # Preconfigured response scripts
+├── domain/               # Core models (Incident, Request, Operator)
+├── infrastructure/       # Adapters for chat API, persistence, notifications
+├── utils/                # Shared utilities
+└── dependecy-injections.ts # Composition root for DI
+```
+
+---
+
+## 🛡️ Security & Reliability
+
+- **Authentication**: operator login with role-based access.  
+- **Authorization**: role enforcement for actions (only supervisors/admins can escalate or close incidents).  
+- **Data protection**: sensitive client information is handled with care; communication channels are abstracted.  
+- **Resilience**: board state persists even if an operator disconnects.  
+
+---
+
+## ⚙️ Getting Started
+
+```bash
+# install dependencies
+npm install
+
+# start development server
+npm run develop
+
+# build for production
+npm run build
+
+# serve production build
+npm run serve
+```
+
+Environment variables define API endpoints for communication (chat, persistence, etc.).
+
+---
+
+## 🎯 Use Cases
+
+This project demonstrates how scrum-like workflow concepts can be applied outside of software development to critical real-time operations like **emergency management**. It is suitable for:
+
+- Roadside assistance companies  
+- Emergency call centers  
+- Logistics/dispatch teams  
+
+---
+
+## 👤 Author
+
+This project is authored and maintained by **Nicolás Velah** as part of a professional portfolio.  
+It demonstrates the ability to combine **React/Gatsby frontend development** with **workflow design**, **Clean Architecture**, and **real-time incident management**.
+
+---
+
+## 📜 License
+
+This project is the intellectual property of **Nicolás Velah**.  
+It may be used for **educational and reference purposes**.  
+For **commercial use**, explicit permission from the author is required.
+
+---
+
+## 🤝 For Recruiters / Hiring Managers
+
+This project showcases:
+
+- Implementation of **workflow management systems** using a scrum-like model.  
+- Application of **Clean Architecture** and **Dependency Injection** in frontend development.  
+- Integration of **real-time communication channels** (chat, scripts, operator–client flows).  
+- Design for **high-stakes environments** like emergency and roadside assistance.  
+
+It highlights the capacity to deliver **scalable, mission-critical control systems** with professional software architecture practices.
